@@ -34,4 +34,5 @@ override.tf.json
 terraform.rc
 
 # CERTS
-certificates/*
+certbot/
+certificates/
