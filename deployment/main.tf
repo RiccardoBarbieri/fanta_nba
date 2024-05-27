@@ -48,3 +48,11 @@ output "env_default_domain" {
 output "env_static_ip" {
   value = azurerm_container_app_environment.app_env.static_ip_address
 }
+
+output "txt_record_fqdn" {
+  value = azurerm_dns_txt_record.txt_autoboost.fqdn
+}
+
+output "container_custom_domain_name" {
+    value = azurerm_container_app_custom_domain.custom_domain.name
+}

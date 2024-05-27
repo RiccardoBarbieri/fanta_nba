@@ -3,25 +3,35 @@ data "azurerm_dns_zone" "autoboost" {
   resource_group_name = data.azurerm_resource_group.main_group.name
 }
 
-resource "azurerm_dns_cname_record" "cname_autoboost" {
-  name                = "helloworld.autoboost.it"
+resource "azurerm_dns_cname_record" "cname_helloworld" {
+  name = "helloworld"
+  #   name                = "helloworld.autoboost.it"
   zone_name           = data.azurerm_dns_zone.autoboost.name
   resource_group_name = data.azurerm_dns_zone.autoboost.resource_group_name
   ttl                 = 300
-  record              = "${azurerm_container_app.container.name}.${azurerm_container_app_environment.app_env.default_domain}"
+  record              = azurerm_container_app.container.latest_revision_fqdn
 
-#   target_resource_id =
+  #   target_resource_id =
+}
+
+resource "azurerm_dns_a_record" "example" {
+  name                = "test"
+  zone_name           = data.azurerm_dns_zone.autoboost.name
+  resource_group_name = data.azurerm_dns_zone.autoboost.resource_group_name
+  ttl                 = 300
+  records             = [azurerm_container_app.container.outbound_ip_addresses[0]]
 }
 
 
+
 resource "azurerm_dns_txt_record" "txt_autoboost" {
-  name                = "asuid.autoboost-domain"
+  name                = "asuid.helloworld"
   zone_name           = data.azurerm_dns_zone.autoboost.name
   resource_group_name = data.azurerm_dns_zone.autoboost.resource_group_name
   ttl                 = 300
 
   record {
-#     value = .properties.customDomainConfiguration.customDomainVerificationId
+    #     value = .properties.customDomainConfiguration.customDomainVerificationId
     value = azurerm_container_app_environment.app_env.custom_domain_verification_id
   }
 }
