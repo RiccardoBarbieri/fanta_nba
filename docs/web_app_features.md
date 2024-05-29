@@ -110,3 +110,8 @@ Di seguito, le principali quote che potrebbero essere di interesse:
 Come si può vedere sono tutte quote relative al vincitore. Se la probabilità di vittoria è molto alta magari conviene scommettere su una differenza punti alta o sulla vittoria di entrambi i tempi.
 
 Non sono presenti quote sui punti totali, sulle prestazioni dei giocatori, ... in quanto non sono informazioni estrapolabili dal modello!
+
+
+# Funzionalità accessoria (grafico efficacia modello)
+Sarebbe interessante far si che al termine di ogni match vi sia un confronto tra l'output fornito dal modello e il risutlato effettivo della partita.
+In questo modo si potrbbe fornire un grafico in cui viene mostrata l'efficacia del nostro modello.
