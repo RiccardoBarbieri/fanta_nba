@@ -11,7 +11,7 @@ public class Utils {
             return new Date(Long.parseLong(lastUpdate) * 1000);
         } else {
             try {
-                return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(lastUpdate);
+                return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(lastUpdate);
             } catch (ParseException e) {
                 e.printStackTrace();
                 return null;
