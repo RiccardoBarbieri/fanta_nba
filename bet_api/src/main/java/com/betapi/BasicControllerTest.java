@@ -1,6 +1,7 @@
 package com.betapi;
 
 import com.betapi.oddsapiservice.OddsApiService;
+import com.betapi.oddsapiservice.model.Event;
 import com.betapi.oddsapiservice.model.Sport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,21 @@ public class BasicControllerTest {
     public List<Sport> getSports() {
         log.debug("Getting sports");
         return oddsApiService.getSports();
+    }
+
+    @GetMapping("/testHandicap")
+    @ResponseBody
+    public List<Event> getTestHandicap() {
+        log.debug("Getting test handicap");
+        return oddsApiService.getOdds(
+                "basketball_nba",
+                "eu",
+                "spreads",
+                null,
+                null,
+                null,
+                null
+        );
     }
 
 }
