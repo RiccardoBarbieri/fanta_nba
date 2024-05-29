@@ -7,25 +7,19 @@ servers:
   - url: https://api.your-middleware.com
     description: Main URL of the middleware
 paths:
-  /odds/head2head:
-    post:
-      summary: Get head-to-head odds
-      description: Returns the top 3 head-to-head odds for a specific NBA game.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MatchRequest'
+  /sports/getSports:
+    get:
+      summary: Get sports list
+      description: Returns all available sports.
       responses:
         '200':
-          description: List of the top 3 head-to-head odds
+          description: List of all available sports
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Odds'
+                  $ref: '#/components/schemas/Sport'
         '400':
           description: Invalid request
           content:
@@ -38,90 +32,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  
-  /odds/halftimefulltime:
-    post:
-      summary: Get halftime/fulltime odds
-      description: Returns the top 3 halftime/fulltime odds for a specific NBA game.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HalftimeFulltimeRequest'
+              
+  /sports/getEvents:
+    get:
+      summary: Get events list
+      description: Returns all available events.
+      parameters:
+        - in: query
+          name: sportKey
+          required: true
+          schema:
+            type: string
+            example: "basketball_nba"
+          description: The sport key of the event
+        - in: query
+          name: regions
+          required: false
+          schema:
+            type: string
+            default: "eu,uk"
+            example: "eu"
+          description: Comma-separated list of regions to get odds for (e.g., "us,uk,eu")
       responses:
         '200':
-          description: List of the top 3 halftime/fulltime odds
+          description: List of all available events
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Odds'
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  
-  /odds/series:
-    post:
-      summary: Get series head-to-head odds
-      description: Returns the top 3 series head-to-head odds for a specific NBA playoff game.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MatchRequest'
-      responses:
-        '200':
-          description: List of the top 3 series head-to-head odds
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Odds'
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  
-  /odds/handicap:
-    post:
-      summary: Get head-to-head handicap odds
-      description: Returns the top 3 head-to-head handicap odds for a specific NBA game.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HandicapRequest'
-      responses:
-        '200':
-          description: List of the top 3 head-to-head handicap odds
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Odds'
+                  $ref: '#/components/schemas/Event'
         '400':
           description: Invalid request
           content:
@@ -135,48 +75,172 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /odds/head2head:
+    get:
+      summary: Get head-to-head odds
+      description: Returns the top 'X' head-to-head odds for a specific event.
+      parameters:
+        - in: query
+          name: eventId
+          required: true
+          schema:
+            type: string
+            example: "bda33adca828c09dc3cac3a856aef176"
+          description: ID of the event
+        - in: query
+          name: sportKey
+          required: true
+          schema:
+            type: string
+            example: "basketball_nba"
+          description: The sport key of the event
+        - in: query
+          name: regions
+          required: false
+          schema:
+            type: string
+            default: "eu,uk"
+            example: "eu"
+          description: Comma-separated list of regions to get odds for (e.g., "us,uk,eu")
+        - in: query
+          name: records
+          required: false
+          schema:
+            type: number
+            default: 1
+            example: 3
+          description: Number of records to retrieve
+      responses:
+        '200':
+          description: List of the top 'X' head-to-head odds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Odds'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /odds/spreads:
+    get:
+      summary: Get head-to-head handicap odds
+      description: Returns the top 'X' head-to-head handicap odds for a specific event.
+      parameters:
+        - in: query
+          name: eventId
+          required: true
+          schema:
+            type: string
+            example: "bda33adca828c09dc3cac3a856aef176"
+          description: ID of the event
+        - in: query
+          name: sportKey
+          required: true
+          schema:
+            type: string
+            example: "basketball_nba"
+          description: The sport key of the event
+        - in: query
+          name: regions
+          required: false
+          schema:
+            type: string
+            default: "eu,uk"
+            example: "eu"
+          description: Comma-separated list of regions to get odds for (e.g., "us,uk,eu")
+        - in: query
+          name: records
+          required: false
+          schema:
+            type: number
+            default: 1
+            example: 3
+          description: Number of records to retrieve
+      responses:
+        '200':
+          description: List of the top 'X' head-to-head handicap odds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Odds'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
 components:
   schemas:
-    MatchRequest:
+    Event:
       type: object
       properties:
-        matchId:
+        id:
           type: string
-          description: ID of the NBA game
-          example: "12345"
+          description: ID of the event
+          example: "bda33adca828c09dc3cac3a856aef176"
+        sport_key:
+          type: string
+          description: The sport key of the event
+          example: "basketball_nba"
+        sport_title:
+          type: string
+          description: The title of the sport
+          example: "NBA Basketball"
+        commence_time:
+          type: string
+          format: date-time
+          description: The start time of the event
+          example: "2023-05-28T20:00:00Z"
+        home_team:
+          type: string
+          description: The name of the home team
+          example: "Los Angeles Lakers"
+        away_team:
+          type: string
+          description: The name of the away team
+          example: "Golden State Warriors"
       required:
-        - matchId
-
-    HalftimeFulltimeRequest:
+        - id
+        - sport_key
+        - commence_time
+        - home_team
+        - away_team
+    
+    Sport:
       type: object
       properties:
-        matchId:
+        key:
           type: string
-          description: ID of the NBA game
-          example: "12345"
-        combination:
+          description: Key of the sport
+          example: "basketball_nba"
+        title: 
           type: string
-          description: Halftime/fulltime combination. Possible values -> a-a, a-x, a-b, b-a, b-x, b-b, x-a, x-b
-          example: "a-a"
+          description: League or competition
+          example: "NBA"
       required:
-        - matchId
-        - combination
-
-    HandicapRequest:
-      type: object
-      properties:
-        matchId:
-          type: string
-          description: ID of the NBA game
-          example: "12345"
-        handicap:
-          type: string
-          description: Specify the type of handicap (+/- points)
-          example: "+5.5"
-      required:
-        - matchId
-        - handicap
-
+        - key
+        - title
+    
     Odds:
       type: object
       properties:
@@ -184,25 +248,40 @@ components:
           type: string
           description: Name of the betting site
           example: "Bet365"
-        link:
+        last_update:
           type: string
-          description: Link to the odds page on the betting site
-          example: "https://www.bet365.com/odds/nba/match123"
-        odds:
-          type: number
-          format: float
-          description: Odds offered by the betting site
-          example: 1.85
-        betType:
-          type: string
-          description: Type of bet (e.g., head2head, halftime/fulltime, series, winningmargin, handicap)
-          example: "head2head"
+          description: Timestamp of the last update 
+          example: "2021-09-10T00:20:00Z"
+        outcomes:
+          type: array
+          description: List of outcomes with odds
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The outcome label. The value will depend on the market. For totals markets, this will be 'Over' or 'Under'. For team markets, it will be the name of the team or participant, or 'Draw'
+                example: "Houston Texans"
+              price:
+                type: number
+                format: float
+                description: The odds of the outcome. The format is determined by the oddsFormat query param. The format is decimal by default.
+                example: 2.23
+              point:
+                type: number
+                format: float
+                nullable: true
+                description: The handicap or points of the outcome, only applicable to spreads and totals markets (this property will be missing for h2h and outrights markets)
+                example: 20.5
+              description:
+                type: string
+                nullable: true
+                description: This field is only relevant for certain markets. It contains more information about the outcome (for example, for player prop markets, it includes the player's name)
       required:
         - siteName
-        - link
-        - odds
-        - betType
-
+        - last_update
+        - outcomes
+    
     ErrorResponse:
       type: object
       properties:
