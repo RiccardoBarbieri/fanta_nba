@@ -20,14 +20,24 @@ public interface OddsApiService {
     @GetExchange(value = "/sports/{sportKey}/odds")
     @ResponseBody
     List<Event> getOdds(/*@RequestParam String apiKey*/
-                        @PathVariable String sportKey,
-                        @RequestParam String regions,
-                        @RequestParam(required = false) String markets,
-                        @RequestParam(required = false) String dateFormat,
-                        @RequestParam(required = false) String oddsFormat,
-                        @RequestParam(required = false) String commenceTimeFrom,
-                        @RequestParam(required = false) String commenceTimeTo);
+            @PathVariable String sportKey,
+            @RequestParam String regions,
+            @RequestParam(required = false) String markets,
+            @RequestParam(required = false) String dateFormat,
+            @RequestParam(required = false) String oddsFormat,
+            @RequestParam(required = false) String commenceTimeFrom,
+            @RequestParam(required = false) String commenceTimeTo);
 
+    @GetExchange(value = "/sports/{sportKey}/events/{eventId}/odds")
+    @ResponseBody
+    Event getEventOdds(/*@RequestParam String apiKey*/
+            @PathVariable String sportKey,
+            @PathVariable String eventId,
+            @RequestParam String regions,
+            @RequestParam(required = false) String markets,
+            @RequestParam(required = false) String dateFormat,
+            @RequestParam(required = false) String oddsFormat,
+            @RequestParam(required = false) String bookmakers);
 
 
 }
