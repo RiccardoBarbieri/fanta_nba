@@ -3,6 +3,7 @@ package com.betapi.oddsapiservice.model;
 import com.betapi.oddsapiservice.utils.Utils;
 
 import java.util.Date;
+import java.util.List;
 
 public class Event {
 
@@ -12,7 +13,7 @@ public class Event {
     private String commence_time;
     private String home_team;
     private String away_team;
-//    private List<Bookmaker> bookmakers;
+    private List<Bookmaker> bookmakers;
 
     public String getId() {
         return id;
@@ -68,11 +69,11 @@ public class Event {
         this.away_team = away_team;
     }
 
-//    public List<Bookmaker> getBookmakers() {
-//        return bookmakers;
-//    }
-//
-//    public void setBookmakers(List<Bookmaker> bookmakers) {
-//        this.bookmakers = bookmakers;
-//    }
+    public List<Bookmaker> getBookmakers() {
+        return bookmakers;
+    }
+
+    public void setBookmakers(List<Bookmaker> bookmakers) {
+        this.bookmakers = bookmakers;
+    }
 }
