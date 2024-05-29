@@ -196,91 +196,125 @@ components:
       properties:
         id:
           type: string
-          description: ID of the event
-          example: "bda33adca828c09dc3cac3a856aef176"
+          description: A unique 32 character identifier for the event.
+          example: e912304de2b2ce35b473ce2ecd3d1502
         sport_key:
           type: string
-          description: The sport key of the event
-          example: "basketball_nba"
+          description: A unique slug for the sport. Use this as the "sport" param in /odds requests.
+          example: americanfootball_nfl
         sport_title:
           type: string
-          description: The title of the sport
-          example: "NBA Basketball"
+          description: A presentable title of the sport. Occasionally this value can change, for example if a league undergoes a name change or change in sponsorship.
+          example: NFL
         commence_time:
           type: string
           format: date-time
-          description: The start time of the event
-          example: "2023-05-28T20:00:00Z"
+          description: The match start time (ISO 8601 formatted). This will be a Unix timestamp integer if the dateFormat query param is set to dateFormat=unix.
+          example: 2023-10-11T23:10:00Z
         home_team:
           type: string
-          description: The name of the home team
-          example: "Los Angeles Lakers"
+          description: The home team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.
+          example: Houston Texans
+          nullable: true
         away_team:
           type: string
-          description: The name of the away team
-          example: "Golden State Warriors"
-      required:
-        - id
-        - sport_key
-        - commence_time
-        - home_team
-        - away_team
+          description: The away team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.
+          example: Kansas City Chiefs
+          nullable: true
     
     Sport:
       type: object
       properties:
         key:
           type: string
-          description: Key of the sport
-          example: "basketball_nba"
-        title: 
+          description: A unique slug for the sport. Use this as the "sport" param in /odds requests.
+          example: americanfootball_nfl
+        active:
+          type: boolean
+          description: Indicates if the sport is in season.
+          example: true
+        group:
           type: string
-          description: League or competition
-          example: "NBA"
-      required:
-        - key
-        - title
+          description: A broader grouping.
+          example: American Football
+        description:
+          type: string
+          description: A brief description of the sport. Subject to change (for example, if sponsors change).
+          example: US Football
+        title:
+          type: string
+          description: A presentable title of the sport. Occasionally this value can change, for example if a league undergoes a name change or change in sponsorship.
+          example: NFL
+        has_outrights:
+          type: boolean
+          description: Indicates if the sport has outrights markets.
+          example: false
     
     Odds:
       type: object
       properties:
-        siteName:
-          type: string
-          description: Name of the betting site
-          example: "Bet365"
-        last_update:
-          type: string
-          description: Timestamp of the last update 
-          example: "2021-09-10T00:20:00Z"
-        outcomes:
+        event:
+          $ref: '#/components/schemas/Event'
+        bookmakers:
           type: array
-          description: List of outcomes with odds
           items:
             type: object
             properties:
-              name:
+              key:
                 type: string
-                description: The outcome label. The value will depend on the market. For totals markets, this will be 'Over' or 'Under'. For team markets, it will be the name of the team or participant, or 'Draw'
-                example: "Houston Texans"
-              price:
-                type: number
-                format: float
-                description: The odds of the outcome. The format is determined by the oddsFormat query param. The format is decimal by default.
-                example: 2.23
-              point:
-                type: number
-                format: float
-                nullable: true
-                description: The handicap or points of the outcome, only applicable to spreads and totals markets (this property will be missing for h2h and outrights markets)
-                example: 20.5
-              description:
+                description: A unique slug (key) of the bookmaker.
+                example: draftkings
+              title:
                 type: string
-                nullable: true
-                description: This field is only relevant for certain markets. It contains more information about the outcome (for example, for player prop markets, it includes the player's name)
-      required:
-        - siteName
-        - last_update
-        - outcomes
+                description: A formatted title of the bookmaker.
+                example: DraftKings
+              last_update:
+                type: string
+                format: date-time
+                description: A timestamp of when the bookmaker's odds were last read. Will be an integer if dateFormat=unix, otherwise it will be a string.
+                example: 2023-10-10T12:10:29Z
+              markets:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      description: The name of the odds market.
+                      example: h2h
+                      enum:
+                        - h2h
+                        - spreads
+                        - totals
+                        - outrights
+                    last_update:
+                      type: string
+                      format: date-time
+                      description: A timestamp of when the market's odds were last read. Will be an integer if dateFormat=unix, otherwise it will be a string. To check the recency of odds, we recommend using this field instead of the "last_update" field at the bookmaker level.
+                      example: 2023-10-10T12:10:29Z
+                    outcomes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: The outcome label. The value will depend on the market. For totals markets, this will be 'Over' or 'Under'. For team markets, it will be the name of the team or participant, or 'Draw'.
+                            example: Houston Texans
+                          price:
+                            type: number
+                            format: float
+                            description: The odds of the outcome. The format is determined by the oddsFormat query param. The format is decimal by default.
+                            example: 2.23
+                          point:
+                            type: number
+                            nullable: true
+                            description: The handicap or points of the outcome, only applicable to spreads and totals markets (this property will be missing for h2h and outrights markets).
+                            example: 20.5
+                          description:
+                            type: string
+                            nullable: true
+                            description: This field is only relevant for certain markets. It contains more information about the outcome (for example, for player prop markets, it includes the player's name).
     
     ErrorResponse:
       type: object
