@@ -1,0 +1,219 @@
+openapi: 3.0.1
+info:
+  title: Betting Odds Middleware API
+  description: API to get betting odds from various betting sites for NBA games.
+  version: 1.0.2
+servers:
+  - url: https://api.your-middleware.com
+    description: Main URL of the middleware
+paths:
+  /odds/head2head:
+    post:
+      summary: Get head-to-head odds
+      description: Returns the top 3 head-to-head odds for a specific NBA game.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchRequest'
+      responses:
+        '200':
+          description: List of the top 3 head-to-head odds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Odds'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /odds/halftimefulltime:
+    post:
+      summary: Get halftime/fulltime odds
+      description: Returns the top 3 halftime/fulltime odds for a specific NBA game.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HalftimeFulltimeRequest'
+      responses:
+        '200':
+          description: List of the top 3 halftime/fulltime odds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Odds'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /odds/series:
+    post:
+      summary: Get series head-to-head odds
+      description: Returns the top 3 series head-to-head odds for a specific NBA playoff game.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchRequest'
+      responses:
+        '200':
+          description: List of the top 3 series head-to-head odds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Odds'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /odds/handicap:
+    post:
+      summary: Get head-to-head handicap odds
+      description: Returns the top 3 head-to-head handicap odds for a specific NBA game.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HandicapRequest'
+      responses:
+        '200':
+          description: List of the top 3 head-to-head handicap odds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Odds'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    MatchRequest:
+      type: object
+      properties:
+        matchId:
+          type: string
+          description: ID of the NBA game
+          example: "12345"
+      required:
+        - matchId
+
+    HalftimeFulltimeRequest:
+      type: object
+      properties:
+        matchId:
+          type: string
+          description: ID of the NBA game
+          example: "12345"
+        combination:
+          type: string
+          description: Halftime/fulltime combination. Possible values -> a-a, a-x, a-b, b-a, b-x, b-b, x-a, x-b
+          example: "a-a"
+      required:
+        - matchId
+        - combination
+
+    HandicapRequest:
+      type: object
+      properties:
+        matchId:
+          type: string
+          description: ID of the NBA game
+          example: "12345"
+        handicap:
+          type: string
+          description: Specify the type of handicap (+/- points)
+          example: "+5.5"
+      required:
+        - matchId
+        - handicap
+
+    Odds:
+      type: object
+      properties:
+        siteName:
+          type: string
+          description: Name of the betting site
+          example: "Bet365"
+        link:
+          type: string
+          description: Link to the odds page on the betting site
+          example: "https://www.bet365.com/odds/nba/match123"
+        odds:
+          type: number
+          format: float
+          description: Odds offered by the betting site
+          example: 1.85
+        betType:
+          type: string
+          description: Type of bet (e.g., head2head, halftime/fulltime, series, winningmargin, handicap)
+          example: "head2head"
+      required:
+        - siteName
+        - link
+        - odds
+        - betType
+
+    ErrorResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Application-specific error code
+          example: "ERR_INVALID_REQUEST"
+        errorMessage:
+          type: string
+          description: Description of the error
+          example: "The request parameters are invalid."
+      required:
+        - errorCode
+        - errorMessage
