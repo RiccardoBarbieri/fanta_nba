@@ -55,6 +55,9 @@ dependencies {
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
 //    implementation("org.apache.httpcomponents.core5:httpcore5:5.2.4")
 
+    // HTML parser
+    implementation("org.jsoup:jsoup:1.17.2")
+
 }
 
 dependencyManagement {
