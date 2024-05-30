@@ -58,6 +58,10 @@ dependencies {
     // HTML parser
     implementation("org.jsoup:jsoup:1.17.2")
 
+    // MongoDB
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.3.0")
+
+
 }
 
 dependencyManagement {
