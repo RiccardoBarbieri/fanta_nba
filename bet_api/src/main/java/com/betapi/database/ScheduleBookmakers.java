@@ -1,18 +1,19 @@
-package com.betapi.oddsapiservice.bookmakers;
+package com.betapi.database;
 
-import com.betapi.oddsapiservice.bookmakers.model.Bookmaker;
+import com.betapi.database.documents.Bookmaker;
+import com.betapi.database.repositories.BookmakerRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +26,11 @@ public class ScheduleBookmakers {
 
     private static final String BOOKMAKERS_URL = "https://the-odds-api.com/sports-odds-data/bookmaker-apis.html";
 
-    public static void main(String[] args) {
-        ScheduleBookmakers scheduleBookmakers = new ScheduleBookmakers();
-        try {
-            scheduleBookmakers.getBookmakers();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private BookmakerRepository bookmakerRepository;
+
+    @Autowired
+    private void setBookmakerRepository(BookmakerRepository bookmakerRepository) {
+        this.bookmakerRepository = bookmakerRepository;
     }
 
     @Scheduled(cron = "0 0 0 1 */1 *")
@@ -39,19 +38,32 @@ public class ScheduleBookmakers {
     public void retrieveBookmakers() {
         log.debug("Retrieving bookmakers");
 
-        List<Bookmaker> bookmakers = new ArrayList<>();
+        List<Bookmaker> bookmakers;
 
         try {
             bookmakers = getBookmakers();
+
+            log.debug("Writing bookmakers to database");
+
+            // Remove bookmakers that no longer exist
+            bookmakerRepository.findAll().forEach(bookmaker -> {
+                if (!bookmakers.contains(bookmaker)) {
+                    log.debug("Detected missing bookmaker: {}, removing", bookmaker.getKey());
+                    bookmakerRepository.delete(bookmaker);
+                }
+            });
+            bookmakers.forEach(bookmaker -> {
+                if (!bookmakerRepository.existsByKey(bookmaker.getKey())) {
+                    log.debug("Adding bookmaker: {}", bookmaker.getKey());
+                    bookmakerRepository.insert(bookmaker);
+                }
+            });
+
+            log.debug("Bookmakers updated");
         } catch (IOException e) {
             log.error("Failed to retrieve bookmakers", e);
         }
 
-        File bookmakersFile = null;
-
-        log.debug("Writing bookmakers to database");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.writeValue(bookmakersFile, bookmakers);
     }
 
     private List<Bookmaker> getBookmakers() throws IOException {
