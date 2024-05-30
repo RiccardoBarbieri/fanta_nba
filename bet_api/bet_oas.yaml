@@ -1,8 +1,8 @@
 openapi: 3.0.1
 info:
   title: Betting Odds Middleware API
-  description: API to get betting odds from various betting sites for NBA games.
-  version: 1.0.2
+  description: API to get betting odds from various betting sites.
+  version: 1.0.1
 servers:
   - url: https://api.your-middleware.com
     description: Main URL of the middleware
@@ -11,6 +11,8 @@ paths:
     get:
       summary: Get sports list
       description: Returns all available sports.
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: List of all available sports
@@ -21,17 +23,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/Sport'
         '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - API key is missing or invalid.
+        '403':
+          description: Forbidden - You do not have permission to access this resource.
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error - An error occurred on the server.
               
   /sports/getEvents:
     get:
@@ -53,6 +51,8 @@ paths:
             default: "eu,uk"
             example: "eu"
           description: Comma-separated list of regions to get odds for (e.g., "us,uk,eu")
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: List of all available events
@@ -63,17 +63,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/Event'
         '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - API key is missing or invalid.
+        '403':
+          description: Forbidden - You do not have permission to access this resource.
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error - An error occurred on the server.
 
   /odds/head2head:
     get:
@@ -110,6 +106,8 @@ paths:
             default: 1
             example: 3
           description: Number of records to retrieve
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: List of the top 'X' head-to-head odds
@@ -120,17 +118,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/Odds'
         '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - API key is missing or invalid.
+        '403':
+          description: Forbidden - You do not have permission to access this resource.
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error - An error occurred on the server.
   
   /odds/spreads:
     get:
@@ -167,6 +161,8 @@ paths:
             default: 1
             example: 3
           description: Number of records to retrieve
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: List of the top 'X' head-to-head handicap odds
@@ -177,17 +173,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/Odds'
         '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - API key is missing or invalid.
+        '403':
+          description: Forbidden - You do not have permission to access this resource.
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error - An error occurred on the server.
   
 components:
   schemas:
@@ -316,17 +308,11 @@ components:
                             nullable: true
                             description: This field is only relevant for certain markets. It contains more information about the outcome (for example, for player prop markets, it includes the player's name).
     
-    ErrorResponse:
-      type: object
-      properties:
-        errorCode:
-          type: string
-          description: Application-specific error code
-          example: "ERR_INVALID_REQUEST"
-        errorMessage:
-          type: string
-          description: Description of the error
-          example: "The request parameters are invalid."
-      required:
-        - errorCode
-        - errorMessage
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: odds-API-KEY
+
+security:
+  - ApiKeyAuth: []
