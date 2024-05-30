@@ -245,6 +245,10 @@ components:
     Bookmaker:
       type: object
       properties:
+        url:
+          type: string
+          description: The URL of the bookmaker's website.
+          example: https://www.draftkings.com
         key:
           type: string
           description: A unique slug (key) of the bookmaker.
