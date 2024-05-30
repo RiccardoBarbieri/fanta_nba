@@ -1,8 +1,13 @@
-package com.betapi.oddsapiservice.bookmakers.model;
+package com.betapi.database.documents;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "bookmakers")
 public class Bookmaker {
 
     private String region;
+    @Id
     private String key;
     private String url;
 
