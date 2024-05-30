@@ -312,7 +312,7 @@ components:
     ApiKeyAuth:
       type: apiKey
       in: header
-      name: odds-API-KEY
+      name: X-API-Key
 
 security:
   - ApiKeyAuth: []
