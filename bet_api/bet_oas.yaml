@@ -12,7 +12,7 @@ paths:
       summary: Get sports list
       description: Returns all available sports.
       security:
-        - ApiKeyAuth: []
+        - ApiKeyAuth: [ ]
       responses:
         '200':
           description: List of all available sports
@@ -30,7 +30,7 @@ paths:
           description: Forbidden - You do not have permission to access this resource.
         '500':
           description: Internal Server Error - An error occurred on the server.
-              
+
   /sports/getEvents:
     get:
       summary: Get events list
@@ -52,7 +52,7 @@ paths:
             example: "eu"
           description: Comma-separated list of regions to get odds for (e.g., "us,uk,eu")
       security:
-        - ApiKeyAuth: []
+        - ApiKeyAuth: [ ]
       responses:
         '200':
           description: List of all available events
@@ -107,7 +107,7 @@ paths:
             example: 3
           description: Number of records to retrieve
       security:
-        - ApiKeyAuth: []
+        - ApiKeyAuth: [ ]
       responses:
         '200':
           description: List of the top 'X' head-to-head odds
@@ -162,7 +162,7 @@ paths:
             example: 3
           description: Number of records to retrieve
       security:
-        - ApiKeyAuth: []
+        - ApiKeyAuth: [ ]
       responses:
         '200':
           description: List of the top 'X' head-to-head handicap odds
@@ -180,7 +180,7 @@ paths:
           description: Forbidden - You do not have permission to access this resource.
         '500':
           description: Internal Server Error - An error occurred on the server.
-  
+
 components:
   schemas:
     Event:
@@ -241,7 +241,72 @@ components:
           type: boolean
           description: Indicates if the sport has outrights markets.
           example: false
-    
+
+    Bookmaker:
+      type: object
+      properties:
+        key:
+          type: string
+          description: A unique slug (key) of the bookmaker.
+          example: draftkings
+        title:
+          type: string
+          description: A formatted title of the bookmaker.
+          example: DraftKings
+        last_update:
+          type: string
+          format: date-time
+          description: A timestamp of when the bookmaker's odds were last read. Will be an integer if dateFormat=unix, otherwise it will be a string.
+          example: 2023-10-10T12:10:29Z
+        markets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Market'
+
+    Market:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The name of the odds market.
+          example: h2h
+          enum:
+            - h2h
+            - spreads
+            - totals
+            - outrights
+        last_update:
+          type: string
+          format: date-time
+          description: A timestamp of when the market's odds were last read. Will be an integer if dateFormat=unix, otherwise it will be a string. To check the recency of odds, we recommend using this field instead of the "last_update" field at the bookmaker level.
+          example: 2023-10-10T12:10:29Z
+        outcomes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Outcome'
+
+    Outcome:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The outcome label. The value will depend on the market. For totals markets, this will be 'Over' or 'Under'. For team markets, it will be the name of the team or participant, or 'Draw'.
+          example: Houston Texans
+        price:
+          type: number
+          format: float
+          description: The odds of the outcome. The format is determined by the oddsFormat query param. The format is decimal by default.
+          example: 2.23
+        point:
+          type: number
+          nullable: true
+          description: The handicap or points of the outcome, only applicable to spreads and totals markets (this property will be missing for h2h and outrights markets).
+          example: 20.5
+        description:
+          type: string
+          nullable: true
+          description: This field is only relevant for certain markets. It contains more information about the outcome (for example, for player prop markets, it includes the player's name).
+
     Odds:
       type: object
       properties:
@@ -250,64 +315,8 @@ components:
         bookmakers:
           type: array
           items:
-            type: object
-            properties:
-              key:
-                type: string
-                description: A unique slug (key) of the bookmaker.
-                example: draftkings
-              title:
-                type: string
-                description: A formatted title of the bookmaker.
-                example: DraftKings
-              last_update:
-                type: string
-                format: date-time
-                description: A timestamp of when the bookmaker's odds were last read. Will be an integer if dateFormat=unix, otherwise it will be a string.
-                example: 2023-10-10T12:10:29Z
-              markets:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    key:
-                      type: string
-                      description: The name of the odds market.
-                      example: h2h
-                      enum:
-                        - h2h
-                        - spreads
-                        - totals
-                        - outrights
-                    last_update:
-                      type: string
-                      format: date-time
-                      description: A timestamp of when the market's odds were last read. Will be an integer if dateFormat=unix, otherwise it will be a string. To check the recency of odds, we recommend using this field instead of the "last_update" field at the bookmaker level.
-                      example: 2023-10-10T12:10:29Z
-                    outcomes:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            description: The outcome label. The value will depend on the market. For totals markets, this will be 'Over' or 'Under'. For team markets, it will be the name of the team or participant, or 'Draw'.
-                            example: Houston Texans
-                          price:
-                            type: number
-                            format: float
-                            description: The odds of the outcome. The format is determined by the oddsFormat query param. The format is decimal by default.
-                            example: 2.23
-                          point:
-                            type: number
-                            nullable: true
-                            description: The handicap or points of the outcome, only applicable to spreads and totals markets (this property will be missing for h2h and outrights markets).
-                            example: 20.5
-                          description:
-                            type: string
-                            nullable: true
-                            description: This field is only relevant for certain markets. It contains more information about the outcome (for example, for player prop markets, it includes the player's name).
-    
+            $ref: '#/components/schemas/Bookmaker'
+
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -315,4 +324,4 @@ components:
       name: X-API-Key
 
 security:
-  - ApiKeyAuth: []
+  - ApiKeyAuth: [ ]
