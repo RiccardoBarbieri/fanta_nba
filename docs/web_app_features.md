@@ -115,3 +115,23 @@ Non sono presenti quote sui punti totali, sulle prestazioni dei giocatori, ... i
 # Funzionalità accessoria (grafico efficacia modello)
 Sarebbe interessante far si che al termine di ogni match vi sia un confronto tra l'output fornito dal modello e il risutlato effettivo della partita.
 In questo modo si potrbbe fornire un grafico in cui viene mostrata l'efficacia del nostro modello.
+
+
+
+
+# Strutturazione pagine webapp
+
+1. Supponiamo una prima pagina in cui si dia la possibilità all'utente di selezionare lo sport ed il campionato. Attualmente abbiamo infomrazioni solo su NBA (ovvero il nostro modello è allenato solo su questa competizione) ma, per quanto riguarda le scommesse, abbiamo disponibilità per tutti gli sports.
+Oltre alle quote e alla previsione, mostriamo poi dati sul campionato (e.g. partite, clasifiche, informazioni della squadra). Attualmente noi pensiamo di opendere queste informazioni dalla NBA_API ma sarebbe interessante trovare una api che le fornisca per ogni sport, così da poter astrarre da una singola implementazione ed essere veramente flessibili.
+Arriveremmo al punto che con un minimo sforzo la nostra web app sarebbe in grado si supportare qualsiasi sport (rimanendo comunque il fatto che il modello è allenato solo per NBA).
+
+2. Dopo aver scelto sport e competizione, potremmo passare ad una schermata in cui è presente la classifica della competizione e le partite del giorno o della settimana (comunque filtraili per data). CI concentrerrremo quindi solo su info generali niente dettagli o quote delle scommesse.
+
+3. Cliccando sulle squadre della classifica potremmo avere informazioni su di esse (altra pagina) e sui relativi giovatori (dettagliando anche informazioni su di essi volendo)
+
+4. Cliccando sui match invece entrerremo nella schermata **core** della nostra applicazione con, oltre a info generali sulle due squadre (estensibili cliccando sul dettaglio della squadra), informazioni sulle quote principali (e più vantaggiose dei siti di scommesse) per ognuna delle due squadre. Daremo la possibilità all'utente di filtrare per certi siti di scommesse di suo interesse.
+
+### Note
+Per ora le scommesse disponibili sono solo h2h e spread (handicap) in quanto sono le uniche sensate con un modello di previsione che fornisce il vincitore. Con questa strutturazione il tutto sarebbe comunque facilmente estensibile in futuro.
+
+API per ottenere tutte le info su tutti gli sport: https://api-sports.io/ (si potrebbe implementare in maniera parametrizzata così da renderla facilemte estensibile in futuro con altri sport)
