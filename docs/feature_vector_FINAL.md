@@ -4,12 +4,13 @@ Ognuno dei gruppi si riferisce ad uno storico a lungo termine (e.g. l'intera sta
 
 ## Performance di squadra per valutare i dati storici
 - record vittorie/sconfitte
-- andamento in casa/trasferta
 - media punti segnati/subiti
 
 Ora io calcolerei questi stessi parametri ma solo in caso di:
 - scontri diretti
 - scontri con squadre più scarse (e più forti)
+- record in casa/trasferta
+
 
 Inoltre, si potrebbero calcolare le stesse statistiche inserendo le seguenti variabili:
 - giorni di riposo della squadra
