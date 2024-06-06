@@ -1,12 +1,7 @@
-variable "cloudflare_cert_path" {
-  type        = string
-  description = "Path to the Cloudflare certificate"
-}
-
-variable "cert_pass" {
-  type        = string
-  description = "Password for the certificate"
-}
+# variable "cloudflare_cert_path" {
+#   type        = string
+#   description = "Path to the Cloudflare certificate"
+# }
 
 # Key Vault for secrets
 data "azurerm_key_vault" "main_vault" {
