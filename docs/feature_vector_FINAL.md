@@ -8,8 +8,7 @@ Ognuno dei gruppi si riferisce ad uno storico a lungo termine (e.g. l'intera sta
 
 Ora io calcolerei questi stessi parametri ma solo in caso di:
 - scontri diretti
-- scontri con squadre più scarse (e più forti)
-- record in casa/trasferta
+- casa/trasferta
 
 
 Inoltre, si potrebbero calcolare le stesse statistiche inserendo le seguenti variabili:
@@ -32,7 +31,7 @@ Di seguito sono riportate le informazioni da sapere relative all'incontro che si
 Alle suddette informazioni, le stesse che hanno composto il DB dei dati storici, si aggiungono ulteriori dati da considerare:
 - GIOCATORI
     - qualità del roster (in questo caso si intende il calcolo del "valore" dei singoli giocatori in campo)
-    - in caso di play-off, valutare anche esperienza dei giocatori
+    - (in caso di play-off, valutare anche esperienza dei giocatori)
 - QUOTE
     - quote pre-partita (3/4 giorni prima della partita)
     - variazione quote (poche ore prima della partita)
