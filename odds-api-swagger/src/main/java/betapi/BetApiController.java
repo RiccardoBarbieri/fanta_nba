@@ -1,8 +1,8 @@
 package betapi;
 
-import com.betapi.oddsapiservice.OddsApiService;
-import com.betapi.oddsapiservice.model.Event;
-import com.betapi.oddsapiservice.model.Sport;
+import betapi.oddsapiservice.OddsApiService;
+import betapi.oddsapiservice.model.Event;
+import betapi.oddsapiservice.model.Sport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +13,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 @Controller
-public class BasicControllerTest {
+public class BetApiController {
     
-    private static final Logger log = LoggerFactory.getLogger(BasicControllerTest.class);
-    
+    private static final Logger log = LoggerFactory.getLogger(BetApiController.class);
 
-    private OddsApiService oddsApiService;
+    private final OddsApiService oddsApiService;
 
     @Autowired
-    public BasicControllerTest(OddsApiService oddsApiService) {
+    public BetApiController(OddsApiService oddsApiService) {
         //testing log level
         this.oddsApiService = oddsApiService;
     }
@@ -47,5 +46,7 @@ public class BasicControllerTest {
                 null
         );
     }
+
+
 
 }

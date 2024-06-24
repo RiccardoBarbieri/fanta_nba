@@ -1,7 +1,7 @@
 package betapi.oddsapiservice;
 
-import com.betapi.oddsapiservice.model.Event;
-import com.betapi.oddsapiservice.model.Sport;
+import betapi.oddsapiservice.model.Event;
+import betapi.oddsapiservice.model.Sport;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
