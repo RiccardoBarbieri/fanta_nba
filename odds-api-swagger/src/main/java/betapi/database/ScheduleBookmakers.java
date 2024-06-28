@@ -66,7 +66,7 @@ public class ScheduleBookmakers {
 
     }
 
-    private List<Bookmaker> getBookmakers() throws IOException {
+    public List<Bookmaker> getBookmakers() throws IOException {
         Document bookmakersPage = Jsoup.connect(BOOKMAKERS_URL).get();
 
         Elements tables = bookmakersPage.select("table");

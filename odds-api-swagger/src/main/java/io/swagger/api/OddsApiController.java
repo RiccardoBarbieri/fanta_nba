@@ -1,6 +1,8 @@
 package io.swagger.api;
 
+import betapi.database.ScheduleBookmakers;
 import betapi.oddsapiservice.OddsApiService;
+import io.swagger.model.Bookmaker;
 import io.swagger.model.Odds;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -15,9 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-06-24T10:03:13.459259793Z[GMT]")
 @RestController
@@ -29,16 +34,35 @@ public class OddsApiController implements OddsApi {
 
     private final OddsApiService oddsApiService;
 
+    private final ScheduleBookmakers scheduleBookmakers;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public OddsApiController(HttpServletRequest request, OddsApiService oddsApiService) {
+    public OddsApiController(HttpServletRequest request, OddsApiService oddsApiService, ScheduleBookmakers scheduleBookmakers) {
         this.request = request;
         this.oddsApiService = oddsApiService;
+        this.scheduleBookmakers = scheduleBookmakers;
     }
 
 
     private Odds getEventOdds(String sportKey, String eventId, String regions, String market){
-        return oddsApiService.getEventOdds(sportKey, eventId, regions, "h2h", null, null, null, null, null, null);
+        Odds odds = oddsApiService.getEventOdds(sportKey, eventId, regions, market, null, null, null, null, null, null);
+
+        List<betapi.database.documents.Bookmaker> bookmakersList;
+        try {
+            bookmakersList = scheduleBookmakers.getBookmakers();
+            Map<String, String> bookmakerUrlMap = bookmakersList.stream()
+                    .collect(Collectors.toMap(b -> b.getKey(), b -> b.getUrl()));
+
+            for (Bookmaker b : odds.getBookmakers()) {
+                String url = bookmakerUrlMap.get(b.getKey());
+                if (url != null) {
+                    b.setUrl(url);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to fetch bookmakers", e);
+        }
+        return odds;
     }
 
     private boolean parameterValidation(String sportKey, String eventId, String regions, BigDecimal records) {
