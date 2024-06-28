@@ -35,6 +35,8 @@ public interface OddsApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of the top 'X' head-to-head odds", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Odds.class)))),
 
+            @ApiResponse(responseCode = "201", description = "There are no available head-to-head odds."),
+
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
 
             @ApiResponse(responseCode = "401", description = "Unauthorized - API key is missing or invalid."),
@@ -45,17 +47,19 @@ public interface OddsApi {
     @RequestMapping(value = "/odds/head2head",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<List<Odds>> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+    ResponseEntity<Odds> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
             , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
             , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
             , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
     );
 
 
-    @Operation(summary = "Get head-to-head handicap odds", description = "Returns the top 'X' head-to-head handicap odds for a specific event.", security = {
+    @Operation(summary = "Get head-to-head handicap (spread) odds", description = "Returns the top 'X' head-to-head handicap odds for a specific event.", security = {
             @SecurityRequirement(name = "ApiKeyAuth")}, tags = {})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of the top 'X' head-to-head handicap odds", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Odds.class)))),
+
+            @ApiResponse(responseCode = "201", description = "There are no available head-to-head handicap (spread) odds."),
 
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
 
@@ -67,7 +71,7 @@ public interface OddsApi {
     @RequestMapping(value = "/odds/spreads",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<List<Odds>> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+    ResponseEntity<Odds> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
             , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
             , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
             , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records

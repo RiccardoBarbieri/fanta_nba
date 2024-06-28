@@ -6,6 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.model.Event;
+import io.swagger.model.Odds;
 import io.swagger.model.Sport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +36,8 @@ public interface SportsApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available events", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Event.class)))),
 
+            @ApiResponse(responseCode = "201", description = "There are no available events."),
+
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
 
             @ApiResponse(responseCode = "401", description = "Unauthorized - API key is missing or invalid."),
@@ -56,6 +59,8 @@ public interface SportsApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available sport groups", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))),
 
+            @ApiResponse(responseCode = "201", description = "There are no available groups."),
+
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
 
             @ApiResponse(responseCode = "401", description = "Unauthorized - API key is missing or invalid."),
@@ -74,6 +79,8 @@ public interface SportsApi {
             @SecurityRequirement(name = "ApiKeyAuth")}, tags = {})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available sports", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Sport.class)))),
+
+            @ApiResponse(responseCode = "201", description = "There are no available sports."),
 
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
 
