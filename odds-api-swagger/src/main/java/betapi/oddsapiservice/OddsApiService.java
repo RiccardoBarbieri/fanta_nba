@@ -1,8 +1,8 @@
 package betapi.oddsapiservice;
 
-import betapi.oddsapiservice.model.Event;
 import betapi.oddsapiservice.model.EventOdds;
-import betapi.oddsapiservice.model.Sport;
+import io.swagger.model.Event;
+import io.swagger.model.Sport;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,7 +17,8 @@ public interface OddsApiService {
     // SPORTS - Returns a list of in-season sport objects.
     @GetExchange(value = "/sports")
     @ResponseBody
-    List<Sport> getSports(/*@RequestParam String apiKey*/);
+    List<Sport> getSports(/*@RequestParam String apiKey*/
+            @RequestParam(required = false) Boolean all);
 
     // ODDS - Returns a list of upcoming and live games with recent odds for a given sport, region and market
     @GetExchange(value = "/sports/{sportKey}/odds")
