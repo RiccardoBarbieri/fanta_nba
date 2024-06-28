@@ -1,6 +1,6 @@
 package betapi.oddsapiservice.client;
 
-import com.betapi.oddsapiservice.OddsApiService;
+import betapi.oddsapiservice.OddsApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package betapi.oddsapiservice.model;
 
-import com.betapi.oddsapiservice.utils.Utils;
+import betapi.oddsapiservice.utils.Utils;
 
 import java.util.Date;
 import java.util.List;

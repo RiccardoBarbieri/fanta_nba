@@ -7,6 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableScheduling
-@EnableMongoRepositories(basePackages = "com.betapi.database.repositories")
+@EnableMongoRepositories(basePackages = "betapi.database.repositories")
 public class AppConfiguration {
 }

@@ -1,37 +1,23 @@
 package io.swagger.api;
 
-import java.math.BigDecimal;
-import io.swagger.model.Odds;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.model.Odds;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-06-24T10:03:13.459259793Z[GMT]")
 @RestController
@@ -49,11 +35,11 @@ public class OddsApiController implements OddsApi {
         this.request = request;
     }
 
-    public ResponseEntity<List<Odds>> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
-,@NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
-,@Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")" ,schema=@Schema( defaultValue="eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue="eu,uk") String regions
-,@Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve" ,schema=@Schema( defaultValue="1")) @Valid @RequestParam(value = "records", required = false, defaultValue="1") BigDecimal records
-) {
+    public ResponseEntity<List<Odds>> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+            , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
+            , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
+    ) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -67,11 +53,11 @@ public class OddsApiController implements OddsApi {
         return new ResponseEntity<List<Odds>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<List<Odds>> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
-,@NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
-,@Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")" ,schema=@Schema( defaultValue="eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue="eu,uk") String regions
-,@Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve" ,schema=@Schema( defaultValue="1")) @Valid @RequestParam(value = "records", required = false, defaultValue="1") BigDecimal records
-) {
+    public ResponseEntity<List<Odds>> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+            , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
+            , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
+    ) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
