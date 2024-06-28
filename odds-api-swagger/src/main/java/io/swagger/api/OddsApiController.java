@@ -44,7 +44,7 @@ public class OddsApiController implements OddsApi {
     }
 
 
-    private Odds getEventOdds(String sportKey, String eventId, String regions, String market){
+    private Odds getEventOdds(String sportKey, String eventId, String regions, String market, BigDecimal records){
         Odds odds = oddsApiService.getEventOdds(sportKey, eventId, regions, market, null, null, null, null, null, null);
 
         List<betapi.database.documents.Bookmaker> bookmakersList;
@@ -62,6 +62,8 @@ public class OddsApiController implements OddsApi {
         } catch (IOException e) {
             log.error("Failed to fetch bookmakers", e);
         }
+
+        // TODO implement records filter
         return odds;
     }
 
@@ -101,7 +103,7 @@ public class OddsApiController implements OddsApi {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             try {
-                Odds odds = getEventOdds(sportKey, eventId, regions, "spreads");
+                Odds odds = getEventOdds(sportKey, eventId, regions, "spreads", records);
                 if (odds != null) {
                     return new ResponseEntity<Odds>(odds, HttpStatus.OK);
                 } else {
@@ -132,7 +134,7 @@ public class OddsApiController implements OddsApi {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             try {
-                Odds odds = getEventOdds(sportKey, eventId, regions, "h2h");
+                Odds odds = getEventOdds(sportKey, eventId, regions, "h2h", records);
                 if (odds != null) {
                     return new ResponseEntity<Odds>(odds, HttpStatus.OK);
                 } else {
