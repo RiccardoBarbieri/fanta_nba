@@ -33,7 +33,7 @@ public class Market   {
     
     OUTRIGHTS("outrights");
 
-    private String value;
+    private final String value;
 
     KeyEnum(String value) {
       this.value = value;

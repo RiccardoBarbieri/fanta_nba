@@ -44,13 +44,13 @@ public class SportsApiController implements SportsApi {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(IS08601_DATEFORMAT);
         try {
             ZonedDateTime.parse(dateTime, formatter);
-            return true;
+            return false;
         } catch (DateTimeParseException e) {
             try {
                 ZonedDateTime parsedDate = ZonedDateTime.parse(dateTime);
-                return true;
-            } catch (DateTimeParseException ex) {
                 return false;
+            } catch (DateTimeParseException ex) {
+                return true;
             }
         }
     }
@@ -67,10 +67,10 @@ public class SportsApiController implements SportsApi {
             }
 
             // Validate commenceTimeFrom and commenceTimeTo (optional)
-            if (commenceTimeFrom != null && !isValidDateTime(commenceTimeFrom)) {
+            if (commenceTimeFrom != null && isValidDateTime(commenceTimeFrom)) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            if (commenceTimeTo != null && !isValidDateTime(commenceTimeTo)) {
+            if (commenceTimeTo != null && isValidDateTime(commenceTimeTo)) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 

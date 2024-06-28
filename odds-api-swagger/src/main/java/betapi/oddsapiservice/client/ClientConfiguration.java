@@ -22,13 +22,12 @@ public class ClientConfiguration {
 
     @Bean
     public RestClient restClient() {
-        RestClient customRestClient = RestClient.builder()
+
+        return RestClient.builder()
                 .requestFactory(new HttpComponentsClientHttpRequestFactory()) //http request library apache
                 .baseUrl(baseUrl)
                 .requestInterceptor(new ApiKeyInterceptor(apiKey))
 //                .defaultStatusHandler() //use to add status handling if needed
                 .build();
-
-        return customRestClient;
     }
 }

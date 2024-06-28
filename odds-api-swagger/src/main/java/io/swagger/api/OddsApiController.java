@@ -45,7 +45,7 @@ public class OddsApiController implements OddsApi {
         // Validazione dei parametri non nulli o vuoti
         if (sportKey == null || sportKey.trim().isEmpty() ||
                 eventId == null || eventId.trim().isEmpty()) {
-            return false;
+            return true;
         }
 
         // Validazione delle regioni
@@ -53,16 +53,16 @@ public class OddsApiController implements OddsApi {
             List<String> validRegions = Arrays.asList("eu", "uk", "us", "au");
             List<String> inputRegions = Arrays.asList(regions.split(","));
             if (!inputRegions.stream().allMatch(validRegions::contains)) {
-                return false;
+                return true;
             }
         }
 
         // Validazione del numero di records
         if (records != null && records.compareTo(BigDecimal.ZERO) <= 0) {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
 
@@ -73,11 +73,11 @@ public class OddsApiController implements OddsApi {
     ) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
-            if (!parameterValidation(sportKey, eventId, regions, records)) {
+            if (parameterValidation(sportKey, eventId, regions, records)) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             try {
-                Odds odds = getEventOdds(sportKey, eventId, regions, "h2h");
+                Odds odds = getEventOdds(sportKey, eventId, regions, "spreads");
                 if (odds != null) {
                     return new ResponseEntity<Odds>(odds, HttpStatus.OK);
                 } else {
@@ -104,7 +104,7 @@ public class OddsApiController implements OddsApi {
     ) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
-            if (!parameterValidation(sportKey, eventId, regions, records)) {
+            if (parameterValidation(sportKey, eventId, regions, records)) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             try {

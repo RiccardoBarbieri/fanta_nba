@@ -6,7 +6,6 @@
 package io.swagger.api;
 
 import io.swagger.model.Event;
-import io.swagger.model.Odds;
 import io.swagger.model.Sport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
