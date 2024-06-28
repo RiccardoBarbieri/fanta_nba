@@ -1,3 +1,7 @@
 **/.idea
 
 **/*.env
+*.class
+*.jar
+*.original
+*.properties
