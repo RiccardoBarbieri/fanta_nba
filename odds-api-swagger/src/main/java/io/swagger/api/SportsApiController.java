@@ -26,15 +26,12 @@ public class SportsApiController implements SportsApi {
 
     private static final Logger log = LoggerFactory.getLogger(SportsApiController.class);
 
-    private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
 
     private final OddsApiService oddsApiService;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public SportsApiController(ObjectMapper objectMapper, HttpServletRequest request, OddsApiService oddsApiService) {
-        this.objectMapper = objectMapper;
+    public SportsApiController(HttpServletRequest request, OddsApiService oddsApiService) {
         this.request = request;
         this.oddsApiService = oddsApiService;
     }
