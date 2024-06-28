@@ -21,6 +21,13 @@ paths:
             type: string
             example: "Basketball"
           description: The sport group name
+        - in: query
+          name: all
+          required: false
+          schema:
+            type: boolean
+            example: false
+          description: If set to true, both in and out of season sports will be returned
       responses:
         '200':
           description: List of all available sports
@@ -30,6 +37,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Sport'
+        '201':
+          description: There are no available sports.
         '400':
           description: Bad Request - The request parameters are invalid.
         '401':
@@ -45,6 +54,14 @@ paths:
       description: Returns all available sport groups.
       security:
         - ApiKeyAuth: [ ]
+      parameters:
+        - in: query
+          name: all
+          required: false
+          schema:
+            type: boolean
+            example: false
+          description: If set to true, both in and out of season sports will be returned
       responses:
         '200':
           description: List of all available sport groups
@@ -55,6 +72,8 @@ paths:
                 items:
                   type: string
                   example: Basketball
+        '201':
+          description: There are no available groups.
         '400':
           description: Bad Request - The request parameters are invalid.
         '401':
@@ -75,6 +94,20 @@ paths:
             type: string
             example: "basketball_nba"
           description: The sport key of the events
+        - in: query
+          name: commenceTimeFrom
+          required: false
+          schema:
+            type: string
+            example: "2023-09-09T00:00:00Z"
+          description: Filter to show games that commence on and after this parameter
+        - in: query
+          name: commenceTimeTo
+          required: false
+          schema:
+            type: string
+            example: "2023-09-10T23:59:59Z"
+          description: Filter to show games that commence on and before this parameter
       security:
         - ApiKeyAuth: [ ]
       responses:
@@ -86,6 +119,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Event'
+        '201':
+          description: There are no available events.
         '400':
           description: Bad Request - The request parameters are invalid.
         '401':
@@ -141,6 +176,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Odds'
+        '201':
+          description: There are no available odds.
         '400':
           description: Bad Request - The request parameters are invalid.
         '401':
@@ -196,6 +233,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Odds'
+        '201':
+          description: There are no available odds.
         '400':
           description: Bad Request - The request parameters are invalid.
         '401':
@@ -333,7 +372,7 @@ components:
         description:
           type: string
           nullable: true
-          description: This field is only relevant for certain markets. It contains more information about the outcome (for example, for player prop markets, it includes the player's name).
+          description: This field is oly relevant for certain markets. It contains more information about the outcome (for example, for player prop markets, it includes the player's name).
 
     Odds:
       type: object
