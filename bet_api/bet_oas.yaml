@@ -13,6 +13,14 @@ paths:
       description: Returns all available sports.
       security:
         - ApiKeyAuth: [ ]
+      parameters:
+        - in: query
+          name: groupName
+          required: false
+          schema:
+            type: string
+            example: "Basketball"
+          description: The sport group name
       responses:
         '200':
           description: List of all available sports
@@ -31,6 +39,30 @@ paths:
         '500':
           description: Internal Server Error - An error occurred on the server.
 
+  /sports/getSportGroups:
+    get:
+      summary: Get sport groups
+      description: Returns all available sport groups.
+      security:
+        - ApiKeyAuth: [ ]
+      responses:
+        '200':
+          description: List of all available sport groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: Basketball
+        '400':
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - API key is missing or invalid.
+        '403':
+          description: Forbidden - You do not have permission to access this resource.
+        '500':
+          description: Internal Server Error - An error occurred on the server.
   /sports/getEvents:
     get:
       summary: Get events list
@@ -42,15 +74,7 @@ paths:
           schema:
             type: string
             example: "basketball_nba"
-          description: The sport key of the event
-        - in: query
-          name: regions
-          required: false
-          schema:
-            type: string
-            default: "eu,uk"
-            example: "eu"
-          description: Comma-separated list of regions to get odds for (e.g., "us,uk,eu")
+          description: The sport key of the events
       security:
         - ApiKeyAuth: [ ]
       responses:
