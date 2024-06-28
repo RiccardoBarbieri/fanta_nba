@@ -2,10 +2,9 @@ package io.swagger.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
+
 import javax.validation.constraints.*;
 
 /**
@@ -34,84 +33,116 @@ public class Sport   {
   @JsonProperty("has_outrights")
   private Boolean hasOutrights = null;
 
-  public Sport key(String key) {
-    this.key = key;
-    return this;
-  }
+// --Commented out by Inspection START (28/06/2024 17:27):
+//  public Sport key(String key) {
+//    this.key = key;
+//    return this;
+//  }
+// --Commented out by Inspection STOP (28/06/2024 17:27)
 
-  /**
-   * A unique slug for the sport. Use this as the \"sport\" param in /odds requests.
-   * @return key
-   **/
-  @Schema(example = "americanfootball_nfl", description = "A unique slug for the sport. Use this as the \"sport\" param in /odds requests.")
-      @NotNull
+// --Commented out by Inspection START (28/06/2024 17:27):
+//  /**
+//   * A unique slug for the sport. Use this as the \"sport\" param in /odds requests.
+//   * @return key
+//   **/
+//  @Schema(exampl// --Commented out by Inspection (28/06/2024 17:27):e = "americanfootball_nfl", description = "A unique slug for the sport. Use this as the \"sport\" param in /odds requests.")
+//      @NotNull
+//
+//    public String getKey() {
+//    return key;
+//  }
+// --Commented out by Inspection STOP (28/06/2024 17:27)
 
-    public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public Sport active(Boolean active) {
-    this.active = active;
-    return this;
-  }
-
-  /**
-   * Indicates if the sport is in season.
-   * @return active
-   **/
-  @Schema(example = "true", description = "Indicates if the sport is in season.")
+// --Commented out by Inspection START (28/06/2024 17:27):
+//  public void setKey(String key) {
+//    this.key = key;
+// --Commented out by Inspection START (28/06/2024 17:27):
+////  }
+////
+////// --Commented out by Inspection START (28/06/2024 17:27):
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+////  public Sport active(Boolean active) {
+////    this.active = active;
+////    return this;
+////  }
+//// --Commented out by Inspection STOP (28/06/2024 17:27)
+// --Commented out by Inspection START (28/06/2024 17:27):
+//// --Commented out by Inspection STOP (28/06/2024 17:27)
+//
+//  /**
+//// --Commented out by Inspection START (28/06/2024 17:27):
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+//   * Indicates if the sport is in season.
+//   * @return active
+//   **/
+//  @Schema(example = "true", description = "Indicates if the sport is in season.")
+// --Commented out by Inspection STOP (28/06/2024 17:27)
       @NotNull
 
     public Boolean isActive() {
     return active;
   }
 
-  public void setActive(Boolean active) {
-    this.active = active;
-  }
-
-  public Sport group(String group) {
-    this.group = group;
-    return this;
-  }
-
-  /**
-   * A broader grouping.
-   * @return group
-   **/
+// --Commented out by Inspection START (28/06/2024 17:27):
+//  public void setActive(Boolean active) {
+//    this.active = active;
+//  }
+//
+//  public Sport group(String group) {
+//// --Commented out by Inspection START (28/06/2024 17:27):
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+//    this.group = group;
+//    return this;
+//  }
+//
+//  /**
+//   * A broader grouping.
+//   * @return group
+//   **/
+// --Commented out by Inspection STOP (28/06/2024 17:27)
   @Schema(example = "American Football", description = "A broader grouping.")
       @NotNull
 
-    public String getGroup() {
-    return group;
-  }
-
-  public void setGroup(String group) {
-    this.group = group;
-  }
-
-  public Sport description(String description) {
-    this.description = description;
-    return this;
-  }
-
-  /**
-   * A brief description of the sport. Subject to change (for example, if sponsors change).
-   * @return description
-   **/
-  @Schema(example = "US Football", description = "A brief description of the sport. Subject to change (for example, if sponsors change).")
-      @NotNull
-
-    public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
+// --Commented out by Inspection START (28/06/2024 17:27):
+//    public String getGroup() {
+// --Commented out by Inspection START (28/06/2024 17:27):
+//// --Commented out by Inspection START (28/06/2024 17:27):
+//////    return group;
+//////  }
+//////
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+////  public void setGroup(String group) {
+////    this.group = group;
+//// --Commented out by Inspection STOP (28/06/2024 17:27)
+//  }
+//
+//  public Sport description(String description) {
+//    this.description = description;
+//    return this;
+//  }
+//
+//  /**
+// --Commented out by Inspection START (28/06/2024 17:27):
+////   * A brief description of the sport. Subject to change (for example, if sponsors change).
+// --Commented out by Inspection START (28/06/2024 17:27):
+////// --Commented out by Inspection STOP (28/06/2024 17:27)
+////   * @return description
+////   **/
+////  @Schema(example = "US Football", description = "A brief description of the sport. Subject to change (for example, if sponsors change).")
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+// --Commented out by Inspection START (28/06/2024 17:27):
+////      @NotNull
+////
+//// --Commented out by Inspection START (28/06/2024 17:27):
+//////    public String getDescription() {
+//////    return description;
+//////  }
+//////
+//////  public void setDescription(String description) {
+//// --Commented out by Inspection STOP (28/06/2024 17:27)
+////    this.description = description;
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+// --Commented out by Inspection STOP (28/06/2024 17:27)
   }
 
   public Sport title(String title) {

@@ -11,20 +11,32 @@ public class Bookmaker {
     private String key;
     private String url;
 
-    public Bookmaker() {
-    }
+// --Commented out by Inspection START (28/06/2024 17:27):
+//    public Bookmaker() {
+//    }
+// --Commented out by Inspection STOP (28/06/2024 17:27)
 
-    public Bookmaker(String region, String key, String url) {
-        this.region = region;
-        this.key = key;
-        this.url = url;
-    }
-
-    public String getRegion() {
-        return region;
-    }
-
-    public void setRegion(String region) {
+// --Commented out by Inspection START (28/06/2024 17:27):
+// --Commented out by Inspection START (28/06/2024 17:27):
+////    public Bookmaker(String region, String key, String url) {
+////        this.region = region;
+//// --Commented out by Inspection STOP (28/06/2024 17:27)
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+// --Commented out by Inspection START (28/06/2024 17:27):
+//// --Commented out by Inspection START (28/06/2024 17:27):
+////        this.key = key;
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+//        this.url = url;
+//    }
+//
+//// --Commented out by Inspection START (28/06/2024 17:27):
+// --Commented out by Inspection STOP (28/06/2024 17:27)
+//    public String getRegion() {
+//        return region;
+//    }
+//
+//    public void setRegion(String region) {
+// --Commented out by Inspection STOP (28/06/2024 17:27)
         this.region = region;
     }
 

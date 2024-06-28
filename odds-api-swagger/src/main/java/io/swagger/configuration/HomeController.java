@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class HomeController {
+    @SuppressWarnings("SameReturnValue")
     @RequestMapping(value = "/")
     public String index() {
         return "redirect:/swagger-ui/";
