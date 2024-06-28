@@ -15,31 +15,29 @@ public class ApiResponseMessage {
     String type;
     String message;
 
-// --Commented out by Inspection START (28/06/2024 17:27):
-//    // --Commented out by Inspection (28/06/2024 17:27):public ApiResponseMessage(){}
-//
-//    public ApiResponseMessage(int code, String message){
-//        this.code = code;
-//        switch(code){
-//        case ERROR:
-//            setType("error");
-//            break;
-//        case WARNING:
-//            setType("warning");
-//            break;
-//        case INFO:
-//            setType("info");
-//            break;
-//        case OK:
-//            setType("ok");
-//            break;
-//        case TOO_BUSY:
-//            setType("too busy");
-//            break;
-//        default:
-//            setType("unknown");
-//            break;
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+    public ApiResponseMessage(){}
+
+    public ApiResponseMessage(int code, String message){
+        this.code = code;
+        switch(code){
+        case ERROR:
+            setType("error");
+            break;
+        case WARNING:
+            setType("warning");
+            break;
+        case INFO:
+            setType("info");
+            break;
+        case OK:
+            setType("ok");
+            break;
+        case TOO_BUSY:
+            setType("too busy");
+            break;
+        default:
+            setType("unknown");
+            break;
         }
         this.message = message;
     }

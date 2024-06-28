@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient;
 @Component
 public class ClientConfiguration {
 
-    // --Commented out by Inspection (28/06/2024 17:27):private static final Logger log = LoggerFactory.getLogger(ClientConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(ClientConfiguration.class);
 
 
     @Value("${odds_api.key}")
@@ -22,12 +22,13 @@ public class ClientConfiguration {
 
     @Bean
     public RestClient restClient() {
-
-        return RestClient.builder()
+        RestClient customRestClient = RestClient.builder()
                 .requestFactory(new HttpComponentsClientHttpRequestFactory()) //http request library apache
                 .baseUrl(baseUrl)
                 .requestInterceptor(new ApiKeyInterceptor(apiKey))
 //                .defaultStatusHandler() //use to add status handling if needed
                 .build();
+
+        return customRestClient;
     }
 }

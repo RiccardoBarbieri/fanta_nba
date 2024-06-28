@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 public class OddsApiController implements OddsApi {
 
-    // --Commented out by Inspection (28/06/2024 17:27):private static final Logger log = LoggerFactory.getLogger(OddsApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(OddsApiController.class);
 
     private final HttpServletRequest request;
 
@@ -38,14 +38,14 @@ public class OddsApiController implements OddsApi {
 
 
     private Odds getEventOdds(String sportKey, String eventId, String regions, String market){
-        return oddsApiService.getEventOdds(sportKey, eventId, regions, market, null, null, null, null, null, null);
+        return oddsApiService.getEventOdds(sportKey, eventId, regions, "h2h", null, null, null, null, null, null);
     }
 
     private boolean parameterValidation(String sportKey, String eventId, String regions, BigDecimal records) {
         // Validazione dei parametri non nulli o vuoti
         if (sportKey == null || sportKey.trim().isEmpty() ||
                 eventId == null || eventId.trim().isEmpty()) {
-            return true;
+            return false;
         }
 
         // Validazione delle regioni
@@ -53,78 +53,74 @@ public class OddsApiController implements OddsApi {
             List<String> validRegions = Arrays.asList("eu", "uk", "us", "au");
             List<String> inputRegions = Arrays.asList(regions.split(","));
             if (!inputRegions.stream().allMatch(validRegions::contains)) {
-                return true;
+                return false;
             }
         }
 
         // Validazione del numero di records
         if (records != null && records.compareTo(BigDecimal.ZERO) <= 0) {
-// --Commented out by Inspection START (28/06/2024 17:27):
-//            return true;
-//        }
-//
-//        return false;
-//    }
-//
-//
-//    public ResponseEntity<Odds> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
-//            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
-//            , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
-//            , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
-//    ) {
-//        String accept = request.getHeader("Accept");
-//        if (accept != null && accept.contains("application/json")) {
-//            if (parameterValidation(sportKey, eventId, regions, records)) {
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
-//            try {
-//                Odds odds = getEventOdds(sportKey, eventId, regions, "h2h");
-//                if (odds != null) {
-//                    return new ResponseEntity<Odds>(odds, HttpStatus.OK);
-//                } else {
-//                    return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);
-//                }
-//            } catch (IllegalArgumentException e) {
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
-//            /*catch (AuthenticationException e) {
-//                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//            } catch (AccessDeniedException e) {
-//                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//            }*/ catch (Exception e) {
-// --Commented out by Inspection START (28/06/2024 17:27):
-////                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-////            }
-////        }
-////        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//// --Commented out by Inspection STOP (28/06/2024 17:27)
-//    }
-//
-//    public ResponseEntity<Odds> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
-//            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
-//            , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
-//            , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
-//    ) {
-//        String accept = request.getHeader("Accept");
-//        if (accept != null && accept.contains("application/json")) {
-//            if (parameterValidation(sportKey, eventId, regions, records)) {
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
-//            try {
-//                Odds odds = getEventOdds(sportKey, eventId, regions, "spreads");
-//                if (odds != null) {
-//                    return new ResponseEntity<Odds>(odds, HttpStatus.OK);
-//                } else {
-//                    return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);
-//                }
-//            } catch (IllegalArgumentException e) {
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
-//            /*catch (AuthenticationException e) {
-//                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//            } catch (AccessDeniedException e) {
-//                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public ResponseEntity<Odds> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+            , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
+            , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
+    ) {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            if (!parameterValidation(sportKey, eventId, regions, records)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            try {
+                Odds odds = getEventOdds(sportKey, eventId, regions, "h2h");
+                if (odds != null) {
+                    return new ResponseEntity<Odds>(odds, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);
+                }
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            /*catch (AuthenticationException e) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            } catch (AccessDeniedException e) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }*/ catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<Odds> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+            , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
+            , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
+    ) {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            if (!parameterValidation(sportKey, eventId, regions, records)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            try {
+                Odds odds = getEventOdds(sportKey, eventId, regions, "h2h");
+                if (odds != null) {
+                    return new ResponseEntity<Odds>(odds, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);
+                }
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            /*catch (AuthenticationException e) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            } catch (AccessDeniedException e) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }*/ catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }

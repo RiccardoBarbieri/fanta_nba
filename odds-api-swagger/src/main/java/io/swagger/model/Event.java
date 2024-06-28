@@ -35,72 +35,54 @@ public class Event   {
   @JsonProperty("away_team")
   private String awayTeam = null;
 
-// --Commented out by Inspection START (28/06/2024 17:27):
-//  public Event id(String id) {
-//    this.id = id;
-//    return this;
-//  }
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+  public Event id(String id) {
+    this.id = id;
+    return this;
+  }
 
-// --Commented out by Inspection START (28/06/2024 17:27):
-//  /**
-//   * A unique 32 character identifier for the event.
-//   * @return id
-// --Commented out by Inspection START (28/06/2024 17:27):
-// --Commented out by Inspection START (28/06/2024 17:27):
-//////   **/
-//////  @Schema(example = "e912304de2b2ce35b473ce2ecd3d1502", description = "A unique 32 character identifier for the event.")
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-//      @NotNull
-//
-//    public String getId() {
-//    return id;
-//  }
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+  /**
+   * A unique 32 character identifier for the event.
+   * @return id
+   **/
+  @Schema(example = "e912304de2b2ce35b473ce2ecd3d1502", description = "A unique 32 character identifier for the event.")
+      @NotNull
 
-// --Commented out by Inspection START (28/06/2024 17:27):
-// --Commented out by Inspection START (28/06/2024 17:27):
-////  public void setId(String id) {
-//// --Commented out by Inspection START (28/06/2024 17:27):
-//////    this.id = id;
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-////  }
-////
-////  public Event sportKey(String sportKey) {
-////    this.sportKey = sportKey;
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-//    return this;
-//  }
-//
-//  /**
-//   * A unique slug for the sport. Use this as the \"sport\" param in /odds requests.
-//   * @return sportKey
-//   **/
-//  @Schema(example = "americanfootball_nfl", description = "A unique slug for the sport. Use this as the \"sport\" param in /odds requests.")
-// --Commented out by Inspection START (28/06/2024 17:27):
-//// --Commented out by Inspection STOP (28/06/2024 17:27)
-// --Commented out by Inspection START (28/06/2024 17:27):
-////      @NotNull
-////
-////    public String getSportKey() {
-////    return sportKey;
-////  }
-////
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-//  public void setSportKey(String sportKey) {
-//    this.sportKey = sportKey;
-//  }
-//
-//  public Event sportTitle(String sportTitle) {
-//    this.sportTitle = sportTitle;
-//    return this;
-//  }
-//
-//  /**
-//   * A presentable title of the sport. Occasionally this value can change, for example if a league undergoes a name change or change in sponsorship.
-//   * @return sportTitle
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+    public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public Event sportKey(String sportKey) {
+    this.sportKey = sportKey;
+    return this;
+  }
+
+  /**
+   * A unique slug for the sport. Use this as the \"sport\" param in /odds requests.
+   * @return sportKey
+   **/
+  @Schema(example = "americanfootball_nfl", description = "A unique slug for the sport. Use this as the \"sport\" param in /odds requests.")
+      @NotNull
+
+    public String getSportKey() {
+    return sportKey;
+  }
+
+  public void setSportKey(String sportKey) {
+    this.sportKey = sportKey;
+  }
+
+  public Event sportTitle(String sportTitle) {
+    this.sportTitle = sportTitle;
+    return this;
+  }
+
+  /**
+   * A presentable title of the sport. Occasionally this value can change, for example if a league undergoes a name change or change in sponsorship.
+   * @return sportTitle
    **/
   @Schema(example = "NFL", description = "A presentable title of the sport. Occasionally this value can change, for example if a league undergoes a name change or change in sponsorship.")
       @NotNull
@@ -113,75 +95,57 @@ public class Event   {
     this.sportTitle = sportTitle;
   }
 
-// --Commented out by Inspection START (28/06/2024 17:27):
-//// --Commented out by Inspection START (28/06/2024 17:27):
-////  public Event commenceTime(OffsetDateTime commenceTime) {
-//// --Commented out by Inspection START (28/06/2024 17:27):
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-////    this.commenceTime = commenceTime;
-////    return this;
-////  }
-// --Commented out by Inspection START (28/06/2024 17:27):
-////// --Commented out by Inspection STOP (28/06/2024 17:27)
-////
-////  /**
-////   * The match start time (ISO 8601 formatted). This will be a Unix timestamp integer if the dateFormat query param is set to dateFormat=unix.
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-// --Commented out by Inspection START (28/06/2024 17:27):
-////   * @return commenceTime
-////   **/
-////  @Schema(example = "2023-10-11T23:10Z", description = "The match start time (ISO 8601 formatted). This will be a Unix timestamp integer if the dateFormat query param is set to dateFormat=unix.")
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+  public Event commenceTime(OffsetDateTime commenceTime) {
+    this.commenceTime = commenceTime;
+    return this;
+  }
+
+  /**
+   * The match start time (ISO 8601 formatted). This will be a Unix timestamp integer if the dateFormat query param is set to dateFormat=unix.
+   * @return commenceTime
+   **/
+  @Schema(example = "2023-10-11T23:10Z", description = "The match start time (ISO 8601 formatted). This will be a Unix timestamp integer if the dateFormat query param is set to dateFormat=unix.")
       @NotNull
 
     @Valid
-// --Commented out by Inspection START (28/06/2024 17:27):
-//    public OffsetDateTime getCommenceTime() {
-//    return commenceTime;
-//  }
-//
-//  public void setCommenceTime(OffsetDateTime commenceTime) {
-//    this.commenceTime = commenceTime;
-//  }
-//
-//  public Event homeTeam(String homeTeam) {
-//    this.homeTeam = homeTeam;
-//    return this;
-//  }
-//
-//  /**
-// --Commented out by Inspection START (28/06/2024 17:27):
-////   * The home team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.
-////   * @return homeTeam
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-//   **/
-//  @Schema(example = "Houston Texans", description = "The home team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.")
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+    public OffsetDateTime getCommenceTime() {
+    return commenceTime;
+  }
 
+  public void setCommenceTime(OffsetDateTime commenceTime) {
+    this.commenceTime = commenceTime;
+  }
+
+  public Event homeTeam(String homeTeam) {
+    this.homeTeam = homeTeam;
+    return this;
+  }
+
+  /**
+   * The home team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.
+   * @return homeTeam
+   **/
+  @Schema(example = "Houston Texans", description = "The home team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.")
+  
     public String getHomeTeam() {
     return homeTeam;
   }
 
   public void setHomeTeam(String homeTeam) {
-// --Commented out by Inspection START (28/06/2024 17:27):
-//    this.homeTeam = homeTeam;
-//  }
-//
-//// --Commented out by Inspection START (28/06/2024 17:27):
-////  public Event awayTeam(String awayTeam) {
-////    this.awayTeam = awayTeam;
-////    return this;
-////  }
-//// --Commented out by Inspection STOP (28/06/2024 17:27)
-//
-//  /**
-//   * The away team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.
-//   * @return awayTeam
-//   **/
-//  @Schema(example = "Kansas City Chiefs", description = "The away team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.")
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+    this.homeTeam = homeTeam;
+  }
 
+  public Event awayTeam(String awayTeam) {
+    this.awayTeam = awayTeam;
+    return this;
+  }
+
+  /**
+   * The away team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.
+   * @return awayTeam
+   **/
+  @Schema(example = "Kansas City Chiefs", description = "The away team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.")
+  
     public String getAwayTeam() {
     return awayTeam;
   }

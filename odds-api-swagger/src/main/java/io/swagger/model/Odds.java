@@ -2,6 +2,7 @@ package io.swagger.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.model.Bookmaker;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
@@ -23,26 +24,18 @@ public class Odds extends Event {
   @Valid
   private List<Bookmaker> bookmakers = null;
 
-// --Commented out by Inspection START (28/06/2024 17:27):
-//  public Odds bookmakers(List<Bookmaker> bookmakers) {
-//    this.bookmakers = bookmakers;
-//    return this;
-//  }
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+  public Odds bookmakers(List<Bookmaker> bookmakers) {
+    this.bookmakers = bookmakers;
+    return this;
+  }
 
-// --Commented out by Inspection START (28/06/2024 17:27):
-// --Commented out by Inspection START (28/06/2024 17:27):
-////  public Odds addBookmakersItem(Bookmaker bookmakersItem) {
-////    if (this.bookmakers == null) {
-// --Commented out by Inspection START (28/06/2024 17:27):
-//////      this.bookmakers = new ArrayList<Bookmaker>();
-//////    }
-//////    this.bookmakers.add(bookmakersItem);
-//////    return this;
-//// --Commented out by Inspection STOP (28/06/2024 17:27)
-// --Commented out by Inspection STOP (28/06/2024 17:27)
-//  }
-// --Commented out by Inspection STOP (28/06/2024 17:27)
+  public Odds addBookmakersItem(Bookmaker bookmakersItem) {
+    if (this.bookmakers == null) {
+      this.bookmakers = new ArrayList<Bookmaker>();
+    }
+    this.bookmakers.add(bookmakersItem);
+    return this;
+  }
 
   /**
    * Get bookmakers
