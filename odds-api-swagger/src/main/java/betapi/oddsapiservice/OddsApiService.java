@@ -1,7 +1,7 @@
 package betapi.oddsapiservice;
 
-import betapi.oddsapiservice.model.EventOdds;
 import io.swagger.model.Event;
+import io.swagger.model.Odds;
 import io.swagger.model.Sport;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,7 +23,7 @@ public interface OddsApiService {
     // ODDS - Returns a list of upcoming and live games with recent odds for a given sport, region and market
     @GetExchange(value = "/sports/{sportKey}/odds")
     @ResponseBody
-    List<EventOdds> getOdds(/*@RequestParam String apiKey*/
+    List<Odds> getOdds(/*@RequestParam String apiKey*/
             @PathVariable String sportKey,
             @RequestParam String regions,
             @RequestParam(required = false) String markets,
@@ -47,7 +47,7 @@ public interface OddsApiService {
     // EVENT ODDS - Returns odds for a single event.
     @GetExchange(value = "/sports/{sportKey}/events/{eventId}/odds")
     @ResponseBody
-    EventOdds getEventOdds(/*@RequestParam String apiKey*/
+    Odds getEventOdds(/*@RequestParam String apiKey*/
             @PathVariable String sportKey,
             @PathVariable String eventId,
             @RequestParam String regions,

@@ -4,7 +4,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.model.Bookmaker;
-import io.swagger.model.Event;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,34 +18,11 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-06-24T10:03:13.459259793Z[GMT]")
 
 
-public class Odds   {
-  @JsonProperty("event")
-  private Event event = null;
+public class Odds extends Event {
 
   @JsonProperty("bookmakers")
   @Valid
   private List<Bookmaker> bookmakers = null;
-
-  public Odds event(Event event) {
-    this.event = event;
-    return this;
-  }
-
-  /**
-   * Get event
-   * @return event
-   **/
-  @Schema(description = "")
-      @NotNull
-
-    @Valid
-    public Event getEvent() {
-    return event;
-  }
-
-  public void setEvent(Event event) {
-    this.event = event;
-  }
 
   public Odds bookmakers(List<Bookmaker> bookmakers) {
     this.bookmakers = bookmakers;
@@ -66,16 +42,15 @@ public class Odds   {
    * @return bookmakers
    **/
   @Schema(description = "")
-      @NotNull
-    @Valid
-    public List<Bookmaker> getBookmakers() {
+  @NotNull
+  @Valid
+  public List<Bookmaker> getBookmakers() {
     return bookmakers;
   }
 
   public void setBookmakers(List<Bookmaker> bookmakers) {
     this.bookmakers = bookmakers;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -85,22 +60,23 @@ public class Odds   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    if (!super.equals(o)) {
+      return false;
+    }
     Odds odds = (Odds) o;
-    return Objects.equals(this.event, odds.event) &&
-        Objects.equals(this.bookmakers, odds.bookmakers);
+    return Objects.equals(this.bookmakers, odds.bookmakers);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(event, bookmakers);
+    return Objects.hash(super.hashCode(), bookmakers);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Odds {\n");
-    
-    sb.append("    event: ").append(toIndentedString(event)).append("\n");
+    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    bookmakers: ").append(toIndentedString(bookmakers)).append("\n");
     sb.append("}");
     return sb.toString();
