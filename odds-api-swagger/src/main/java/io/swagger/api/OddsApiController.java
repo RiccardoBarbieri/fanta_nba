@@ -1,6 +1,6 @@
 package io.swagger.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import betapi.oddsapiservice.OddsApiService;
 import io.swagger.model.Odds;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-06-24T10:03:13.459259793Z[GMT]")
@@ -25,50 +25,107 @@ public class OddsApiController implements OddsApi {
 
     private static final Logger log = LoggerFactory.getLogger(OddsApiController.class);
 
-    private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
 
+    private final OddsApiService oddsApiService;
+
+
     @org.springframework.beans.factory.annotation.Autowired
-    public OddsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
+    public OddsApiController(HttpServletRequest request, OddsApiService oddsApiService) {
         this.request = request;
+        this.oddsApiService = oddsApiService;
     }
 
-    public ResponseEntity<List<Odds>> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+
+    private Odds getEventOdds(String sportKey, String eventId, String regions, String market){
+        return oddsApiService.getEventOdds(sportKey, eventId, regions, "h2h", null, null, null, null, null, null);
+    }
+
+    private boolean parameterValidation(String sportKey, String eventId, String regions, BigDecimal records) {
+        // Validazione dei parametri non nulli o vuoti
+        if (sportKey == null || sportKey.trim().isEmpty() ||
+                eventId == null || eventId.trim().isEmpty()) {
+            return false;
+        }
+
+        // Validazione delle regioni
+        if (regions != null && !regions.trim().isEmpty()) {
+            List<String> validRegions = Arrays.asList("eu", "uk", "us", "au");
+            List<String> inputRegions = Arrays.asList(regions.split(","));
+            if (!inputRegions.stream().allMatch(validRegions::contains)) {
+                return false;
+            }
+        }
+
+        // Validazione del numero di records
+        if (records != null && records.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public ResponseEntity<Odds> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
             , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
             , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
             , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
     ) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
+            if (!parameterValidation(sportKey, eventId, regions, records)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
             try {
-                return new ResponseEntity<List<Odds>>(objectMapper.readValue("[ {\n  \"bookmakers\" : [ {\n    \"markets\" : [ {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    }, {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    } ],\n    \"last_update\" : \"2023-10-10T12:10:29Z\",\n    \"title\" : \"DraftKings\",\n    \"url\" : \"https://www.draftkings.com\",\n    \"key\" : \"draftkings\"\n  }, {\n    \"markets\" : [ {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    }, {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    } ],\n    \"last_update\" : \"2023-10-10T12:10:29Z\",\n    \"title\" : \"DraftKings\",\n    \"url\" : \"https://www.draftkings.com\",\n    \"key\" : \"draftkings\"\n  } ],\n  \"event\" : {\n    \"sport_key\" : \"americanfootball_nfl\",\n    \"id\" : \"e912304de2b2ce35b473ce2ecd3d1502\",\n    \"home_team\" : \"Houston Texans\",\n    \"sport_title\" : \"NFL\",\n    \"commence_time\" : \"2023-10-11T23:10:00Z\",\n    \"away_team\" : \"Kansas City Chiefs\"\n  }\n}, {\n  \"bookmakers\" : [ {\n    \"markets\" : [ {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    }, {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    } ],\n    \"last_update\" : \"2023-10-10T12:10:29Z\",\n    \"title\" : \"DraftKings\",\n    \"url\" : \"https://www.draftkings.com\",\n    \"key\" : \"draftkings\"\n  }, {\n    \"markets\" : [ {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    }, {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    } ],\n    \"last_update\" : \"2023-10-10T12:10:29Z\",\n    \"title\" : \"DraftKings\",\n    \"url\" : \"https://www.draftkings.com\",\n    \"key\" : \"draftkings\"\n  } ],\n  \"event\" : {\n    \"sport_key\" : \"americanfootball_nfl\",\n    \"id\" : \"e912304de2b2ce35b473ce2ecd3d1502\",\n    \"home_team\" : \"Houston Texans\",\n    \"sport_title\" : \"NFL\",\n    \"commence_time\" : \"2023-10-11T23:10:00Z\",\n    \"away_team\" : \"Kansas City Chiefs\"\n  }\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Odds>>(HttpStatus.INTERNAL_SERVER_ERROR);
+                Odds odds = getEventOdds(sportKey, eventId, regions, "h2h");
+                if (odds != null) {
+                    return new ResponseEntity<Odds>(odds, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);
+                }
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            /*catch (AuthenticationException e) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            } catch (AccessDeniedException e) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }*/ catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
-        return new ResponseEntity<List<Odds>>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<List<Odds>> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+    public ResponseEntity<Odds> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
             , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
             , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
             , @Parameter(in = ParameterIn.QUERY, description = "Number of records to retrieve", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "records", required = false, defaultValue = "1") BigDecimal records
     ) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
+            if (!parameterValidation(sportKey, eventId, regions, records)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
             try {
-                return new ResponseEntity<List<Odds>>(objectMapper.readValue("[ {\n  \"bookmakers\" : [ {\n    \"markets\" : [ {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    }, {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    } ],\n    \"last_update\" : \"2023-10-10T12:10:29Z\",\n    \"title\" : \"DraftKings\",\n    \"url\" : \"https://www.draftkings.com\",\n    \"key\" : \"draftkings\"\n  }, {\n    \"markets\" : [ {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    }, {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    } ],\n    \"last_update\" : \"2023-10-10T12:10:29Z\",\n    \"title\" : \"DraftKings\",\n    \"url\" : \"https://www.draftkings.com\",\n    \"key\" : \"draftkings\"\n  } ],\n  \"event\" : {\n    \"sport_key\" : \"americanfootball_nfl\",\n    \"id\" : \"e912304de2b2ce35b473ce2ecd3d1502\",\n    \"home_team\" : \"Houston Texans\",\n    \"sport_title\" : \"NFL\",\n    \"commence_time\" : \"2023-10-11T23:10:00Z\",\n    \"away_team\" : \"Kansas City Chiefs\"\n  }\n}, {\n  \"bookmakers\" : [ {\n    \"markets\" : [ {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    }, {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    } ],\n    \"last_update\" : \"2023-10-10T12:10:29Z\",\n    \"title\" : \"DraftKings\",\n    \"url\" : \"https://www.draftkings.com\",\n    \"key\" : \"draftkings\"\n  }, {\n    \"markets\" : [ {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    }, {\n      \"outcomes\" : [ {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      }, {\n        \"price\" : 2.23,\n        \"name\" : \"Houston Texans\",\n        \"description\" : \"description\",\n        \"point\" : 20.5\n      } ],\n      \"last_update\" : \"2023-10-10T12:10:29Z\",\n      \"key\" : \"h2h\"\n    } ],\n    \"last_update\" : \"2023-10-10T12:10:29Z\",\n    \"title\" : \"DraftKings\",\n    \"url\" : \"https://www.draftkings.com\",\n    \"key\" : \"draftkings\"\n  } ],\n  \"event\" : {\n    \"sport_key\" : \"americanfootball_nfl\",\n    \"id\" : \"e912304de2b2ce35b473ce2ecd3d1502\",\n    \"home_team\" : \"Houston Texans\",\n    \"sport_title\" : \"NFL\",\n    \"commence_time\" : \"2023-10-11T23:10:00Z\",\n    \"away_team\" : \"Kansas City Chiefs\"\n  }\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Odds>>(HttpStatus.INTERNAL_SERVER_ERROR);
+                Odds odds = getEventOdds(sportKey, eventId, regions, "h2h");
+                if (odds != null) {
+                    return new ResponseEntity<Odds>(odds, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);
+                }
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            /*catch (AuthenticationException e) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            } catch (AccessDeniedException e) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }*/ catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
-        return new ResponseEntity<List<Odds>>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 }
