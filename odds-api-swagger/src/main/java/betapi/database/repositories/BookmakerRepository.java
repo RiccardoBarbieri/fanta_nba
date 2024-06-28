@@ -1,6 +1,6 @@
 package betapi.database.repositories;
 
-import com.betapi.database.documents.Bookmaker;
+import betapi.database.documents.Bookmaker;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

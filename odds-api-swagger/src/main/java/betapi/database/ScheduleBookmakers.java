@@ -1,7 +1,7 @@
 package betapi.database;
 
-import com.betapi.database.documents.Bookmaker;
-import com.betapi.database.repositories.BookmakerRepository;
+import betapi.database.documents.Bookmaker;
+import betapi.database.repositories.BookmakerRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
