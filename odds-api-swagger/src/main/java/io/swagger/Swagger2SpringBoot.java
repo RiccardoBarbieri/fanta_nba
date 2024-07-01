@@ -12,7 +12,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "io.swagger", "io.swagger.api", "io.swagger.configuration" })
+@ComponentScan(basePackages = { "io.swagger", "io.swagger.api", "io.swagger.configuration", "betapi", "betapi.oddsapiservice", "betapi.database" })
 public class Swagger2SpringBoot implements CommandLineRunner {
 
     @Override
