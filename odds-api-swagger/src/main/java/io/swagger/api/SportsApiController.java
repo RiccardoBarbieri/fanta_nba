@@ -56,46 +56,56 @@ public class SportsApiController implements SportsApi {
         }
     }
 
-    public ResponseEntity<List<Event>> sportsGetEventsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the events", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
-            , @Parameter(in = ParameterIn.QUERY, description = "Filter to show games that commence on and after this parameter", schema = @Schema()) @Valid @RequestParam(value = "commenceTimeFrom", required = false) String commenceTimeFrom
-            , @Parameter(in = ParameterIn.QUERY, description = "Filter to show games that commence on and before this parameter", schema = @Schema()) @Valid @RequestParam(value = "commenceTimeTo", required = false) String commenceTimeTo
+    public ResponseEntity<List<Event>> sportsGetEventsGet(
+            @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the events", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey,
+            @Parameter(in = ParameterIn.QUERY, description = "Filter to show games that commence on and after this parameter", schema = @Schema()) @Valid @RequestParam(value = "commenceTimeFrom", required = false) String commenceTimeFrom,
+            @Parameter(in = ParameterIn.QUERY, description = "Filter to show games that commence on and before this parameter", schema = @Schema()) @Valid @RequestParam(value = "commenceTimeTo", required = false) String commenceTimeTo
     ) {
+        log.info("Received sportsGetEventsGet request with sportKey: {}, commenceTimeFrom: {}, commenceTimeTo: {}", sportKey, commenceTimeFrom, commenceTimeTo);
+
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             // Validate sportKey
             if (sportKey == null || sportKey.trim().isEmpty()) {
+                log.warn("Bad request received with invalid sportKey");
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             // Validate commenceTimeFrom and commenceTimeTo (optional)
             if (commenceTimeFrom != null && isValidDateTime(commenceTimeFrom)) {
+                log.warn("Bad request received with invalid commenceTimeFrom: {}", commenceTimeFrom);
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             if (commenceTimeTo != null && isValidDateTime(commenceTimeTo)) {
+                log.warn("Bad request received with invalid commenceTimeTo: {}", commenceTimeTo);
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             try {
                 List<Event> events = oddsApiService.getEvents(null, sportKey, null, null, commenceTimeFrom, commenceTimeTo);
                 if (events != null && !events.isEmpty()) {
+                    log.debug("Returning {} events", events.size());
                     return new ResponseEntity<>(events, HttpStatus.OK);
                 } else {
+                    log.info("No events found for sportsGetEventsGet");
                     return new ResponseEntity<>(events, HttpStatus.NO_CONTENT);
                 }
             } catch (IllegalArgumentException e) {
+                log.error("Bad request received: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            /*catch (AuthenticationException e) {
+            }/*catch (AuthenticationException e) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             } catch (AccessDeniedException e) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }*/ catch (Exception e) {
+                log.error("Internal server error: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+
+        log.warn("Unsupported Accept header: {}", accept);
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
 
     private List<String> getUniqueGroups(List<Sport> sports) {
         return sports.stream()
@@ -104,7 +114,11 @@ public class SportsApiController implements SportsApi {
                 .collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<String>> sportsGetSportGroupsGet(@Parameter(in = ParameterIn.QUERY, description = "If set to true, both in and out of season sports will be returned", schema = @Schema()) @Valid @RequestParam(value = "all", required = false) Boolean all) {
+    public ResponseEntity<List<String>> sportsGetSportGroupsGet(
+            @Parameter(in = ParameterIn.QUERY, description = "If set to true, both in and out of season sports will be returned", schema = @Schema()) @Valid @RequestParam(value = "all", required = false) Boolean all
+    ) {
+        log.info("Received sportsGetSportGroupsGet request with all: {}", all);
+
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -112,24 +126,30 @@ public class SportsApiController implements SportsApi {
                 if (sports != null && !sports.isEmpty()) {
                     List<String> groups = getUniqueGroups(sports);
                     if (groups != null && !groups.isEmpty()) {
+                        log.debug("Returning {} sport groups", groups.size());
                         return new ResponseEntity<>(groups, HttpStatus.OK);
                     } else {
+                        log.info("No sport groups found for sportsGetSportGroupsGet");
                         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
                     }
                 } else {
+                    log.info("No sports found for sportsGetSportGroupsGet");
                     return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
                 }
             } catch (IllegalArgumentException e) {
+                log.error("Bad request received: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            /*catch (AuthenticationException e) {
+            }/*catch (AuthenticationException e) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             } catch (AccessDeniedException e) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }*/ catch (Exception e) {
+                log.error("Internal server error: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+
+        log.warn("Unsupported Accept header: {}", accept);
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -140,13 +160,17 @@ public class SportsApiController implements SportsApi {
                 .collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<Sport>> sportsGetSportsGet(@Parameter(in = ParameterIn.QUERY, description = "The sport group name", schema = @Schema()) @Valid @RequestParam(value = "groupName", required = false) String groupName
-            , @Parameter(in = ParameterIn.QUERY, description = "If set to true, both in and out of season sports will be returned", schema = @Schema()) @Valid @RequestParam(value = "all", required = false) Boolean all
+    public ResponseEntity<List<Sport>> sportsGetSportsGet(
+            @Parameter(in = ParameterIn.QUERY, description = "The sport group name", schema = @Schema()) @Valid @RequestParam(value = "groupName", required = false) String groupName,
+            @Parameter(in = ParameterIn.QUERY, description = "If set to true, both in and out of season sports will be returned", schema = @Schema()) @Valid @RequestParam(value = "all", required = false) Boolean all
     ) {
+        log.info("Received sportsGetSportsGet request with groupName: {}, all: {}", groupName, all);
+
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             // Validate groupName (optional)
             if (groupName != null && groupName.trim().isEmpty()) {
+                log.warn("Bad request received with invalid groupName");
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
@@ -155,24 +179,30 @@ public class SportsApiController implements SportsApi {
                 if (sports != null && !sports.isEmpty()) {
                     List<Sport> sportFiltered = filterByGroup(sports, groupName);
                     if (sportFiltered != null && !sportFiltered.isEmpty()) {
+                        log.debug("Returning {} sports", sportFiltered.size());
                         return new ResponseEntity<>(sportFiltered, HttpStatus.OK);
                     } else {
+                        log.info("No sports found for sportsGetSportsGet");
                         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                     }
                 } else {
+                    log.info("No sports found for sportsGetSportsGet");
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 }
             } catch (IllegalArgumentException e) {
+                log.error("Bad request received: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            /*catch (AuthenticationException e) {
+            }/*catch (AuthenticationException e) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             } catch (AccessDeniedException e) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }*/ catch (Exception e) {
+                log.error("Internal server error: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+
+        log.warn("Unsupported Accept header: {}", accept);
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
