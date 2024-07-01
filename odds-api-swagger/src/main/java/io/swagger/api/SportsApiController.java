@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -47,7 +48,7 @@ public class SportsApiController implements SportsApi {
             return false;
         } catch (DateTimeParseException e) {
             try {
-                ZonedDateTime parsedDate = ZonedDateTime.parse(dateTime);
+                ZonedDateTime.parse(dateTime);
                 return false;
             } catch (DateTimeParseException ex) {
                 return true;
@@ -111,7 +112,7 @@ public class SportsApiController implements SportsApi {
                 if (sports != null && !sports.isEmpty()) {
                     List<String> groups = getUniqueGroups(sports);
                     if (groups != null && !groups.isEmpty()) {
-                        return new ResponseEntity<List<String>>(groups, HttpStatus.OK);
+                        return new ResponseEntity<>(groups, HttpStatus.OK);
                     } else {
                         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
                     }
@@ -129,7 +130,7 @@ public class SportsApiController implements SportsApi {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return new ResponseEntity<List<String>>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     private List<Sport> filterByGroup(List<Sport> sports, String group) {
@@ -172,7 +173,7 @@ public class SportsApiController implements SportsApi {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return new ResponseEntity<List<Sport>>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 }

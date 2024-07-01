@@ -1,11 +1,7 @@
 package io.swagger.api;
 
-import betapi.database.ScheduleBookmakers;
 import betapi.oddsapiservice.OddsApiService;
-import io.swagger.model.Bookmaker;
-import io.swagger.model.Market;
 import io.swagger.model.Odds;
-import io.swagger.model.Outcome;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-06-24T10:03:13.459259793Z[GMT]")
 @RestController
@@ -35,145 +29,34 @@ public class OddsApiController implements OddsApi {
 
     private final OddsApiService oddsApiService;
 
-    private final ScheduleBookmakers scheduleBookmakers;
-
     @org.springframework.beans.factory.annotation.Autowired
-    public OddsApiController(HttpServletRequest request, OddsApiService oddsApiService, ScheduleBookmakers scheduleBookmakers) {
+    public OddsApiController(HttpServletRequest request, OddsApiService oddsApiService) {
         this.request = request;
         this.oddsApiService = oddsApiService;
-        this.scheduleBookmakers = scheduleBookmakers;
-    }
-
-
-    private static List<Odds> sortBookmakersByOdds(Odds odds) {
-        Odds oddsCopyForHomeTeam = deepCopyOdds(odds);
-        Odds oddsCopyForAwayTeam = deepCopyOdds(odds);
-
-        // Ordina i bookmakers per la squadra di casa
-        List<Bookmaker> sortedByHomeTeam = oddsCopyForHomeTeam.getBookmakers().stream()
-                .sorted((b1, b2) -> {
-                    Float price1 = getPriceForTeam(b1, odds.getHomeTeam());
-                    Float price2 = getPriceForTeam(b2, odds.getHomeTeam());
-                    return price2.compareTo(price1); // Ordine decrescente
-                })
-                .collect(Collectors.toList());
-
-        // Ordina i bookmakers per la squadra in trasferta
-        List<Bookmaker> sortedByAwayTeam = oddsCopyForAwayTeam.getBookmakers().stream()
-                .sorted((b1, b2) -> {
-                    Float price1 = getPriceForTeam(b1, odds.getAwayTeam());
-                    Float price2 = getPriceForTeam(b2, odds.getAwayTeam());
-                    return price2.compareTo(price1); // Ordine decrescente
-                })
-                .collect(Collectors.toList());
-
-        // Aggiorna le liste di bookmakers nelle copie delle Odds
-        oddsCopyForHomeTeam.setBookmakers(sortedByHomeTeam);
-        oddsCopyForAwayTeam.setBookmakers(sortedByAwayTeam);
-
-        // Ritorna entrambe le copie
-        return Arrays.asList(oddsCopyForHomeTeam, oddsCopyForAwayTeam);
-    }
-
-    private static Float getPriceForTeam(Bookmaker bookmaker, String team) {
-        return bookmaker.getMarkets().stream()
-                .flatMap(market -> market.getOutcomes().stream())
-                .filter(outcome -> outcome.getName().equals(team))
-                .map(Outcome::getPrice)
-                .findFirst()
-                .orElse(Float.MIN_VALUE); // Valore predefinito nel caso in cui non si trovi l'outcome
-    }
-
-    private static Odds deepCopyOdds(Odds original) {
-        Odds copy = new Odds();
-        copy.setId(original.getId());
-        copy.setSportKey(original.getSportKey());
-        copy.setSportTitle(original.getSportTitle());
-        copy.setCommenceTime(original.getCommenceTime());
-        copy.setHomeTeam(original.getHomeTeam());
-        copy.setAwayTeam(original.getAwayTeam());
-        copy.setBookmakers(original.getBookmakers().stream()
-                .map(OddsApiController::deepCopyBookmaker)
-                .collect(Collectors.toList()));
-        return copy;
-    }
-
-    private static Bookmaker deepCopyBookmaker(Bookmaker original) {
-        Bookmaker copy = new Bookmaker();
-        copy.setKey(original.getKey());
-        copy.setTitle(original.getTitle());
-        copy.setUrl(original.getUrl());
-        copy.setLastUpdate(original.getLastUpdate());
-        copy.setMarkets(original.getMarkets().stream()
-                .map(OddsApiController::deepCopyMarket)
-                .collect(Collectors.toList()));
-        return copy;
-    }
-
-    private static Market deepCopyMarket(Market original) {
-        Market copy = new Market();
-        copy.setKey(original.getKey());
-        copy.setOutcomes(original.getOutcomes().stream()
-                .map(OddsApiController::deepCopyOutcome)
-                .collect(Collectors.toList()));
-        return copy;
-    }
-
-    private static Outcome deepCopyOutcome(Outcome original) {
-        Outcome copy = new Outcome();
-        copy.setName(original.getName());
-        copy.setPrice(original.getPrice());
-        copy.setPoint(original.getPoint());
-        copy.setDescription(original.getDescription());
-        return copy;
     }
 
     private List<Odds> getEventOdds(String sportKey, String eventId, String regions, String market){
         Odds odds = oddsApiService.getEventOdds(null, sportKey, eventId, regions, market, null, null, null, null, null, null);
 
-        List<betapi.database.documents.Bookmaker> bookmakersList;
         try {
-            bookmakersList = scheduleBookmakers.getBookmakers();
-            Map<String, String> bookmakerUrlMap = bookmakersList.stream()
-                    .collect(Collectors.toMap(b -> (b.getRegion() + b.getKey()), betapi.database.documents.Bookmaker::getUrl));
-
-            for (Bookmaker b : odds.getBookmakers()) {
-
-                String url;
-                if (regions.contains(",")) {
-                    for (String reg: regions.split(",")) {
-                        url = bookmakerUrlMap.get(reg + b.getKey());
-                        if (url != null) {
-                            b.setUrl(url);
-                            break;
-                        }
-                    }
-                }
-                else {
-                    b.setUrl(bookmakerUrlMap.get(regions.substring(0,2) + b.getKey()));
-                }
-            }
+            OddsUtils.addBookmakersUrl(odds, regions);
         } catch (IOException e) {
-            log.error("Failed to fetch bookmakers", e);
+            throw new RuntimeException(e);
         }
 
-        return sortBookmakersByOdds(odds);
+        return OddsUtils.sortBookmakersByOdds(odds);
     }
 
     private boolean parameterValidation(String sportKey, String eventId, String regions) {
-        // Validazione dei parametri non nulli o vuoti
         if (sportKey == null || sportKey.trim().isEmpty() ||
                 eventId == null || eventId.trim().isEmpty()) {
             return true;
         }
 
-        // Validazione delle regioni
         if (regions != null && !regions.trim().isEmpty()) {
             List<String> validRegions = Arrays.asList("eu", "uk", "us", "au");
             List<String> inputRegions = Arrays.asList(regions.split(","));
-            if (!inputRegions.stream().allMatch(validRegions::contains)) {
-                return true;
-            }
+            return !inputRegions.stream().allMatch(validRegions::contains);
         }
 
         return false;
@@ -191,8 +74,8 @@ public class OddsApiController implements OddsApi {
             }
             try {
                 List<Odds> odds = getEventOdds(sportKey, eventId, regions, "h2h");
-                if (odds != null && !odds.isEmpty()) {
-                    return new ResponseEntity<List<Odds>>(odds, HttpStatus.OK);
+                if (!odds.isEmpty()) {
+                    return new ResponseEntity<>(odds, HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);
                 }
@@ -222,7 +105,7 @@ public class OddsApiController implements OddsApi {
             try {
                 List<Odds> odds = getEventOdds(sportKey, eventId, regions, "spreads");
                 if (!odds.isEmpty()) {
-                    return new ResponseEntity<List<Odds>>(odds, HttpStatus.OK);
+                    return new ResponseEntity<>(odds, HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);
                 }
