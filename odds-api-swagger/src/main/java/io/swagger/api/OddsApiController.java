@@ -46,7 +46,6 @@ public class OddsApiController implements OddsApi {
 
 
     private static List<Odds> sortBookmakersByOdds(Odds odds) {
-        // Copia profonda dell'oggetto Odds originale
         Odds oddsCopyForHomeTeam = deepCopyOdds(odds);
         Odds oddsCopyForAwayTeam = deepCopyOdds(odds);
 
@@ -78,7 +77,6 @@ public class OddsApiController implements OddsApi {
 
     private static Float getPriceForTeam(Bookmaker bookmaker, String team) {
         return bookmaker.getMarkets().stream()
-                //.filter(market -> market.getKey().equals("h2h"))
                 .flatMap(market -> market.getOutcomes().stream())
                 .filter(outcome -> outcome.getName().equals(team))
                 .map(Outcome::getPrice)
@@ -87,7 +85,6 @@ public class OddsApiController implements OddsApi {
     }
 
     private static Odds deepCopyOdds(Odds original) {
-        // Implementazione della copia profonda
         Odds copy = new Odds();
         copy.setId(original.getId());
         copy.setSportKey(original.getSportKey());
@@ -138,12 +135,22 @@ public class OddsApiController implements OddsApi {
         try {
             bookmakersList = scheduleBookmakers.getBookmakers();
             Map<String, String> bookmakerUrlMap = bookmakersList.stream()
-                    .collect(Collectors.toMap(b -> b.getKey(), b -> b.getUrl()));
+                    .collect(Collectors.toMap(b -> (b.getRegion() + b.getKey()), betapi.database.documents.Bookmaker::getUrl));
 
             for (Bookmaker b : odds.getBookmakers()) {
-                String url = bookmakerUrlMap.get(b.getKey());
-                if (url != null) {
-                    b.setUrl(url);
+
+                String url;
+                if (regions.contains(",")) {
+                    for (String reg: regions.split(",")) {
+                        url = bookmakerUrlMap.get(reg + b.getKey());
+                        if (url != null) {
+                            b.setUrl(url);
+                            break;
+                        }
+                    }
+                }
+                else {
+                    b.setUrl(bookmakerUrlMap.get(regions.substring(0,2) + b.getKey()));
                 }
             }
         } catch (IOException e) {
@@ -183,7 +190,7 @@ public class OddsApiController implements OddsApi {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             try {
-                List<Odds> odds = getEventOdds(sportKey, eventId, regions, "spreads");
+                List<Odds> odds = getEventOdds(sportKey, eventId, regions, "h2h");
                 if (odds != null && !odds.isEmpty()) {
                     return new ResponseEntity<List<Odds>>(odds, HttpStatus.OK);
                 } else {
@@ -214,7 +221,7 @@ public class OddsApiController implements OddsApi {
             }
             try {
                 List<Odds> odds = getEventOdds(sportKey, eventId, regions, "spreads");
-                if (odds != null && !odds.isEmpty()) {
+                if (!odds.isEmpty()) {
                     return new ResponseEntity<List<Odds>>(odds, HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(odds, HttpStatus.NO_CONTENT);

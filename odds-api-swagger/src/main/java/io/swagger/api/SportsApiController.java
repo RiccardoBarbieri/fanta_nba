@@ -107,7 +107,7 @@ public class SportsApiController implements SportsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                List<Sport> sports = oddsApiService.getSports(null, all.toString());
+                List<Sport> sports = oddsApiService.getSports(null, all != null ? all.toString() : null);
                 if (sports != null && !sports.isEmpty()) {
                     List<String> groups = getUniqueGroups(sports);
                     if (groups != null && !groups.isEmpty()) {
@@ -133,6 +133,7 @@ public class SportsApiController implements SportsApi {
     }
 
     private List<Sport> filterByGroup(List<Sport> sports, String group) {
+        if (group == null) return sports;
         return sports.stream()
                 .filter(sport -> group.equals(sport.getGroup()))
                 .collect(Collectors.toList());
@@ -149,7 +150,7 @@ public class SportsApiController implements SportsApi {
             }
 
             try {
-                List<Sport> sports = oddsApiService.getSports(null, all.toString());
+                List<Sport> sports = oddsApiService.getSports(null, all != null ? all.toString() : null);
                 if (sports != null && !sports.isEmpty()) {
                     List<Sport> sportFiltered = filterByGroup(sports, groupName);
                     if (sportFiltered != null && !sportFiltered.isEmpty()) {
