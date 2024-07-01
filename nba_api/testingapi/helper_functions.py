@@ -1,12 +1,9 @@
 from typing import List, AnyStr, Dict
 
+from constants import LEAGUE_GAME_FINDER_FIELDS
+
 # Static variables, to put in a CONSTANTS module
 # Relevant fields from LeagueGameFinder dictionary
-LEAGUE_GAME_FINDER_FIELDS = [
-    'team_id', 'fgm', 'fga', 'fg3m', 'fg3a', 'ftm', 'fta', 'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
-    'pf', 'pts'
-]
-
 
 # Helper functions
 
@@ -32,7 +29,7 @@ def all_keys_to_lower(d: Dict | List[Dict]) -> Dict | List[Dict]:
     Convert all keys in a dictionary or list of dictionaries to lowercase.
 
     :param d: A dictionary or list of dictionaries.
-    :return: A dictionary or list of dictionaries with all keys in uppercase.
+    :return: A dictionary or list of dictionaries with all keys in lowercase.
     """
     if isinstance(d, list) and d and isinstance(d[0], dict):
         return [all_keys_to_lower(i) for i in d]
