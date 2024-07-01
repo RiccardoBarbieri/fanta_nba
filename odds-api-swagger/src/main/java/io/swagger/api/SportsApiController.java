@@ -75,7 +75,7 @@ public class SportsApiController implements SportsApi {
             }
 
             try {
-                List<Event> events = oddsApiService.getEvents(sportKey, null, null, commenceTimeFrom, commenceTimeTo);
+                List<Event> events = oddsApiService.getEvents(null, sportKey, null, null, commenceTimeFrom, commenceTimeTo);
                 if (events != null && !events.isEmpty()) {
                     return new ResponseEntity<>(events, HttpStatus.OK);
                 } else {
@@ -107,7 +107,7 @@ public class SportsApiController implements SportsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                List<Sport> sports = oddsApiService.getSports(all);
+                List<Sport> sports = oddsApiService.getSports(null, all.toString());
                 if (sports != null && !sports.isEmpty()) {
                     List<String> groups = getUniqueGroups(sports);
                     if (groups != null && !groups.isEmpty()) {
@@ -149,7 +149,7 @@ public class SportsApiController implements SportsApi {
             }
 
             try {
-                List<Sport> sports = oddsApiService.getSports(all);
+                List<Sport> sports = oddsApiService.getSports(null, all.toString());
                 if (sports != null && !sports.isEmpty()) {
                     List<Sport> sportFiltered = filterByGroup(sports, groupName);
                     if (sportFiltered != null && !sportFiltered.isEmpty()) {

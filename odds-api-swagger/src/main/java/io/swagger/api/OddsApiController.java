@@ -132,7 +132,7 @@ public class OddsApiController implements OddsApi {
     }
 
     private List<Odds> getEventOdds(String sportKey, String eventId, String regions, String market){
-        Odds odds = oddsApiService.getEventOdds(sportKey, eventId, regions, market, null, null, null, null, null, null);
+        Odds odds = oddsApiService.getEventOdds(null, sportKey, eventId, regions, market, null, null, null, null, null, null);
 
         List<betapi.database.documents.Bookmaker> bookmakersList;
         try {
