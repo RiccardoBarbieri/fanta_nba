@@ -5,6 +5,7 @@ import pandas as pd
 from nba_api.stats.endpoints.boxscoreadvancedv2 import BoxScoreAdvancedV2
 from nba_api.stats.endpoints.leaguedashlineups import LeagueDashLineups
 from nba_api.stats.endpoints.teamgamelog import TeamGameLog
+from nba_api.stats.endpoints.playbyplayv2 import PlayByPlayV2
 from nba_api.stats.static import teams
 
 from helper_functions import all_keys_to_lower
@@ -41,13 +42,13 @@ def get_season_games_for_team(team_ticker: str, season: str, playoffs: bool) -> 
     return all_keys_to_lower(team_game_log)
 
 
-def get_dash_lineups(team_ticker: str, opp_team_ticker: str, date: str, playoffs: bool) -> List:
+def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, playoffs: bool) -> List:
     """
     Get the starting lineup and the bench for a specific game.
 
     :param team_ticker: The team abbreviation.
     :param opp_team_ticker: The opponent team abbreviation.
-    :param date: The date of the game in the format 'YYYY-MM-DD'.
+    :param game_id: The game identifier.
     :param playoffs: true to get the playoff games, false to get the regular season games.
 
     :return: A list containing the dashboard lineup for the game.
@@ -58,6 +59,11 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, date: str, playoffs
     team_id = filter(lambda x: x['abbreviation'] == team_ticker, teams_info).__next__()['id']
     opp_team_id = filter(lambda x: x['abbreviation'] == opp_team_ticker, teams_info).__next__()['id']
 
+    league_game_log = get_season_games_for_team(team_ticker, '2023-24', playoffs)
+    date = filter(lambda x: x['game_id'] == game_id, league_game_log).__next__()['game_date']
+
+    print(date)
+
     if playoffs:
         season_type = 'Playoffs'
     else:
@@ -66,8 +72,8 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, date: str, playoffs
     dash_lineups = LeagueDashLineups(team_id_nullable=team_id,
                                      opponent_team_id=opp_team_id,
                                      date_from_nullable=date,
-                                     season_type_all_star=season_type,
-                                     date_to_nullable=date).get_normalized_dict()['Lineups']
+                                     date_to_nullable=date,
+                                     season_type_all_star=season_type).get_normalized_dict()['Lineups']
 
     return all_keys_to_lower(dash_lineups)
 
@@ -83,6 +89,19 @@ def get_boxscore(game_id: str) -> Dict:
     boxscore = BoxScoreAdvancedV2(game_id=game_id).get_normalized_dict()['TeamStats']
 
     return all_keys_to_lower(boxscore)
+
+
+def get_playbyplay(game_id: str) -> Dict:
+    """
+    Get the play by play for a specific game.
+
+    :param game_id: The game identifier.
+
+    :return: A dictionary containing the play by play for the game.
+    """
+    playbyplay = PlayByPlayV2(game_id=game_id).get_normalized_dict()['play_by_play']
+
+    return all_keys_to_lower(playbyplay)
 
 
 # def get_game_by_date(team_ticker: str, season: str, date: str, playoffs: bool) -> Dict:
@@ -188,34 +207,44 @@ def aggregate_regular_season_stats(team_ticker: str, season: str, game_number: i
     }
 
 
-# MAYBE REPLACE DATE WITH GAME_ID
-def get_lineup(team_ticker: str, opp_team_ticker: str, date: str, playoffs: bool) -> List[Dict[AnyStr, AnyStr]]:
+def get_longest_lineup(team_ticker: str, opp_team_ticker: str, game_id: str, playoffs: bool) -> Dict[
+    AnyStr, List[Dict[AnyStr, AnyStr]]]:
     """
-    Get the starting lineup and the bench for a specific game.
+    Get the lineup that has played for the longest time and the bench calculated by eliminating that lineup from all the
+    players that played in the game.
 
     :param team_ticker: The team abbreviation.
     :param opp_team_ticker: The opponent team abbreviation.
-    :param date: The date of the game in the format 'YYYY-MM-DD'.
+    :param game_id: The game identifier.
     :param playoffs: true to get the playoff games, false to get the regular season games.
 
     :return: A dictionary containing the starting lineup and the bench for the game, like
     {
-        'name': 'Player Name',
-        'id': 'Player ID',
+        'lineup': [{'name': 'Player A', 'id': '123'}, ...],
+        'bench': [{'name': 'Player B', 'id': '456'}, ...],
     }
     """
-    dash_lineups = get_dash_lineups(team_ticker, opp_team_ticker, date, playoffs)
+    dash_lineups = get_dash_lineups(team_ticker, opp_team_ticker, game_id, playoffs)
 
-    dash_lineups.sort(key=lambda x: x['min'])
+    dash_lineups.sort(key=lambda x: -x['min'])
 
-    names_string = dash_lineups[0]['group_name']
-    ids_string = dash_lineups[0]['group_id']
-    names = names_string.split(' - ')
-    ids = ids_string.split('-')[1:-1]
+    # Getting all players that played in the game
+    all_players = set()
+    for i in dash_lineups:
+        all_players.update(
+            [(name, id) for name, id in zip(i['group_name'].split(' - '), i['group_id'].split('-')[1:-1])])
 
-    starting_lineup = [{'name': name, 'id': id} for name, id in zip(names, ids)]
+    # Getting lineup that played the longest
+    lineup_names_string = dash_lineups[0]['group_name']
+    lineup_ids_string = dash_lineups[0]['group_id']
+    longest_lineup = set(
+        [(name, id) for name, id in zip(lineup_names_string.split(' - '), lineup_ids_string.split('-')[1:-1])])
 
-    return starting_lineup
+    # Getting the bench by removing the longest lineup from all players
+    bench = all_players - longest_lineup
+
+    return {'lineup': [{'name': name, 'id': id} for name, id in longest_lineup],
+            'bench': [{'name': name, 'id': id} for name, id in bench]}
 
 
 def get_offdef_rating(team_ticker: str, season: str, game_id_up_to: str, playoffs: bool) -> Dict[AnyStr, float]:
@@ -253,7 +282,6 @@ def get_offdef_rating(team_ticker: str, season: str, game_id_up_to: str, playoff
         opp_boxscore = filter(lambda x: x['team_abbreviation'] != team_ticker, boxscores).__next__()
         team_boxscore = filter(lambda x: x['team_abbreviation'] == team_ticker, boxscores).__next__()
 
-
         cur_opp_poss = opp_boxscore['poss']
         cur_team_poss = team_boxscore['poss']
 
@@ -266,7 +294,8 @@ def get_offdef_rating(team_ticker: str, season: str, game_id_up_to: str, playoff
         team_points += cur_team_pts
 
 
-    return {'off_rating': (100 * (int(team_points) / team_poss)), 'def_rating': 100 * (int(opp_points) / opp_poss)}
+
+    return {'off_rating': (100 * (round(team_points) / team_poss)), 'def_rating': 100 * (round(opp_points) / opp_poss)}
 
 
 def print_df(df):
@@ -276,7 +305,6 @@ def print_df(df):
 
 if __name__ == '__main__':
     get_offdef_rating('BOS', '2023-24', '0022300103', False)
-
 
     #     tid         gid
     #  2  1610612738  0022300103  2023-10-30 00:00:00     BOS @ WAS
@@ -295,10 +323,10 @@ if __name__ == '__main__':
 
 # MISSING
 
-# offensive and defensive rating A and B TODO already calculated in boxscoreadvancedv2
-# starting lineup A and B ????? CHECK
-# bench A and B ????? NOT USING
-# win percentage last 5 games A and B (TODO gather from game log sorted
+# offensive and defensive rating A and B DONE
+# starting lineup A and B ????? DONE
+# bench A and B ????? DONE
+# win percentage last 5 games A and B DONE
 # referee name TODO: it is in playbyplay (maybe v2)
 
 # home_team 0 if A at home, 1 if B at home
