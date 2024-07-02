@@ -1,6 +1,9 @@
 from typing import List, AnyStr, Dict
+import sys
 
-from constants import LEAGUE_GAME_FINDER_FIELDS
+sys.path.append('..')
+
+from utils.constants import LEAGUE_GAME_FINDER_FIELDS
 
 # Static variables, to put in a CONSTANTS module
 # Relevant fields from LeagueGameFinder dictionary

@@ -1,5 +1,8 @@
 from pprint import pprint
 from typing import List, Dict, AnyStr
+import sys
+
+sys.path.append('..')
 
 import pandas as pd
 from nba_api.stats.endpoints.boxscoreadvancedv2 import BoxScoreAdvancedV2
@@ -9,8 +12,8 @@ from nba_api.stats.endpoints.playbyplayv2 import PlayByPlayV2
 from nba_api.live.nba.endpoints.boxscore import BoxScore
 from nba_api.stats.static import teams
 
-from helper_functions import all_keys_to_lower
-from validation import validate_season_string, validate_team_ticker, validate_game_number
+from utils.helper_functions import all_keys_to_lower
+from utils.validation import validate_season_string, validate_team_ticker, validate_game_number
 
 
 # TODO consider implementing caching for the team_game_log
