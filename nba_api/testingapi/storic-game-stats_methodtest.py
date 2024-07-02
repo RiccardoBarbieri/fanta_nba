@@ -1,10 +1,9 @@
 from nba_api.stats.endpoints.teamgamelog import TeamGameLog
-import nba_api.stats.static.teams as teams
-from helper_functions import join_to_game_info, all_keys_to_lower
+from nba_api.stats.static import teams
+from utils.helper_functions import join_to_game_info, all_keys_to_lower
 import json
 import re
 import datetime
-from pprint import pprint
 
 # Endpoint parameters:
 # - team1_ticker (string) the team abbreviation
@@ -18,10 +17,10 @@ dateTo = '2024-06-06'
 teamTicker1 = 'BOS'
 teamTicker2 = 'WAS'
 
-teams = teams.get_teams()
+teams_info = teams.get_teams()
 
-ticker1_id = filter(lambda x: x['abbreviation'] == teamTicker1, teams).__next__()['id']
-ticker2_id = filter(lambda x: x['abbreviation'] == teamTicker2, teams).__next__()['id']
+ticker1_id = filter(lambda x: x['abbreviation'] == teamTicker1, teams_info).__next__()['id']
+ticker2_id = filter(lambda x: x['abbreviation'] == teamTicker2, teams_info).__next__()['id']
 
 # convert to MM/DD/YYYY using datetime
 date_from = datetime.datetime.strptime(dateFrom, '%Y-%m-%d').strftime('%m/%d/%Y')
