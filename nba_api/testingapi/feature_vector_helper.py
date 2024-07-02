@@ -6,6 +6,7 @@ from nba_api.stats.endpoints.boxscoreadvancedv2 import BoxScoreAdvancedV2
 from nba_api.stats.endpoints.leaguedashlineups import LeagueDashLineups
 from nba_api.stats.endpoints.teamgamelog import TeamGameLog
 from nba_api.stats.endpoints.playbyplayv2 import PlayByPlayV2
+from nba_api.live.nba.endpoints.boxscore import BoxScore
 from nba_api.stats.static import teams
 
 from helper_functions import all_keys_to_lower
@@ -78,7 +79,7 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, playo
     return all_keys_to_lower(dash_lineups)
 
 
-def get_boxscore(game_id: str) -> Dict:
+def get_boxscore_teamstats(game_id: str) -> Dict:
     """
     Get the boxscore for a specific game.
 
@@ -91,6 +92,19 @@ def get_boxscore(game_id: str) -> Dict:
     return all_keys_to_lower(boxscore)
 
 
+def get_live_boxscore(game_id: str) -> Dict:
+    """
+    Get the live boxscore for a specific game.
+
+    :param game_id: The game identifier.
+
+    :return: A dictionary containing the live boxscore for the game.
+    """
+    boxscore = BoxScore(game_id=game_id).get_dict()['game']
+
+    return all_keys_to_lower(boxscore)
+
+
 def get_playbyplay(game_id: str) -> Dict:
     """
     Get the play by play for a specific game.
@@ -99,7 +113,7 @@ def get_playbyplay(game_id: str) -> Dict:
 
     :return: A dictionary containing the play by play for the game.
     """
-    playbyplay = PlayByPlayV2(game_id=game_id).get_normalized_dict()['play_by_play']
+    playbyplay = PlayByPlayV2(game_id=game_id).get_normalized_dict()['PlayByPlay']
 
     return all_keys_to_lower(playbyplay)
 
@@ -278,7 +292,7 @@ def get_offdef_rating(team_ticker: str, season: str, game_id_up_to: str, playoff
     team_points = 0
 
     for game_id in game_ids:
-        boxscores = get_boxscore(game_id)
+        boxscores = get_boxscore_teamstats(game_id)
         opp_boxscore = filter(lambda x: x['team_abbreviation'] != team_ticker, boxscores).__next__()
         team_boxscore = filter(lambda x: x['team_abbreviation'] == team_ticker, boxscores).__next__()
 
@@ -293,9 +307,22 @@ def get_offdef_rating(team_ticker: str, season: str, game_id_up_to: str, playoff
         opp_points += cur_opp_pts
         team_points += cur_team_pts
 
-
-
     return {'off_rating': (100 * (round(team_points) / team_poss)), 'def_rating': 100 * (round(opp_points) / opp_poss)}
+
+
+def get_referee(game_id: str) -> Dict:
+    """
+    Get the referees for a specific game.
+
+    :param game_id: The game identifier.
+
+    :return: A list containing the referees for the game.
+    """
+    live_boxscore = get_live_boxscore(game_id)['officials']
+
+    off1 = filter(lambda x: x['assignment'] == 'OFFICIAL1', live_boxscore).__next__()
+
+    return {'name': off1['name'], 'id': off1['personId']}
 
 
 def print_df(df):
@@ -304,7 +331,7 @@ def print_df(df):
 
 
 if __name__ == '__main__':
-    get_offdef_rating('BOS', '2023-24', '0022300103', False)
+    print(get_referee('0022300103'))
 
     #     tid         gid
     #  2  1610612738  0022300103  2023-10-30 00:00:00     BOS @ WAS
@@ -327,12 +354,11 @@ if __name__ == '__main__':
 # starting lineup A and B ????? DONE
 # bench A and B ????? DONE
 # win percentage last 5 games A and B DONE
-# referee name TODO: it is in playbyplay (maybe v2)
+# referee name DONE
 
-# home_team 0 if A at home, 1 if B at home
+# distance travelled by away team PDPDPDPD
 
-# distance travelled by away team
-
+# home_team 0 if A at home, 1 if B at home TODO: apply when combining the methods
 # game date TODO: apply when combining the methods
 # season TODO: apply when combining the methods
 # topic (if season 0, if playoffs 1) TODO: apply when combining the methods
