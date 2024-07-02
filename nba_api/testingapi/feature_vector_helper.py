@@ -13,6 +13,7 @@ from helper_functions import all_keys_to_lower
 from validation import validate_season_string, validate_team_ticker, validate_game_number
 
 
+# TODO consider implementing caching for the team_game_log
 def get_season_games_for_team(team_ticker: str, season: str, playoffs: bool) -> List[Dict]:
     """
     Get all the games played by a team in a season.
@@ -62,8 +63,6 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, playo
 
     league_game_log = get_season_games_for_team(team_ticker, '2023-24', playoffs)
     date = filter(lambda x: x['game_id'] == game_id, league_game_log).__next__()['game_date']
-
-    print(date)
 
     if playoffs:
         season_type = 'Playoffs'
@@ -118,6 +117,37 @@ def get_playbyplay(game_id: str) -> Dict:
     return all_keys_to_lower(playbyplay)
 
 
+def get_prev_game(team_ticker: str, game_id: str, season: str, playoffs: bool) -> str | None:
+    """
+    Get the previous game played by a team in a season.
+
+    :param team_ticker: The team abbreviation.
+    :param game_id: The game identifier.
+    :param season: A string representing the season in the format 'YYYY-YY'.
+    :param playoffs: true to get the playoff games, false to get the regular season games.
+    :return: The id of the previous game played by the team, None if there is no previous game.
+    """
+    validate_team_ticker(team_ticker)
+    validate_season_string(season)
+
+    team_game_log = get_season_games_for_team(team_ticker, season, playoffs)
+
+    df_team_game_log = pd.DataFrame(team_game_log)
+    if game_id not in df_team_game_log['game_id'].tolist():
+        raise ValueError('Game ID not found in the game log')
+
+    df_team_game_log.loc[:, 'game_date'] = pd.to_datetime(df_team_game_log['game_date'], format='%b %d, %Y')
+    df_team_game_log.sort_values(by='game_date', inplace=True, ascending=True)
+    df_team_game_log.reset_index(drop=True, inplace=True)
+
+    game_index = df_team_game_log[df_team_game_log['game_id'] == game_id].index[0]
+
+    if game_index == 0:
+        return None
+
+    return df_team_game_log.iloc[game_index - 1, :]['game_id']
+
+
 # def get_game_by_date(team_ticker: str, season: str, date: str, playoffs: bool) -> Dict:
 #     """
 #     Get a game played by a team in a season by date.
@@ -144,7 +174,7 @@ def get_playbyplay(game_id: str) -> Dict:
 
 
 # TODO Create version of this function for the playoffs
-# maybe it's ok to use game number system for playoffs also, get tot games for team before
+# maybe it's ok to use game number system for playoffs also, get tot games for team before TODO ref 1
 def aggregate_regular_season_stats(team_ticker: str, season: str, game_number: int = 82) -> Dict:
     """
     Aggregates stats from an entire season for a specific team, the stats are aggregated
@@ -171,6 +201,10 @@ def aggregate_regular_season_stats(team_ticker: str, season: str, game_number: i
     validate_season_string(season)
     validate_team_ticker(team_ticker)
     validate_game_number(game_number)
+
+    # TODO ref 1
+    # if playoffs and game_number > 16:
+    #     raise ValueError('Game number must be between 1 and 16 for playoffs')
 
     team_game_log = get_season_games_for_team(team_ticker, season, False)
 
@@ -205,7 +239,7 @@ def aggregate_regular_season_stats(team_ticker: str, season: str, game_number: i
         last_5_games_w_pct = last_5_games[last_5_games == 'W'].count() / 5
 
     return {
-        'team_id': df_team_game_log.iloc[game_number - 1, :]['team_id'],
+        'team_id': df_team_game_log.iloc[game_number - 1, :]['team_id'],  # TODO maybe replace with team_ticker
         'season': season,
         'fg_pct': fg_pct,
         'fg3_pct': fg3_pct,
@@ -269,7 +303,7 @@ def get_offdef_rating(team_ticker: str, season: str, game_id_up_to: str, playoff
     :param game_id_up_to: The game identifier.
     :param season: A string representing the season in the format 'YYYY-YY'.
     :param playoffs: true to get the playoff games, false to get the regular season games.
-    :return:
+    :return: A dictionary containing the offensive and defensive rating for the team.
     """
     validate_season_string(season)
     validate_team_ticker(team_ticker)
@@ -325,28 +359,61 @@ def get_referee(game_id: str) -> Dict:
     return {'name': off1['name'], 'id': off1['personId']}
 
 
+def get_arena(game_id: str | None) -> Dict:
+    """
+    Get the arena for a specific game.
+
+    :param game_id: The game identifier, if None return home arena.
+
+    :return: A dictionary containing the arena for the game.
+    """
+
+    if game_id is None:
+        team_game_log = get_season_games_for_team('BOS', '2023-24', False)
+        df_team_game_log = pd.DataFrame(team_game_log)
+        df_team_game_log.loc[:, 'game_date'] = pd.to_datetime(df_team_game_log['game_date'], format='%b %d, %Y')
+        df_team_game_log.sort_values(by='game_date', inplace=True, ascending=True)
+        df_team_game_log.reset_index(drop=True, inplace=True)
+        first_home_game_id = df_team_game_log[df_team_game_log['matchup'].str.contains('vs.')].iloc[0, :]['game_id']
+        game_id = first_home_game_id
+
+    live_boxscore = get_live_boxscore(game_id)
+
+    return {'name': live_boxscore['arena']['arenaName'], 'city': live_boxscore['arena']['arenaCity'], 'state': live_boxscore['arena']['arenaState']}
+
+
 def print_df(df):
     with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', None):
         print(df)
 
 
 if __name__ == '__main__':
-    print(get_referee('0022300103'))
 
-    #     tid         gid
-    #  2  1610612738  0022300103  2023-10-30 00:00:00     BOS @ WAS
-    # 74  1610612738  0022300010  2023-11-10 00:00:00   BOS vs. BKN
-    # 72  1610612738  0022301060  2024-03-28 00:00:00     BOS @ ATL
-    # 73  1610612738  0022301074  2024-03-30 00:00:00     BOS @ NOP
+    prev_game = get_prev_game('BOS', '0022300065', '2023-24', False)
 
-    # 74  1610612738  0022301087  2024-04-01 00:00:00     BOS @ CHA
-    # 75  1610612738  0022301105  2024-04-03 00:00:00   BOS vs. OKC
-    # 76  1610612738  0022301118  2024-04-05 00:00:00   BOS vs. SAC
-    # 77  1610612738  0022301134  2024-04-07 00:00:00   BOS vs. POR
-    # 78  1610612738  0022301148  2024-04-09 00:00:00     BOS @ MIL
-    # 79  1610612738  0022301167  2024-04-11 00:00:00   BOS vs. NYK
-    # 80  1610612738  0022301173  2024-04-12 00:00:00   BOS vs. CHA
-    # 81  1610612738  0022301186  2024-04-14 00:00:00   BOS vs. WAS
+    print(prev_game)
+
+    print(get_arena(prev_game))
+    print(get_arena('0022300065'))
+
+    # print(teams.get_teams())
+     
+    #        team_id     game_id            game_date      matchup
+    # 0   1610612738  0022300065  2023-10-25 00:00:00    BOS @ NYK
+    # 1   1610612738  0022300080  2023-10-27 00:00:00  BOS vs. MIA
+    # 2   1610612738  0022300103  2023-10-30 00:00:00    BOS @ WAS
+    # 3   1610612738  0022300118  2023-11-01 00:00:00  BOS vs. IND
+    # 4   1610612738  0022300136  2023-11-04 00:00:00    BOS @ BKN
+    # 5   1610612738  0022300154  2023-11-06 00:00:00    BOS @ MIN
+    # 6   1610612738  0022300159  2023-11-08 00:00:00    BOS @ PHI
+    # 7   1610612738  0022300010  2023-11-10 00:00:00  BOS vs. BKN
+    # 8   1610612738  0022300174  2023-11-11 00:00:00  BOS vs. TOR
+    # 9   1610612738  0022300188  2023-11-13 00:00:00  BOS vs. NYK
+    # 10  1610612738  0022300194  2023-11-15 00:00:00    BOS @ PHI
+    # 11  1610612738  0022300031  2023-11-17 00:00:00    BOS @ TOR
+    # 12  1610612738  0022300213  2023-11-19 00:00:00    BOS @ MEM
+    # 13  1610612738  0022300217  2023-11-20 00:00:00    BOS @ CHA
+    # 14  1610612738  0022300228  2023-11-22 00:00:00  BOS vs. MIL
 
 # MISSING
 
