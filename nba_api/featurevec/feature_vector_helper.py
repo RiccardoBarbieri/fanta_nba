@@ -318,7 +318,7 @@ def get_number_of_playoff_games_for_team(team_ticker: str, season: str) -> int:
 #     return game
 
 
-def aggregate_regular_season_stats(team_ticker: str, season: str, playoffs: bool, game_number: int = 82) -> Dict:
+def aggregate_simple_season_stats(team_ticker: str, season: str, playoffs: bool, game_number: int = 82) -> Dict:
     """
     Aggregates stats from an entire season for a specific team, the stats are aggregated
     are the one present in the team game log:
@@ -608,7 +608,9 @@ if __name__ == '__main__':
 
     # print(get_player_efficiency('1628369', '0022300136', '2023-24'))
 
-    print(get_teams_in_playoffs('2023-24'))
+    reg_season_games_log = get_season_games_for_team('BOS', '2023-24', playoffs=False)
+    df_reg_season_games = pd.DataFrame(reg_season_games_log)
+    print_df(df_reg_season_games)
 
     # Jayson Tatum 1628369
     #        team_id     game_id            game_date      matchup
