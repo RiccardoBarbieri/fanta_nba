@@ -11,20 +11,35 @@ from utils.constants import LEAGUE_GAME_FINDER_FIELDS
 # Helper functions
 
 
-def get_home_away_team(matchups: AnyStr) -> Dict[AnyStr, AnyStr]:
+def get_home_away_team(matchup: AnyStr) -> Dict[AnyStr, AnyStr]:
     """
     Get the home and away teams from a matchup string.
 
-    :param matchups: A string representing a matchup.
+    :param matchup: A string representing a matchup.
     :return: A dictionary containing the home and away teams (home_team and away_team keys).
     """
-    if ' vs. ' in matchups:
-        home_team, away_team = matchups.split(' vs. ')
-    elif ' @ ' in matchups:
-        away_team, home_team = matchups.split(' @ ')
+    if ' vs. ' in matchup:
+        home_team, away_team = matchup.split(' vs. ')
+    elif ' @ ' in matchup:
+        away_team, home_team = matchup.split(' @ ')
     else:
         raise ValueError('Matchup string must contain either " vs. " or " @ "')
     return {'home_team': home_team, 'away_team': away_team}
+
+
+def get_opponent(matchup: AnyStr) -> Dict[AnyStr, AnyStr]:
+    """
+    Get the opponent from a matchup string.
+
+    :param matchup: A string representing a matchup.
+    :return: The abbreviation of the opponent team.
+    """
+    if ' vs. ' in matchup:
+        return matchup.split(' vs. ')[1]
+    elif ' @ ' in matchup:
+        return matchup.split(' @ ')[1]
+    else:
+        raise ValueError('Matchup string must contain either " vs. " or " @ "')
 
 
 def all_keys_to_lower(d: Dict | List[Dict]) -> Dict | List[Dict]:
