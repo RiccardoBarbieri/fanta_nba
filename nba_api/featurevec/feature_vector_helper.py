@@ -1,3 +1,4 @@
+import datetime
 import functools
 import os
 import pickle
@@ -7,6 +8,7 @@ from pprint import pprint
 from typing import List, Dict, AnyStr, Tuple
 
 import pandas as pd
+import requests
 
 sys.path.append('..')
 from nba_api.stats.endpoints.boxscoreadvancedv2 import BoxScoreAdvancedV2
@@ -14,6 +16,8 @@ from nba_api.stats.endpoints.leaguedashlineups import LeagueDashLineups
 from nba_api.stats.endpoints.teamgamelog import TeamGameLog
 from nba_api.stats.endpoints.playbyplayv2 import PlayByPlayV2
 from nba_api.live.nba.endpoints.boxscore import BoxScore
+from nba_api.stats.endpoints.scoreboardv2 import ScoreboardV2
+from nba_api.stats.endpoints.boxscoresummaryv2 import BoxScoreSummaryV2
 from nba_api.stats.endpoints.cumestatsplayer import CumeStatsPlayer
 from nba_api.stats.endpoints.commonplayerinfo import CommonPlayerInfo
 from nba_api.stats.endpoints.commonallplayers import CommonAllPlayers
@@ -81,13 +85,14 @@ def get_league_game_log_for_season(season: str, playoffs: bool) -> List[Dict]:
 
 
 @functools.lru_cache
-def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, playoffs: bool) -> List:
+def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, season: str, playoffs: bool) -> List:
     """
     Get the starting lineup and the bench for a specific game.
 
     :param team_ticker: The team abbreviation.
     :param opp_team_ticker: The opponent team abbreviation.
     :param game_id: The game identifier.
+    :param season: A string representing the season in the format 'YYYY-YY'.
     :param playoffs: true to get the playoff games, false to get the regular season games.
 
     :return: A list containing the dashboard lineup for the game.
@@ -98,8 +103,11 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, playo
     team_id = filter(lambda x: x['abbreviation'] == team_ticker, teams_info).__next__()['id']
     opp_team_id = filter(lambda x: x['abbreviation'] == opp_team_ticker, teams_info).__next__()['id']
 
-    league_game_log = get_season_games_for_team(team_ticker, '2023-24', playoffs)
+    league_game_log = get_season_games_for_team(team_ticker, season, playoffs)
     date = filter(lambda x: x['game_id'] == game_id, league_game_log).__next__()['game_date']
+
+    # date = datetime.datetime.strptime(date, '%b %d, %Y').strftime('%m/%d/%Y')
+    date = get_date_from_game_id(game_id)
 
     if playoffs:
         season_type = 'Playoffs'
@@ -108,9 +116,12 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, playo
 
     dash_lineups = LeagueDashLineups(team_id_nullable=team_id,
                                      opponent_team_id=opp_team_id,
+                                     season=season,
                                      date_from_nullable=date,
                                      date_to_nullable=date,
-                                     season_type_all_star=season_type).get_normalized_dict()['Lineups']
+                                     season_type_all_star=season_type)
+
+    dash_lineups = dash_lineups.get_normalized_dict()['Lineups']
 
     return all_keys_to_lower(dash_lineups)
 
@@ -129,18 +140,62 @@ def get_boxscore_teamstats(game_id: str) -> Dict:
     return all_keys_to_lower(boxscore)
 
 
+# @functools.lru_cache
+# def get_live_boxscore(game_id: str) -> Dict:
+#     """
+#     Get the live boxscore for a specific game.
+#
+#     :param game_id: The game identifier.
+#
+#     :return: A dictionary containing the live boxscore for the game.
+#     """
+#     boxscore = BoxScore(game_id=game_id).get_dict()['game']
+#
+#     return all_keys_to_lower(boxscore)
+
+
 @functools.lru_cache
-def get_live_boxscore(game_id: str) -> Dict:
+def get_scoreboard(date: str) -> Dict[AnyStr, List]:
     """
-    Get the live boxscore for a specific game.
+    Get the scoreboard for a specific date.
+
+    :param date: The date in the format 'YYYY-MM-DD'.
+
+    :return: A list of dictionaries containing the games played on the date.
+    """
+    scoreboard = ScoreboardV2(game_date=date).get_normalized_dict()
+
+    return all_keys_to_lower(scoreboard)
+
+
+@functools.lru_cache
+def get_date_from_game_id(game_id: str) -> str:
+    """
+    Get the date from a game identifier.
 
     :param game_id: The game identifier.
 
-    :return: A dictionary containing the live boxscore for the game.
+    :return: The date of the game.
     """
-    boxscore = BoxScore(game_id=game_id).get_dict()['game']
+    boxscore_summary = get_boxscore_summary(game_id)
 
-    return all_keys_to_lower(boxscore)
+    date_stupid_format = boxscore_summary['gameinfo'][0]['GAME_DATE']
+
+    return datetime.datetime.strptime(date_stupid_format, '%A, %B %d, %Y').strftime('%Y-%m-%d')
+
+
+@functools.lru_cache
+def get_boxscore_summary(game_id: str):
+    """
+    Get the boxscore summary for a specific game.
+
+    :param game_id: The game identifier.
+
+    :return: A dictionary containing the boxscore summary for the game.
+    """
+    boxscore_summary = BoxScoreSummaryV2(game_id=game_id).get_normalized_dict()
+
+    return all_keys_to_lower(boxscore_summary)
 
 
 @functools.lru_cache
@@ -224,6 +279,9 @@ def get_common_team_roster(team_id: str, season: str) -> List[Dict]:
     return all_keys_to_lower(common_team_roster)
 
 
+#  _____________________________________________________________________________________________________________________
+
+
 def get_prev_game(team_ticker: str, game_id: str, season: str, playoffs: bool) -> str | None:
     """
     Get the previous game played by a team in a season.
@@ -293,32 +351,7 @@ def get_number_of_playoff_games_for_team(team_ticker: str, season: str) -> int:
     return len(playoff_games)
 
 
-# def get_game_by_date(team_ticker: str, season: str, date: str, playoffs: bool) -> Dict:
-#     """
-#     Get a game played by a team in a season by date.
-#
-#     :param team_ticker: The team abbreviation.
-#     :param season: A string representing the season in the format 'YYYY-YY'.
-#     :param date: A string representing the date of the game in the format 'YYYY-MM-DD'.
-#     :param playoffs: true to get the playoff games, false to get the regular season games.
-#
-#     :return: A dictionary containing the game played by the team in the season on the date.
-#     """
-#     validate_season_string(season)
-#     validate_team_ticker(team_ticker)
-#
-#     team_game_log = get_season_games_for_team(team_ticker, season, False)
-#
-#     df_team_game_log = pd.DataFrame(team_game_log)
-#     df_team_game_log.loc[:, 'game_date'] = pd.to_datetime(df_team_game_log['game_date'], format='%b %d, %Y')
-#     df_team_game_log.sort_values(by='game_date', inplace=True, ascending=True)
-#     df_team_game_log.reset_index(drop=True, inplace=True)
-#     game = df_team_game_log[df_team_game_log['game_date'] == date].iloc[0, :]
-#
-#     return game
-
-
-def aggregate_simple_season_stats(team_ticker: str, season: str, playoffs: bool, game_number: int = 82) -> Dict:
+def aggregate_simple_game_cum_stats(team_ticker: str, season: str, playoffs: bool, game_number: int = 82) -> Dict:
     """
     Aggregates stats from an entire season for a specific team, the stats are aggregated
     are the one present in the team game log:
@@ -398,7 +431,7 @@ def aggregate_simple_season_stats(team_ticker: str, season: str, playoffs: bool,
     }
 
 
-def get_longest_lineup(team_ticker: str, opp_team_ticker: str, game_id: str, playoffs: bool) -> Dict[
+def get_longest_lineup(team_ticker: str, opp_team_ticker: str, game_id: str, season: str, playoffs: bool) -> Dict[
     AnyStr, List[Dict[AnyStr, AnyStr]]]:
     """
     Get the lineup that has played for the longest time and the bench calculated by eliminating that lineup from all the
@@ -407,6 +440,7 @@ def get_longest_lineup(team_ticker: str, opp_team_ticker: str, game_id: str, pla
     :param team_ticker: The team abbreviation.
     :param opp_team_ticker: The opponent team abbreviation.
     :param game_id: The game identifier.
+    :param season: A string representing the season in the format 'YYYY-YY'.
     :param playoffs: true to get the playoff games, false to get the regular season games.
 
     :return: A dictionary containing the starting lineup and the bench for the game, like
@@ -415,7 +449,7 @@ def get_longest_lineup(team_ticker: str, opp_team_ticker: str, game_id: str, pla
         'bench': [{'name': 'Player B', 'id': '456'}, ...],
     }
     """
-    dash_lineups = get_dash_lineups(team_ticker, opp_team_ticker, game_id, playoffs)
+    dash_lineups = get_dash_lineups(team_ticker, opp_team_ticker, game_id, season, playoffs)
 
     dash_lineups.sort(key=lambda x: -x['min'])
 
@@ -495,11 +529,11 @@ def get_referee(game_id: str) -> Dict:
 
     :return: A list containing the referees for the game.
     """
-    live_boxscore = get_live_boxscore(game_id)['officials']
+    officials = get_boxscore_summary(game_id)['officials']
 
-    off1 = filter(lambda x: x['assignment'] == 'OFFICIAL1', live_boxscore).__next__()
+    off1 = officials[0]
 
-    return {'name': off1['name'], 'id': off1['personId']}
+    return {'name': f'{off1["FIRST_NAME"]} {off1["LAST_NAME"]}', 'id': off1['OFFICIAL_ID']}
 
 
 def get_arena(team_ticker: str, season: str, game_id: str | None, playoffs: bool) -> Dict:
@@ -523,30 +557,52 @@ def get_arena(team_ticker: str, season: str, game_id: str | None, playoffs: bool
         first_home_game_id = df_team_game_log[df_team_game_log['matchup'].str.contains('vs.')].iloc[0, :]['game_id']
         game_id = first_home_game_id
 
-    live_boxscore = get_live_boxscore(game_id)
+    # date = get_date_from_game_id(game_id)
+    #
+    # scoreboard = get_scoreboard(date)
+    #
+    # arena_name = filter(lambda x: x['GAME_ID'] == game_id, scoreboard['gameheader']).__next__()['ARENA_NAME']
+    #
+    # return {'name': arena_name, 'city': '', 'state': ''}
 
-    return {'name': live_boxscore['arena']['arenaName'], 'city': live_boxscore['arena']['arenaCity'],
-            'state': live_boxscore['arena']['arenaState']}
+    response = requests.get('https://www.nba.com/game/' + game_id)
+
+    if response.status_code != 200:
+        raise ValueError('Failed to get the arena information, status code: ' + str(response.status_code) + '.')
+
+    index_start = response.text.find('"arenaName"')
+    index_end = response.text.find('"arenaCountry"') + 19
+    arena_info = response.text[index_start:index_end]
+
+    arena_info = arena_info.split(',')
+
+    arena_name = arena_info[0].split(':')[1].replace('"', '')
+    arena_city = arena_info[1].split(':')[1].replace('"', '')
+    arena_state = arena_info[2].split(':')[1].replace('"', '')
+    arena_country = arena_info[3].split(':')[1].replace('"', '')
+
+    return {'name': arena_name, 'city': arena_city, 'state': arena_state, 'country': arena_country}
 
 
-def get_player_efficiency(player_id: str, game_id_up_to: str, season: str) -> float:
+
+def get_player_efficiency(player_id: str, team_ticker: str, game_id_up_to: str, season: str) -> float:
     """
     Get the player efficiency rating for a specific player using the following formula:
     
 
     :param player_id: The player identifier.
+    :param team_ticker: The team abbreviation.
     :param game_id_up_to: The game identifier to calculate the player efficiency up to.
     :param season: A string representing the season in the format 'YYYY-YY'.
 
     :return: The player efficiency rating.
     """
-    common_player_info = get_common_player_info(player_id)
-
-    team_ticker = common_player_info['team_abbreviation']
-
     team_game_log_reg = get_season_games_for_team(team_ticker, season, False)
     team_game_log_playoff = get_season_games_for_team(team_ticker, season, True)
-    team_game_log = team_game_log_reg + team_game_log_playoff
+    if team_game_log_playoff:
+        team_game_log = team_game_log_reg + team_game_log_playoff
+    else:
+        team_game_log = team_game_log_reg
 
     df_team_game_log = pd.DataFrame(team_game_log)
     df_team_game_log.loc[:, 'game_date'] = pd.to_datetime(df_team_game_log['game_date'], format='%b %d, %Y')
@@ -596,21 +652,9 @@ def print_df(df):
 
 
 if __name__ == '__main__':
-    # ids = ['0022300065', '0022300080', '0022300103', '0022300118']
-    # dates = ['2023-10-25', '2023-10-27', '2023-10-30', '2023-11-01']
-    # season = '2023-24'
-    # team_ticker = 'BOS'
-    # playoffs = False
-    #
-    # for i, id in enumerate(ids):
-    #     print(dates[i])
-    #     print(get_distance_travelled(team_ticker, id, season, playoffs))
+    get_arena('BOS', '2023-24', '0021800007', False)
 
-    # print(get_player_efficiency('1628369', '0022300136', '2023-24'))
 
-    reg_season_games_log = get_season_games_for_team('BOS', '2023-24', playoffs=False)
-    df_reg_season_games = pd.DataFrame(reg_season_games_log)
-    print_df(df_reg_season_games)
 
     # Jayson Tatum 1628369
     #        team_id     game_id            game_date      matchup
@@ -629,18 +673,3 @@ if __name__ == '__main__':
     # 12  1610612738  0022300213  2023-11-19 00:00:00    BOS @ MEM
     # 13  1610612738  0022300217  2023-11-20 00:00:00    BOS @ CHA
     # 14  1610612738  0022300228  2023-11-22 00:00:00  BOS vs. MIL
-
-# MISSING
-
-# offensive and defensive rating A and B DONE
-# starting lineup A and B ????? DONE
-# bench A and B ????? DONE
-# win percentage last 5 games A and B DONE
-# referee name DONE
-
-# distance travelled by away team PDPDPDPD
-
-# home_team 0 if A at home, 1 if B at home TODO: apply when combining the methods
-# game date TODO: apply when combining the methods
-# season TODO: apply when combining the methods
-# topic (if season 0, if playoffs 1) TODO: apply when combining the methods
