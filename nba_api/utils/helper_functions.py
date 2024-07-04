@@ -26,6 +26,16 @@ def get_home_away_team(matchup: AnyStr) -> Dict[AnyStr, AnyStr]:
         raise ValueError('Matchup string must contain either " vs. " or " @ "')
     return {'home_team': home_team, 'away_team': away_team}
 
+def add_suffix_to_keys(d: Dict, suffix: AnyStr) -> Dict:
+    """
+    Add a suffix to all keys in a dictionary.
+
+    :param d: A dictionary.
+    :param suffix: A string to add to the end of each key.
+    :return: A dictionary with all keys suffixed.
+    """
+    return {f'{k}_{suffix}': v for k, v in d.items()}
+
 
 def get_opponent(matchup: AnyStr) -> Dict[AnyStr, AnyStr]:
     """
