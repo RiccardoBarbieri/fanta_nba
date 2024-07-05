@@ -133,6 +133,7 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, seaso
     else:
         season_type = 'Regular Season'
 
+    start_time = time.time()
     dash_lineups = LeagueDashLineups(team_id_nullable=team_id,
                                      opponent_team_id=opp_team_id,
                                      season=season,
@@ -141,6 +142,7 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, seaso
                                      season_type_all_star=season_type,
                                      # headers={'User-Agent': next(user_agents_cycle)}
                                      )
+    logger.debug(f'get_dash_lineups took {time.time() - start_time} seconds')
     time.sleep(0.3)
 
     dash_lineups = dash_lineups.get_normalized_dict()['Lineups']
@@ -462,7 +464,7 @@ def aggregate_simple_game_cume_stats(team_ticker: str, season: str, playoffs: bo
     ts_pct = grouped['pts'].sum() / (2 * (grouped['fga'].sum() + 0.44 * grouped['fta'].sum()))
     if (game_number - 5) < 0:
         last_5_games = df_team_game_log.iloc[0:game_number, :]['wl']
-        last_5_games_w_pct = last_5_games[last_5_games == 'W'].count() / game_number
+        last_5_games_w_pct = last_5_games[last_5_games == 'W'].count() / (game_number + 1)
     else:
         last_5_games = df_team_game_log.iloc[game_number - 5:game_number, :]['wl']
         last_5_games_w_pct = last_5_games[last_5_games == 'W'].count() / 5
@@ -664,11 +666,6 @@ def get_player_efficiency(player_id: str, team_ticker: str, game_id_up_to: str, 
     df_player_game_log.reset_index(drop=True, inplace=True)
     df_player_game_log = df_player_game_log.loc[
                          :df_player_game_log[df_player_game_log['game_id'] == game_id_up_to].index[0], :]
-
-    index = df_player_game_log[df_player_game_log['game_id'] == game_id_up_to].index[0]
-    index = index - 1 if index > 0 else index
-
-    df_player_game_log = df_player_game_log.iloc[:index, :]
 
     df_player_game_log.drop(columns=['game_id', 'game_date', 'matchup', 'wl', 'min'], inplace=True)
 
