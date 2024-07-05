@@ -4,6 +4,7 @@ import pickle
 import random
 import sys
 import time
+import traceback
 from pprint import pprint
 from typing import List, Dict, AnyStr, Any
 
@@ -326,8 +327,12 @@ if __name__ == '__main__':
                 dataframe.to_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', index=False)
             else:
                 dataframe = pd.read_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv')
-                len_df_rg = len(dataframe[~dataframe['playoff']]['game_id'].unique())
-                len_df_pg = len(dataframe[dataframe['playoff']]['game_id'].unique())
+                if len(dataframe) == 0:
+                    len_df_rg = 0
+                    len_df_pg = 0
+                else:
+                    len_df_rg = len(dataframe[~dataframe['playoff']]['game_id'].unique())
+                    len_df_pg = len(dataframe[dataframe['playoff']]['game_id'].unique())
 
             for game_number in range(len_df_rg, len(team['reg_season_games'])):
                 reg_game = team['reg_season_games'][game_number]
@@ -359,6 +364,7 @@ if __name__ == '__main__':
                     except Exception as e:
                         logger.error(f'Error occured for game {reg_game["game_id"]}')
                         logger.error(e)
+                        traceback.print_exc()
                         dataframe = pd.DataFrame(feature_vectors, columns=FV_COLS)
                         dataframe.to_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', mode='a', index=False,
                                          header=False)
@@ -394,6 +400,7 @@ if __name__ == '__main__':
                     except Exception as e:
                         logger.error(f'Error occured for game {playoff_game["game_id"]}')
                         logger.error(e)
+                        traceback.print_exc()
                         dataframe = pd.DataFrame(feature_vectors, columns=FV_COLS)
                         dataframe.to_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', mode='a', index=False,
                                          header=False)
