@@ -74,3 +74,18 @@ The matchup string is formatted as follows:
  - `TEAM_A vs. TEAM_B` the house team is TEAM_A
  - `TEAM_B @ TEAM_A` the house team is TEAM_B (read @ as "at")
 
+## OBTAIN FEATURE VECTOR
+Call `get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_team_home: bool,
+                       game_id: str, playoffs: bool) -> Dict[AnyStr, Any]`
+
+Necessary parameters:
+ - `season`: the season of the game in the format `YYYY-YY`, e.g. `2023-24`
+ - `team_ticker`: the team ticker, e.g. `BOS`
+ - `opp_team_ticker`: the opponent team ticker
+ - `is_team_home`: boolean indicating if the team is the home team
+ - `game_id`: the game id of the game
+ - `playoffs`: boolean indicating if the game is a playoff game
+
+How to obtain unknown parameters:
+ - `game_id` and `playoffs`: `get_game_id_and_season_type(team_ticker: str, season: str, date: str) -> Dict[str, Any]:`
+ - `is_team_home`: `is_team_home(team_ticker: str, game_id: str, season: str) -> bool:`
