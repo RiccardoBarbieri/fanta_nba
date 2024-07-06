@@ -1,47 +1,46 @@
 ### Dopo aver letto vari articoli ho appurato che questo sono le statistiche che ci servono:
 
 ## Vettore finale
-win_percentage_A
-fg_percentage_A
-fg3_percentage_A
-ft_percentage_A
-rebounds_A
-assists_A
-turnovers_A
-steals_A
-blocks_A
-plus_minus_A
-offensive_rating_A
-defensive_rating_A
-true_shooting_percentage_A 
-win_percentage_B
-fg_percentage_B
-fg3_percentage_B
-ft_percentage_B
-rebounds_B
-assists_B
-turnovers_B
-steals_B
-blocks_B
-plus_minus_B
-offensive_rating_B
-defensive_rating_B
-true_shooting_percentage_B
-Starting_line_up_A
-Starting_line_up_B
-Bench_A
-Bench_B
-Bookmark_A
-Bookmark_B
-win_percentage_A_last5games
-win_percentage_B_last5games
-Referee_name
-Home_Team -> 0 se A in casa, 1 se A fuori casa
-Distance_travelled -> distanza tra le città
-Data_partita
-Season -> anno della stagione (farei un dataset solo con le ultime 3 stagioni)
-Topic -> 0 se siamo in regular season, 1 se siamo nei playoff  (altre partite tipo amichevoli o partite di preseason non vanno contate)
-
+ - win_percentage_A
+ - fg_percentage_A
+ - fg3_percentage_A
+ - ft_percentage_A
+ - rebounds_A
+ - assists_A
+ - turnovers_A
+ - steals_A
+ - blocks_A
+ - plus_minus_A
+ - offensive_rating_A
+ - defensive_rating_A
+ - true_shooting_percentage_A 
+ - win_percentage_B
+ - fg_percentage_B
+ - fg3_percentage_B
+ - ft_percentage_B
+ - rebounds_B
+ - assists_B
+ - turnovers_B
+ - steals_B
+ - blocks_B
+ - plus_minus_B
+ - offensive_rating_B
+ - defensive_rating_B
+ - true_shooting_percentage_B
+ - Starting_line_up_A
+ - Starting_line_up_B
+ - Bench_A
+ - Bench_B
+ - Bookmark_A
+ - Bookmark_B
+ - win_percentage_A_last5games
+ - win_percentage_B_last5games
+ - Referee_name
+ - Home_Team -> 0 se A in casa, 1 se A fuori casa
+ - Distance_travelled -> distanza tra le città
+ - Data_partita
+ - Season -> anno della stagione (farei un dataset solo con le ultime 3 stagioni)
+ - Topic -> 0 se siamo in regular season, 1 se siamo nei playoff  (altre partite tipo amichevoli o partite di preseason non vanno contate)
 
 
 ## Notes:
