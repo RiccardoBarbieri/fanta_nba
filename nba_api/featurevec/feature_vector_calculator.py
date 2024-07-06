@@ -217,11 +217,6 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
     home_team_game = game_team if is_team_home else game_opponent
     away_team_game = game_team if not is_team_home else game_opponent
 
-    loaded.loc[loaded['game_id'] == game_id, 'pts_H'] = home_team_game['pts'].values[0]
-    loaded.loc[loaded['game_id'] == game_id, 'pts_A'] = away_team_game['pts'].values[0]
-    loaded.loc[loaded['game_id'] == game_id, 'winner'] = 'home' if home_team['pts'].values[0] > away_team['pts'].values[
-        0] else 'away'
-
     misc_stats = {
         'lineup_efficiency': lineup_efficiency,
         # 'bench_efficiency': bench_efficiency,
@@ -236,7 +231,7 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
         'home_team': team_ticker if is_team_home else opp_team_ticker,
         'away_team': opp_team_ticker if is_team_home else team_ticker,
         'game_id': game_id,
-        'winner': 'home' if home_team['pts'].values[0] > away_team['pts'].values[0] else 'away',
+        'winner': 'home' if home_team_game['pts'].values[0] > away_team_game['pts'].values[0] else 'away',
         'pts_H': home_team_game['pts'].values[0],
         'pts_A': away_team_game['pts'].values[0],
     }
@@ -349,31 +344,30 @@ if __name__ == '__main__':
 
         game_ids_processed = set()
 
+        # If file exists, load it and skip the games that are already processed
+        if os.path.exists(f'../data/feature_vector/fv_{season}.csv'):
+            df = pd.read_csv(f'../data/feature_vector/fv_{season}.csv', dtype={
+                'game_id': str,
+                'home_team': str,
+                'away_team': str,
+                'season': str,
+                'referee_id': int
+            })
+            game_ids_processed = set(df['game_id'].unique()) if len(df) > 0 else set()
+        else:
+            df = pd.DataFrame(columns=FV_COLS)
+            game_ids_processed = set()
+            # Create empty file with the header
+            df.to_csv(f'../data/feature_vector/fv_{season}.csv', index=False)
+
+        logger.debug(f'game_ids already process = {len(game_ids_processed)}')
+
         games = start_dataset[season]
         for game_id in games:
             logger.info(f'Calculating f.vecs. for game: {game_id}')
 
             game = games[game_id]
             feature_vector = {}
-            feature_vectors = []
-
-            # If file exists, load it and skip the games that are already processed
-            if os.path.exists(f'../data/feature_vector/fv_{season}.csv'):
-                df = pd.read_csv(f'../data/feature_vector/fv_{season}.csv', dtype={
-                    'game_id': str,
-                    'home_team': str,
-                    'away_team': str,
-                    'season': str,
-                    'referee_id': int
-                })
-                game_ids_processed = set(df['game_id'].unique()) if len(df) > 0 else set()
-            else:
-                df = pd.DataFrame(columns=FV_COLS)
-                game_ids_processed = set()
-                # Create empty file with the header
-                df.to_csv(f'../data/feature_vector/fv_{season}.csv', index=False)
-
-            logger.debug(f'game_ids already process = {len(game_ids_processed)}')
 
             if game_id in game_ids_processed:
                 continue
