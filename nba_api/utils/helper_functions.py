@@ -1,30 +1,58 @@
 from typing import List, AnyStr, Dict
+import sys
+
+sys.path.append('..')
+
+from utils.constants import LEAGUE_GAME_FINDER_FIELDS
 
 # Static variables, to put in a CONSTANTS module
 # Relevant fields from LeagueGameFinder dictionary
-LEAGUE_GAME_FINDER_FIELDS = [
-    'team_id', 'fgm', 'fga', 'fg3m', 'fg3a', 'ftm', 'fta', 'oreb', 'dreb', 'reb', 'ast', 'stl', 'blk', 'tov',
-    'pf', 'pts'
-]
-
 
 # Helper functions
 
 
-def get_home_away_team(matchups: AnyStr) -> Dict[AnyStr, AnyStr]:
+def get_home_away_team(matchup: AnyStr) -> Dict[AnyStr, AnyStr]:
     """
     Get the home and away teams from a matchup string.
 
-    :param matchups: A string representing a matchup.
+    :param matchup: A string representing a matchup.
     :return: A dictionary containing the home and away teams (home_team and away_team keys).
     """
-    if ' vs. ' in matchups:
-        home_team, away_team = matchups.split(' vs. ')
-    elif ' @ ' in matchups:
-        away_team, home_team = matchups.split(' @ ')
+    if ' vs. ' in matchup:
+        home_team, away_team = matchup.split(' vs. ')
+    elif ' @ ' in matchup:
+        away_team, home_team = matchup.split(' @ ')
     else:
         raise ValueError('Matchup string must contain either " vs. " or " @ "')
     return {'home_team': home_team, 'away_team': away_team}
+
+def add_suffix_to_keys(d: Dict, suffix: AnyStr) -> Dict:
+    """
+    Add a suffix to all keys in a dictionary.
+
+    :param d: A dictionary.
+    :param suffix: A string to add to the end of each key.
+    :return: A dictionary with all keys suffixed.
+    """
+    return {f'{k}_{suffix}': v for k, v in d.items()}
+
+
+def get_opponent(main_team: str, matchup: AnyStr) -> Dict[AnyStr, AnyStr]:
+    """
+    Get the opponent from a matchup string.
+
+    :param main_team: A string representing the main team.
+    :param matchup: A string representing a matchup.
+    :return: The abbreviation of the opponent team.
+    """
+    if ' vs. ' in matchup:
+        teams = matchup.split(' vs. ')
+        return teams[1] if teams[0] == main_team else teams[0]
+    elif ' @ ' in matchup:
+        teams = matchup.split(' @ ')
+        return teams[1] if teams[0] == main_team else teams[0]
+    else:
+        raise ValueError('Matchup string must contain either " vs. " or " @ "')
 
 
 def all_keys_to_lower(d: Dict | List[Dict]) -> Dict | List[Dict]:
@@ -32,7 +60,7 @@ def all_keys_to_lower(d: Dict | List[Dict]) -> Dict | List[Dict]:
     Convert all keys in a dictionary or list of dictionaries to lowercase.
 
     :param d: A dictionary or list of dictionaries.
-    :return: A dictionary or list of dictionaries with all keys in uppercase.
+    :return: A dictionary or list of dictionaries with all keys in lowercase.
     """
     if isinstance(d, list) and d and isinstance(d[0], dict):
         return [all_keys_to_lower(i) for i in d]

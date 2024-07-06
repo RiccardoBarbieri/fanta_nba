@@ -1,1 +1,5 @@
 nba_venv
+
+cache/
+
+*.log
