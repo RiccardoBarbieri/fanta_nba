@@ -37,17 +37,20 @@ def add_suffix_to_keys(d: Dict, suffix: AnyStr) -> Dict:
     return {f'{k}_{suffix}': v for k, v in d.items()}
 
 
-def get_opponent(matchup: AnyStr) -> Dict[AnyStr, AnyStr]:
+def get_opponent(main_team: str, matchup: AnyStr) -> Dict[AnyStr, AnyStr]:
     """
     Get the opponent from a matchup string.
 
+    :param main_team: A string representing the main team.
     :param matchup: A string representing a matchup.
     :return: The abbreviation of the opponent team.
     """
     if ' vs. ' in matchup:
-        return matchup.split(' vs. ')[1]
+        teams = matchup.split(' vs. ')
+        return teams[1] if teams[0] == main_team else teams[0]
     elif ' @ ' in matchup:
-        return matchup.split(' @ ')[1]
+        teams = matchup.split(' @ ')
+        return teams[1] if teams[0] == main_team else teams[0]
     else:
         raise ValueError('Matchup string must contain either " vs. " or " @ "')
 
