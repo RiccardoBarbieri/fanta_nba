@@ -5,3 +5,5 @@
 *.jar
 *.original
 *.properties
+
+__pycache__
