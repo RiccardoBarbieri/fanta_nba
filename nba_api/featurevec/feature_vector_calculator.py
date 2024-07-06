@@ -1,7 +1,6 @@
 import datetime
 import os.path
 import pickle
-import random
 import sys
 import time
 import traceback
@@ -16,11 +15,12 @@ from utils.validation import validate_season_string
 
 from nba_api.stats.static.teams import get_teams
 
-from feature_vector_helper import get_common_team_roster, get_season_games_for_team, get_referee, \
+from featurevec.feature_vector_helper import get_season_games_for_team, get_referee, \
     aggregate_simple_game_cume_stats, \
-    get_longest_lineup, get_offdef_rating, get_player_efficiency, get_date_from_game_id
+    get_longest_lineup, get_offdef_rating, get_player_efficiency, get_date_from_game_id, print_df, \
+    get_league_game_log_for_season
 from utils.helper_functions import get_home_away_team, get_opponent, add_suffix_to_keys
-from utils.constants import FV_COLS, LOG_FILE
+from utils.constants import LOG_FILE, FV_COLS
 
 
 def get_starting_dataset(seasons: List[str]):
@@ -30,28 +30,15 @@ def get_starting_dataset(seasons: List[str]):
     :param seasons: The seasons to get the roster for.
     :return: A dictionary containing the roster of all teams for the given seasons and the games played by the team.
     Example structure
-    teams_players_by_season = {
+    team_season_by_game = {
         '2019-20': {
-            'ATL': {
-                'id': 1610612737,
-                'players': [11111, 22222]
-                'reg_season_games': [
-                    {
-                        'game_id': '0021900001',
-                        'date': '2019-10-24',
-                        'home': True,
-                        'opponent': 'DET'
-                    }
-                ],
-                'playoff_games': [
-                    {
-                        'game_id': '0041900401',
-                        'date': '2020-08-17',
-                        'home': False,
-                        'opponent': 'MIL'
-                    }
-                ]
-            }
+            'game_id_1': {
+                'team_ticker': 'LAL',
+                'opponent': 'LAC',
+                'date': '2020-01-01',
+                'home': True,
+                'playoff': False
+            },
         }
     }
     """
@@ -64,63 +51,87 @@ def get_starting_dataset(seasons: List[str]):
     for i in range(len(seasons)):
         seasons_suffixes.append(seasons[i].split('-')[1])
 
-    teams_players_by_season = {}
-    temp_teams_players_by_season = {}
+    team_season_by_game = {}
+    # temp_team_season_by_game = {}
 
-    file_name_prefix = '../data/teams_players_games_by_season_'
+    file_name_prefix = '../data/games_by_season_'
 
     for season, season_suffix in zip(seasons, seasons_suffixes):
-        if not os.path.exists(f'{file_name_prefix}{season_suffix}.pickle'):
-            print(f'Processing season {season}')
-            temp_teams_players_by_season = {}
-            temp_teams_players_by_season[season] = {}
-            for team_id, team_ticker in map(lambda x: (x['id'], x['abbreviation']), teams):
-                print(f'Processing team {team_id} ({team_ticker})')
-                temp_teams_players_by_season[season].update({team_ticker: {'id': team_id, 'players': []}})
-                roster = get_common_team_roster(team_id, season)
-                for player in roster:
-                    temp_teams_players_by_season[season][team_ticker]['players'].append(player['player_id'])
+        # Load the data if it exists
+        if os.path.exists(f'{file_name_prefix}{season_suffix}.pickle'):
+            logger.info(f'Loading data for season {season}')
+            team_season_by_game[season] = pickle.load(open(f'{file_name_prefix}{season_suffix}.pickle', 'rb'))
+            continue
 
-                temp_teams_players_by_season[season][team_ticker]['reg_season_games'] = []
-                reg_season_games_log = get_season_games_for_team(team_ticker, season, playoffs=False)
-                df_reg_season_games = pd.DataFrame(reg_season_games_log)
-                df_reg_season_games.loc[:, 'game_date'] = pd.to_datetime(df_reg_season_games['game_date'],
-                                                                         format='%b %d, %Y')
-                df_reg_season_games.sort_values(by='game_date', inplace=True, ascending=True)
-                df_reg_season_games.reset_index(drop=True, inplace=True)
+        logger.info(f'Processing season {season}')
+        team_season_by_game = {season: {}}
+        # Set of game ids of this season
+        game_ids = set()
+        for team_id, team_ticker in map(lambda x: (x['id'], x['abbreviation']), teams):
+            logger.info(f'Processing team {team_id} ({team_ticker})')
 
-                for idx, row in df_reg_season_games.iterrows():
-                    temp_teams_players_by_season[season][team_ticker]['reg_season_games'].append({
-                        'game_id': row['game_id'],
+            # __________________REGULAR SEASON GAMES__________________
+            # Getting season games for team
+            reg_season_games_log = get_season_games_for_team(team_ticker, season, playoffs=False)
+            df_reg_season_games = pd.DataFrame(reg_season_games_log)
+            df_reg_season_games.loc[:, 'game_date'] = pd.to_datetime(df_reg_season_games['game_date'],
+                                                                     format='%b %d, %Y')
+            df_reg_season_games.sort_values(by='game_date', inplace=True, ascending=True)
+            df_reg_season_games.reset_index(drop=True, inplace=True)
+
+            for idx, row in df_reg_season_games.iterrows():
+                # Skip if the game id is already in the set
+                if row['game_id'] in game_ids:
+                    logger.debug(f'Skipping game {row["game_id"]} for team {team_ticker} as it is already processed')
+                    continue
+                game_ids.add(row['game_id'])
+
+                logger.debug(f'Adding game {row["game_id"]} for team {team_ticker}')
+                team_season_by_game[season].update({
+                    row['game_id']: {
+                        'team_ticker': team_ticker,
+                        'opponent': get_opponent(team_ticker, row['matchup']),
                         'date': row['game_date'],
                         'home': get_home_away_team(row['matchup'])['home_team'] == team_ticker,
-                        'opponent': get_opponent(row['matchup'])
-                    })
+                        'playoff': False
+                    }
+                })
 
-                temp_teams_players_by_season[season][team_ticker]['playoff_games'] = []
-                playoff_games_log = get_season_games_for_team(team_ticker, season, playoffs=True)
-                if playoff_games_log:
-                    df_playoff_games = pd.DataFrame(playoff_games_log)
-                    df_playoff_games.loc[:, 'game_date'] = pd.to_datetime(df_playoff_games['game_date'],
-                                                                          format='%b %d, %Y')
-                    df_playoff_games.sort_values(by='game_date', inplace=True, ascending=True)
-                    df_playoff_games.reset_index(drop=True, inplace=True)
+            # __________________PLAYOFF GAMES__________________
+            # Getting playoff games for team
+            playoff_games_log = get_season_games_for_team(team_ticker, season, playoffs=True)
+            # Skip if there are no playoff games
+            if not playoff_games_log:
+                continue
 
-                    for idx, row in df_playoff_games.iterrows():
-                        temp_teams_players_by_season[season][team_ticker]['playoff_games'].append({
-                            'game_id': row['game_id'],
-                            'date': row['game_date'],
-                            'home': get_home_away_team(row['matchup'])['home_team'] == team_ticker,
-                            'opponent': get_opponent(row['matchup'])
-                        })
+            df_playoff_games = pd.DataFrame(playoff_games_log)
+            df_playoff_games.loc[:, 'game_date'] = pd.to_datetime(df_playoff_games['game_date'],
+                                                                  format='%b %d, %Y')
+            df_playoff_games.sort_values(by='game_date', inplace=True, ascending=True)
+            df_playoff_games.reset_index(drop=True, inplace=True)
 
-            pickle.dump(temp_teams_players_by_season, open(f'{file_name_prefix}{season_suffix}.pickle', 'wb'))
-        else:
-            temp_teams_players_by_season = pickle.load(open(f'{file_name_prefix}{season_suffix}.pickle', 'rb'))
+            for idx, row in df_playoff_games.iterrows():
+                # Skip if the game id is already in the set
+                if row['game_id'] in game_ids:
+                    logger.debug(f'Skipping game {row["game_id"]} for team {team_ticker} as it is already processed')
+                    continue
+                game_ids.add(row['game_id'])
 
-        teams_players_by_season.update(temp_teams_players_by_season)
+                logger.debug(f'Adding game {row["game_id"]} for team {team_ticker}')
+                team_season_by_game[season].update({
+                    row['game_id']: {
+                        'team_ticker': team_ticker,
+                        'opponent': get_opponent(team_ticker, row['matchup']),
+                        'date': row['game_date'],
+                        'home': get_home_away_team(row['matchup'])['home_team'] == team_ticker,
+                        'playoff': True
+                    }
+                })
 
-    return teams_players_by_season
+        pickle.dump(team_season_by_game[season], open(f'{file_name_prefix}{season_suffix}.pickle', 'wb'))
+        logger.info(f'Data for season {season} saved')
+
+    return team_season_by_game
 
 
 def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_team_home: bool,
@@ -191,6 +202,26 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
     # logger.debug(f'Get player efficiency for bench opponent took {time.time() - start_time} seconds')
     # bench_efficiency_opp /= len(longest_lineup_opp['bench'])
 
+    regseas_gamelog = get_league_game_log_for_season(season, playoffs=False)
+    playoff_gamelog = get_league_game_log_for_season(season, playoffs=True)
+    regseas_gamelog = pd.DataFrame(regseas_gamelog)
+    playoff_gamelog = pd.DataFrame(playoff_gamelog)
+    gamelog = pd.concat([regseas_gamelog, playoff_gamelog])
+    gamelog.reset_index(drop=True, inplace=True)
+
+    game_team = gamelog.loc[(gamelog['game_id'] == game_id) & (
+                gamelog['team_abbreviation'] == team_ticker)]
+    game_opponent = gamelog.loc[(gamelog['game_id'] == game_id) & (
+                gamelog['team_abbreviation'] == opp_team_ticker)]
+
+    home_team_game = game_team if is_team_home else game_opponent
+    away_team_game = game_team if not is_team_home else game_opponent
+
+    loaded.loc[loaded['game_id'] == game_id, 'pts_H'] = home_team_game['pts'].values[0]
+    loaded.loc[loaded['game_id'] == game_id, 'pts_A'] = away_team_game['pts'].values[0]
+    loaded.loc[loaded['game_id'] == game_id, 'winner'] = 'home' if home_team['pts'].values[0] > away_team['pts'].values[
+        0] else 'away'
+
     misc_stats = {
         'lineup_efficiency': lineup_efficiency,
         # 'bench_efficiency': bench_efficiency,
@@ -205,6 +236,9 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
         'home_team': team_ticker if is_team_home else opp_team_ticker,
         'away_team': opp_team_ticker if is_team_home else team_ticker,
         'game_id': game_id,
+        'winner': 'home' if home_team['pts'].values[0] > away_team['pts'].values[0] else 'away',
+        'pts_H': home_team_game['pts'].values[0],
+        'pts_A': away_team_game['pts'].values[0],
     }
 
     simple_season_stats.pop('team_id')
@@ -228,6 +262,7 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
         simple_season_stats_opp = add_suffix_to_keys(simple_season_stats_opp, 'H')
         misc_stats_opp = add_suffix_to_keys(misc_stats_opp, 'H')
 
+    referee = get_referee(game_id)
 
     return {
         **simple_season_stats,
@@ -240,7 +275,8 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
         'season': season,
         'date': get_date_from_game_id(game_id),
         'playoff': playoffs,
-        'referee': get_referee(game_id)
+        'referee_name': referee['name'],
+        'referee_id': referee['id']
     }
 
 
@@ -283,10 +319,6 @@ def get_game_id_and_season_type(team_ticker: str, season: str, date: str) -> Dic
             return {'game_id': game['game_id'], 'playoff': True}
 
 
-
-
-
-
 import logging
 
 log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s] [%(name)s] %(message)s")
@@ -304,7 +336,10 @@ logger = logging.getLogger(os.path.basename(__file__))
 logger.setLevel(logging.DEBUG)
 
 if __name__ == '__main__':
-    seasons = ['2021-22', '2022-23', '2023-24']
+    seasons = ['2022-23', '2023-24']
+    # seasons = ['2021-22', '2022-23', '2023-24']
+    # seasons = ['2020-21', '2021-22', '2022-23', '2023-24']
+    # seasons = ['2019-20', '2020-21', '2021-22', '2022-23', '2023-24']
 
     start_dataset = get_starting_dataset(seasons)
 
@@ -312,106 +347,68 @@ if __name__ == '__main__':
     for season in start_dataset:
         logger.info(f'Calculating f.vecs. for season: {season}')
 
-        teams = start_dataset[season]
-        for team_ticker in teams:
-            logger.info(f'Calculating f.vecs. for team: {team_ticker}')
+        game_ids_processed = set()
 
-            team = teams[team_ticker]
+        games = start_dataset[season]
+        for game_id in games:
+            logger.info(f'Calculating f.vecs. for game: {game_id}')
+
+            game = games[game_id]
             feature_vector = {}
             feature_vectors = []
 
-            if not os.path.exists(f'../data/feature_vector/fv_{season}_{team_ticker}.csv'):
-                dataframe = pd.DataFrame(columns=FV_COLS)
-                len_df_rg = 0
-                len_df_pg = 0
-                dataframe.to_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', index=False)
+            # If file exists, load it and skip the games that are already processed
+            if os.path.exists(f'../data/feature_vector/fv_{season}.csv'):
+                df = pd.read_csv(f'../data/feature_vector/fv_{season}.csv', dtype={
+                    'game_id': str,
+                    'home_team': str,
+                    'away_team': str,
+                    'season': str,
+                    'referee_id': int
+                })
+                game_ids_processed = set(df['game_id'].unique()) if len(df) > 0 else set()
             else:
-                dataframe = pd.read_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv')
-                if len(dataframe) == 0:
-                    len_df_rg = 0
-                    len_df_pg = 0
-                else:
-                    len_df_rg = len(dataframe[~dataframe['playoff']]['game_id'].unique())
-                    len_df_pg = len(dataframe[dataframe['playoff']]['game_id'].unique())
+                df = pd.DataFrame(columns=FV_COLS)
+                game_ids_processed = set()
+                # Create empty file with the header
+                df.to_csv(f'../data/feature_vector/fv_{season}.csv', index=False)
 
-            for game_number in range(len_df_rg, len(team['reg_season_games'])):
-                reg_game = team['reg_season_games'][game_number]
-                feature_vector = {}
+            logger.debug(f'game_ids already process = {len(game_ids_processed)}')
 
-                logger.info(
-                    f'Calculating f.vecs. for regular season game: {reg_game["game_id"]}, number: {game_number}')
+            if game_id in game_ids_processed:
+                continue
 
-                success = False
-                while not success:
-                    try:
-                        start_time = time.time()
+            feature_vector = {}
 
-                        feature_vector.update(
-                            get_feature_vector(season, team_ticker, reg_game['opponent'], reg_game['home'],
-                                               reg_game['game_id'], False))
+            logger.info(f'Calculating f.vecs. for game: {game_id} for season {season}')
 
-                        pprint(feature_vector)
-                        logger.debug(
-                            f'Feature vector calculation for game {reg_game["game_id"]} took {time.time() - start_time} seconds')
+            success = False
+            while not success:
+                try:
+                    start_time = time.time()
+                    feature_vector = get_feature_vector(season, game['team_ticker'], game['opponent'], game['home'],
+                                                        game_id, game['playoff'])
 
-                        feature_vectors.append(feature_vector)
-                        dataframe = pd.DataFrame(feature_vectors, columns=FV_COLS)
-                        dataframe.to_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', mode='a', index=False,
-                                         header=False)
-                        feature_vectors = []
-                        logger.debug('Feature vectors saved')
-                        success = True
-                    except Exception as e:
-                        logger.error(f'Error occured for game {reg_game["game_id"]}')
-                        logger.error(e)
-                        traceback.print_exc()
-                        dataframe = pd.DataFrame(feature_vectors, columns=FV_COLS)
-                        dataframe.to_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', mode='a', index=False,
-                                         header=False)
-                        feature_vector = {}
-                        feature_vectors = []
-                        success = False
-                        logger.debug('Feature vectors saved')
-                        time.sleep(1)
+                    pprint(feature_vector)
 
-            for game_number in range(len_df_pg, len(team['playoff_games'])):
-                playoff_game = team['playoff_games'][game_number]
-                feature_vector = {}
+                    logger.debug(
+                        f'Feature vector calculation for game {game_id} took {time.time() - start_time} seconds')
 
-                logger.info(f'Calculating f.vecs. for playoff game: {playoff_game["game_id"]}, number: {game_number}')
-
-                success = False
-                while not success:
-                    try:
-                        start_time = time.time()
-
-                        feature_vector.update(get_feature_vector(season, team_ticker, playoff_game['opponent'],
-                                                                 playoff_game['home'], playoff_game['game_id'], True))
-                        logger.debug(
-                            f'Feature vector calculation for game {playoff_game["game_id"]} took {time.time() - start_time} seconds')
-
-                        feature_vectors.append(feature_vector)
-                        dataframe = pd.DataFrame(feature_vectors, columns=FV_COLS)
-                        dataframe.to_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', mode='a', index=False,
-                                         header=False)
-                        feature_vectors = []
-                        logger.debug('Feature vectors saved')
-                        success = True
-                    except Exception as e:
-                        logger.error(f'Error occured for game {playoff_game["game_id"]}')
-                        logger.error(e)
-                        traceback.print_exc()
-                        dataframe = pd.DataFrame(feature_vectors, columns=FV_COLS)
-                        dataframe.to_csv(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', mode='a', index=False,
-                                         header=False)
-                        feature_vector = {}
-                        feature_vectors = []
-                        success = False
-                        logger.debug('Feature vectors saved')
-                        time.sleep(1)
+                    dataframe = pd.DataFrame([feature_vector], columns=FV_COLS)
+                    dataframe.to_csv(f'../data/feature_vector/fv_{season}.csv', mode='a', index=False,
+                                     header=False)
+                    logger.debug('Feature vectors saved')
+                    success = True
+                    game_ids_processed.add(game_id)
+                except Exception as e:
+                    logger.error(f'Error occured for game {game_id}')
+                    logger.error(e)
+                    traceback.print_exc()
+                    feature_vector = {}
+                    success = False
+                    time.sleep(1)
 
             # logger.debug(f'Saving feature vectors for team {team_ticker}, season {season}')
             # with open(f'../data/feature_vector/fv_{season}_{team_ticker}.csv', 'wb') as f:
             #     dataframe = pd.DataFrame(feature_vectors)
             #     dataframe.to_csv(f, index=False, mode='a', header=False)
-
