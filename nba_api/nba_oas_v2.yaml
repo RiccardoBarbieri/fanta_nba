@@ -1,0 +1,431 @@
+openapi: 3.0.0
+info:
+  title: Basketball Match-Up and Team Information API
+  version: 1.0.0
+  description: API for retrieving detailed information about basketball match-ups, teams, and players.
+paths:
+  /matchup/{id}:
+    get:
+      summary: Get basic details of a match-up
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Match-up details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchUp'
+              examples:
+                example1:
+                  value:
+                    id: 123
+                    home_team:
+                      id: 1
+                      name: Lakers
+                      ticker: LAL
+                      logo: https://example.com/logos/lakers.png
+                    away_team:
+                      id: 2
+                      name: Celtics
+                      ticker: BOS
+                      logo: https://example.com/logos/celtics.png
+                    date_time: 2023-12-25T18:30:00Z
+                    city_arena: Los Angeles, Staples Center
+                    referee: John Doe
+                    season_type: Regular Season
+        '201':
+          description: There are no available data.
+        '400':
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - Authentication is required.
+        '500':
+          description: Internal Server Error - An error occurred on the server.
+
+  /matchup/{id}/advanced:
+    get:
+      summary: Get advanced details of a match-up
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Advanced match-up details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdvancedMatchDetails'
+              examples:
+                example1:
+                  value:
+                    - match_id: 123
+                      home_team_id: 1
+                      away_team_id: 2
+                      home_team_score: 102
+                      away_team_score: 98
+                      winner: home
+                      point_difference: 4
+                    - match_id: 124
+                      home_team_id: 1
+                      away_team_id: 2
+                      home_team_score: 110
+                      away_team_score: 105
+                      winner: home
+                      point_difference: 5
+        '201':
+          description: There are no available data.
+        '400':
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - Authentication is required.
+        '500':
+          description: Internal Server Error - An error occurred on the server.
+
+  /team/{id}:
+    get:
+      summary: Get basic details of a team
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Team details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+              examples:
+                example1:
+                  value:
+                    id: 1
+                    name: Lakers
+                    city_arena: Los Angeles, Staples Center
+                    coach: Frank Vogel
+                    logo: https://example.com/logos/lakers.png
+                    roster:
+                      - LeBron James
+                      - Anthony Davis
+                      - Russell Westbrook
+        '201':
+          description: There are no available data.
+        '400':
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - Authentication is required.
+        '500':
+          description: Internal Server Error - An error occurred on the server.
+
+  /team/{id}/advanced:
+    get:
+      summary: Get advanced details of a team
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: filter
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [HOME, AWAY]
+      responses:
+        '200':
+          description: Advanced team details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamAdvancedDetails'
+              examples:
+                example1:
+                  value:
+                    recent_record:
+                      wins: 8
+                      losses: 2
+                    points:
+                      scored: 1020
+                      conceded: 950
+                    recent_matches:
+                      - match_id: 123
+                        home_team_id: 1
+                        away_team_id: 2
+                        home_team_score: 102
+                        away_team_score: 98
+                        winner: home
+                        point_difference: 4
+                      - match_id: 124
+                        home_team_id: 1
+                        away_team_id: 2
+                        home_team_score: 110
+                        away_team_score: 105
+                        winner: home
+                        point_difference: 5
+        '201':
+          description: There are no available data.
+        '400':
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - Authentication is required.
+        '500':
+          description: Internal Server Error - An error occurred on the server.
+
+  /player/{id}:
+    get:
+      summary: Get basic details of a player
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Player details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+              examples:
+                example1:
+                  value:
+                    id: 23
+                    name: LeBron James
+                    team:
+                      id: 1
+                      name: Lakers
+                      ticker: LAL
+                      logo: https://example.com/logos/lakers.png
+                    role: Forward
+                    jersey_number: 23
+                    age: 36
+                    height: "6'9"
+                    weight: "250 lbs"
+                    photo: https://example.com/photos/lebron.png
+        '201':
+          description: There are no available data.
+        '400':
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - Authentication is required.
+        '500':
+          description: Internal Server Error - An error occurred on the server.
+
+  /player/{id}/advanced:
+    get:
+      summary: Get advanced details of a player
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: filter
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [HOME, AWAY]
+      responses:
+        '200':
+          description: Advanced player details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerAdvancedDetails'
+              examples:
+                example1:
+                  value:
+                    statistics:
+                      points: 28.5
+                      rebounds: 7.9
+                      assists: 8.2
+                      blocks: 1.0
+                      steals: 1.2
+                      turnovers: 3.4
+                      field_goal_percentage: 0.51
+                      three_point_percentage: 0.36
+                      free_throw_percentage: 0.75
+        '201':
+          description: There are no available data.
+        '400':
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - Authentication is required.
+        '500':
+          description: Internal Server Error - An error occurred on the server.
+
+components:
+  schemas:
+    MatchUp:
+      type: object
+      properties:
+        id:
+          type: integer
+        home_team:
+          $ref: '#/components/schemas/TeamBase'
+        away_team:
+          $ref: '#/components/schemas/TeamBase'
+        date_time:
+          type: string
+          format: date-time
+        city_arena:
+          type: string
+        referee:
+          type: string
+        season_type:
+          type: string
+          enum: [Regular Season, Playoffs, All Star, Pre Season]
+
+    AdvancedMatchDetails:
+      type: object
+      properties:
+        match_id:
+          type: integer
+        home_team_id:
+          type: integer
+        away_team_id:
+          type: integer
+        home_team_score:
+          type: integer
+        away_team_score:
+          type: integer
+        winner:
+          type: string
+          enum: [home, away]
+        point_difference:
+          type: integer
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        city_arena:
+          type: string
+        coach:
+          type: string
+        logo:
+          type: string
+          format: uri
+        roster:
+          type: array
+          items:
+            type: string
+        advanced_details:
+          $ref: '#/components/schemas/TeamAdvancedDetails'
+
+    TeamBase:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ticker:
+          type: string
+        logo:
+          type: string
+          format: uri
+
+    TeamAdvancedDetails:
+      type: object
+      properties:
+        recent_record:
+          type: object
+          properties:
+            wins:
+              type: integer
+            losses:
+              type: integer
+        points:
+          type: object
+          properties:
+            scored:
+              type: integer
+            conceded:
+              type: integer
+        recent_matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdvancedMatchDetails'
+
+    Player:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        team:
+          $ref: '#/components/schemas/TeamBase'
+        role:
+          type: string
+        jersey_number:
+          type: integer
+        age:
+          type: integer
+        height:
+          type: string
+        weight:
+          type: string
+        photo:
+          type: string
+          format: uri
+        advanced_details:
+          $ref: '#/components/schemas/PlayerAdvancedDetails'
+
+    PlayerAdvancedDetails:
+      type: object
+      properties:
+        statistics:
+          type: object
+          properties:
+            points:
+              type: number
+            rebounds:
+              type: number
+            assists:
+              type: number
+            blocks:
+              type: number
+            steals:
+              type: number
+            turnovers:
+              type: number
+            field_goal_percentage:
+              type: number
+            three_point_percentage:
+              type: number
+            free_throw_percentage:
+              type: number
