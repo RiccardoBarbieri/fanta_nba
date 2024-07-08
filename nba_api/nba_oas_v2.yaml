@@ -193,6 +193,67 @@ paths:
         '500':
           description: Internal Server Error - An error occurred on the server.
 
+  /team/{id}/advanced/details:
+    get:
+      summary: Get detailed advanced statistics of a team
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: filter
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [HOME, AWAY]
+      responses:
+        '200':
+          description: Detailed advanced statistics of a team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamAdvancedDetailedStatistics'
+              examples:
+                example1:
+                  value:
+                    statistics:
+                      points:
+                        total: 1020
+                        average: 102
+                      rebounds:
+                        total: 520
+                        average: 52
+                      assists:
+                        total: 240
+                        average: 24
+                      steals:
+                        total: 80
+                        average: 8
+                      blocks:
+                        total: 40
+                        average: 4
+                      turnovers:
+                        total: 150
+                        average: 15
+                      field_goal_percentage: 0.48
+                      three_point_percentage: 0.36
+                      free_throw_percentage: 0.78
+        '201':
+          description: There are no available data.
+        '400':
+          description: Bad Request - The request parameters are invalid.
+        '401':
+          description: Unauthorized - Authentication is required.
+        '500':
+          description: Internal Server Error - An error occurred on the server.
+
   /player/{id}:
     get:
       summary: Get basic details of a player
@@ -342,21 +403,6 @@ components:
           type: array
           items:
             type: string
-        advanced_details:
-          $ref: '#/components/schemas/TeamAdvancedDetails'
-
-    TeamBase:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        ticker:
-          type: string
-        logo:
-          type: string
-          format: uri
 
     TeamAdvancedDetails:
       type: object
@@ -379,6 +425,74 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AdvancedMatchDetails'
+
+    TeamAdvancedDetailedStatistics:
+      type: object
+      properties:
+        statistics:
+          type: object
+          properties:
+            points:
+              type: object
+              properties:
+                total:
+                  type: integer
+                average:
+                  type: number
+            rebounds:
+              type: object
+              properties:
+                total:
+                  type: integer
+                average:
+                  type: number
+            assists:
+              type: object
+              properties:
+                total:
+                  type: integer
+                average:
+                  type: number
+            steals:
+              type: object
+              properties:
+                total:
+                  type: integer
+                average:
+                  type: number
+            blocks:
+              type: object
+              properties:
+                total:
+                  type: integer
+                average:
+                  type: number
+            turnovers:
+              type: object
+              properties:
+                total:
+                  type: integer
+                average:
+                  type: number
+            field_goal_percentage:
+              type: number
+            three_point_percentage:
+              type: number
+            free_throw_percentage:
+              type: number
+
+    TeamBase:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ticker:
+          type: string
+        logo:
+          type: string
+          format: uri
 
     Player:
       type: object
