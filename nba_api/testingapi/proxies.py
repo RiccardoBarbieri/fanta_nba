@@ -1,4 +1,3 @@
-import requests
 from proxy_checker import ProxyChecker
 
 def download_proxies():

@@ -1,12 +1,7 @@
-import requests
-from nba_api.stats.endpoints import teaminfocommon
-from nba_api.stats.endpoints import drafthistory
-from nba_api.stats.endpoints import cumestatsteamgames
-from nba_api.stats.endpoints import teamgamelog
-from nba_api.stats.endpoints import leaguegamefinder
-from pprint import pprint
-import pandas
 import json
+
+import pandas
+from nba_api.stats.endpoints import leaguegamefinder
 
 pandas.set_option('display.max_columns', None)
 pandas.set_option('display.width', 200)

@@ -4,7 +4,6 @@ import os
 import pickle
 import sys
 import time
-from pprint import pprint
 from typing import List, Dict, AnyStr, Tuple
 
 import pandas as pd
@@ -27,12 +26,8 @@ from nba_api.stats.endpoints.commonteamroster import CommonTeamRoster
 from nba_api.stats.endpoints.leaguegamelog import LeagueGameLog
 
 from utils.helper_functions import all_keys_to_lower
-from utils.constants import LOG_FILE
-from utils.validation import validate_season_string, validate_team_ticker, validate_game_number
+from utils.validation import validate_season_string, validate_team_ticker
 from geo.distance import get_distance_between_arenas
-
-from fake_useragent import UserAgent
-from itertools import cycle
 
 # ua = UserAgent(fallback='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.2592.87')
 #
