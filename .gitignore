@@ -2,6 +2,7 @@
 
 **/*.env
 *.class
+/odds-api-swagger/target
 *.jar
 *.original
 *.properties
