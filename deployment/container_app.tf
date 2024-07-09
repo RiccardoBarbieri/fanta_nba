@@ -1,8 +1,3 @@
-# variable "cert_pass" {
-#   type        = string
-#   description = "Password for the certificate"
-# }
-
 # App environment
 resource "azurerm_container_app_environment" "app_env" {
   name                = "HelloWorld-Environment"
@@ -10,32 +5,18 @@ resource "azurerm_container_app_environment" "app_env" {
   resource_group_name = data.azurerm_resource_group.main_group.name
 }
 
-# resource "azurerm_container_app_environment_certificate" "env_cert" {
-# #   certificate_blob_base64      = filebase64("certificates/cert.pfx")
-# #   certificate_blob_base64      = base64encode(data.azurerm_key_vault_secret.autoboost_cert.value)
-# #   certificate_blob_base64      = base64encode(format("%s%s", data.azurerm_key_vault_certificate_data.autoboost_cert.pem, data.azurerm_key_vault_certificate_data.autoboost_cert.key))
-#   certificate_blob_base64      = base64encode(format("%s%s", file("./certificates/fullchain.pem"), file("./certificates/privkey.pem")))
-#   certificate_password         = ""
-#   container_app_environment_id = azurerm_container_app_environment.app_env.id
-#   name                         = "env-cert"
+# Substituted by the custom script
+# See gist https://gist.github.com/LynnAU/131426847d2793c76e36548f9937f966
+# Track issue https://github.com/hashicorp/terraform-provider-azurerm/issues/25788 for updates
+# resource "azurerm_container_app_custom_domain" "custom_domain" {
+#   name             = "helloworld.autoboost.it"
+#   container_app_id = azurerm_container_app.container.id
+#
+#   depends_on = [
+#     azurerm_dns_cname_record.cname_helloworld,
+#     azurerm_dns_txt_record.txt_autoboost
+#   ]
 # }
-
-resource "azurerm_container_app_custom_domain" "custom_domain" {
-  name             = "helloworld.autoboost.it"
-  container_app_id = azurerm_container_app.container.id
-
-  lifecycle {
-    ignore_changes = [
-      certificate_binding_type,
-      container_app_environment_certificate_id
-    ]
-  }
-
-  depends_on = [
-    azurerm_dns_cname_record.cname_helloworld,
-    azurerm_dns_txt_record.txt_autoboost
-  ]
-}
 
 # App container
 resource "azurerm_container_app" "container" {

@@ -37,36 +37,22 @@ data "azurerm_client_config" "current" {}
 # _____________________________________________________________
 # OUTPUTS
 
-output "env_default_domain" {
-  value = azurerm_container_app_environment.app_env.default_domain
+output "resource_group_name" {
+  value = data.azurerm_resource_group.main_group.name
 }
 
-output "fqdn" {
-  value = azurerm_container_app.container.ingress[0].fqdn
+output "container_app_env_name" {
+  value = azurerm_container_app_environment.app_env.name
 }
 
-output "outbound_ip_addresses" {
-  value = azurerm_container_app.container.outbound_ip_addresses
+output "custom_domain" {
+  value = "helloworld.autoboost.it"
 }
 
-output "env_static_ip" {
-  value = azurerm_container_app_environment.app_env.static_ip_address
+output "container_app_name" {
+  value = azurerm_container_app.container.name
 }
 
-output "container_custom_domain_name" {
-  value = azurerm_container_app_custom_domain.custom_domain.name
+output "container_app_ip" {
+  value = azurerm_container_app.container.outbound_ip_addresses[0]
 }
-
-output "managed_certificate_response" {
-    value = azapi_resource.managed_certificate.output
-}
-
-output "custom_domain_binding_state_update_to_Disabled" {
-    value = azapi_update_resource.custom_domain.output
-}
-
-output "custom_domain_binding_state_update_to_Enabled" {
-    value = azapi_update_resource.custom_domain_binding.output
-}
-
-
