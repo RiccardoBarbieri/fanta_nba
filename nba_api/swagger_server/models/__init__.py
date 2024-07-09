@@ -1,0 +1,18 @@
+# coding: utf-8
+
+# flake8: noqa
+from __future__ import absolute_import
+# import models into model package
+from swagger_server.models.advanced_match_details import AdvancedMatchDetails
+from swagger_server.models.match_up import MatchUp
+from swagger_server.models.player import Player
+from swagger_server.models.player_advanced_details import PlayerAdvancedDetails
+from swagger_server.models.player_advanced_details_statistics import PlayerAdvancedDetailsStatistics
+from swagger_server.models.team import Team
+from swagger_server.models.team_advanced_detailed_statistics import TeamAdvancedDetailedStatistics
+from swagger_server.models.team_advanced_detailed_statistics_statistics import TeamAdvancedDetailedStatisticsStatistics
+from swagger_server.models.team_advanced_detailed_statistics_statistics_points import TeamAdvancedDetailedStatisticsStatisticsPoints
+from swagger_server.models.team_advanced_details import TeamAdvancedDetails
+from swagger_server.models.team_advanced_details_points import TeamAdvancedDetailsPoints
+from swagger_server.models.team_advanced_details_recent_record import TeamAdvancedDetailsRecentRecord
+from swagger_server.models.team_base import TeamBase

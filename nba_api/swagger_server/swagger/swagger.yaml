@@ -1,0 +1,711 @@
+openapi: 3.0.0
+info:
+  title: Basketball Match-Up and Team Information API
+  description: "API for retrieving detailed information about basketball match-ups,\
+    \ teams, and players."
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /matchup/{id}:
+    get:
+      summary: Get basic details of a match-up
+      operationId: matchup_id_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Match-up details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchUp'
+              examples:
+                example1:
+                  value:
+                    id: 123
+                    home_team:
+                      id: 1
+                      name: Lakers
+                      ticker: LAL
+                      logo: https://example.com/logos/lakers.png
+                    away_team:
+                      id: 2
+                      name: Celtics
+                      ticker: BOS
+                      logo: https://example.com/logos/celtics.png
+                    date_time: 2023-12-25T18:30:00Z
+                    city_arena: "Los Angeles, Staples Center"
+                    referee: John Doe
+                    season_type: Regular Season
+        "201":
+          description: There are no available data.
+        "400":
+          description: Bad Request - The request parameters are invalid.
+        "401":
+          description: Unauthorized - Authentication is required.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /matchup/{id}/advanced:
+    get:
+      summary: Get advanced details of a match-up
+      operationId: matchup_id_advanced_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: X
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Advanced match-up details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdvancedMatchDetails'
+                x-content-type: application/json
+              examples:
+                example1:
+                  value:
+                  - match_id: 123
+                    home_team_id: 1
+                    away_team_id: 2
+                    home_team_score: 102
+                    away_team_score: 98
+                    winner: home
+                    point_difference: 4
+                  - match_id: 124
+                    home_team_id: 1
+                    away_team_id: 2
+                    home_team_score: 110
+                    away_team_score: 105
+                    winner: home
+                    point_difference: 5
+        "201":
+          description: There are no available data.
+        "400":
+          description: Bad Request - The request parameters are invalid.
+        "401":
+          description: Unauthorized - Authentication is required.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /team/{id}:
+    get:
+      summary: Get basic details of a team
+      operationId: team_id_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Team details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+              examples:
+                example1:
+                  value:
+                    id: 1
+                    name: Lakers
+                    city_arena: "Los Angeles, Staples Center"
+                    coach: Frank Vogel
+                    logo: https://example.com/logos/lakers.png
+                    roster:
+                    - LeBron James
+                    - Anthony Davis
+                    - Russell Westbrook
+        "201":
+          description: There are no available data.
+        "400":
+          description: Bad Request - The request parameters are invalid.
+        "401":
+          description: Unauthorized - Authentication is required.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /team/{id}/advanced:
+    get:
+      summary: Get advanced details of a team
+      operationId: team_id_advanced_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: X
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: filter
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - HOME
+          - AWAY
+      responses:
+        "200":
+          description: Advanced team details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamAdvancedDetails'
+              examples:
+                example1:
+                  value:
+                    recent_record:
+                      wins: 8
+                      losses: 2
+                    points:
+                      scored: 1020
+                      conceded: 950
+                    recent_matches:
+                    - match_id: 123
+                      home_team_id: 1
+                      away_team_id: 2
+                      home_team_score: 102
+                      away_team_score: 98
+                      winner: home
+                      point_difference: 4
+                    - match_id: 124
+                      home_team_id: 1
+                      away_team_id: 2
+                      home_team_score: 110
+                      away_team_score: 105
+                      winner: home
+                      point_difference: 5
+        "201":
+          description: There are no available data.
+        "400":
+          description: Bad Request - The request parameters are invalid.
+        "401":
+          description: Unauthorized - Authentication is required.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /team/{id}/advanced/details:
+    get:
+      summary: Get detailed advanced statistics of a team
+      operationId: team_id_advanced_details_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: X
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: filter
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - HOME
+          - AWAY
+      responses:
+        "200":
+          description: Detailed advanced statistics of a team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamAdvancedDetailedStatistics'
+              examples:
+                example1:
+                  value:
+                    statistics:
+                      points:
+                        total: 1020
+                        average: 102
+                      rebounds:
+                        total: 520
+                        average: 52
+                      assists:
+                        total: 240
+                        average: 24
+                      steals:
+                        total: 80
+                        average: 8
+                      blocks:
+                        total: 40
+                        average: 4
+                      turnovers:
+                        total: 150
+                        average: 15
+                      field_goal_percentage: 0.48
+                      three_point_percentage: 0.36
+                      free_throw_percentage: 0.78
+        "201":
+          description: There are no available data.
+        "400":
+          description: Bad Request - The request parameters are invalid.
+        "401":
+          description: Unauthorized - Authentication is required.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /player/{id}:
+    get:
+      summary: Get basic details of a player
+      operationId: player_id_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Player details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+              examples:
+                example1:
+                  value:
+                    id: 23
+                    name: LeBron James
+                    team:
+                      id: 1
+                      name: Lakers
+                      ticker: LAL
+                      logo: https://example.com/logos/lakers.png
+                    role: Forward
+                    jersey_number: 23
+                    age: 36
+                    height: 6'9
+                    weight: 250 lbs
+                    photo: https://example.com/photos/lebron.png
+        "201":
+          description: There are no available data.
+        "400":
+          description: Bad Request - The request parameters are invalid.
+        "401":
+          description: Unauthorized - Authentication is required.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /player/{id}/advanced:
+    get:
+      summary: Get advanced details of a player
+      operationId: player_id_advanced_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: X
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: filter
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - HOME
+          - AWAY
+      responses:
+        "200":
+          description: Advanced player details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerAdvancedDetails'
+              examples:
+                example1:
+                  value:
+                    statistics:
+                      points: 28.5
+                      rebounds: 7.9
+                      assists: 8.2
+                      blocks: 1
+                      steals: 1.2
+                      turnovers: 3.4
+                      field_goal_percentage: 0.51
+                      three_point_percentage: 0.36
+                      free_throw_percentage: 0.75
+        "201":
+          description: There are no available data.
+        "400":
+          description: Bad Request - The request parameters are invalid.
+        "401":
+          description: Unauthorized - Authentication is required.
+        "500":
+          description: Internal Server Error - An error occurred on the server.
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    MatchUp:
+      type: object
+      properties:
+        id:
+          type: integer
+        home_team:
+          $ref: '#/components/schemas/TeamBase'
+        away_team:
+          $ref: '#/components/schemas/TeamBase'
+        date_time:
+          type: string
+          format: date-time
+        city_arena:
+          type: string
+        referee:
+          type: string
+        season_type:
+          type: string
+          enum:
+          - Regular Season
+          - Playoffs
+          - All Star
+          - Pre Season
+      example:
+        season_type: Regular Season
+        date_time: 2000-01-23T04:56:07.000+00:00
+        city_arena: city_arena
+        id: 0
+        home_team:
+          ticker: ticker
+          name: name
+          logo: http://example.com/aeiou
+          id: 6
+        referee: referee
+        away_team: null
+    AdvancedMatchDetails:
+      type: object
+      properties:
+        match_id:
+          type: integer
+        home_team_id:
+          type: integer
+        away_team_id:
+          type: integer
+        home_team_score:
+          type: integer
+        away_team_score:
+          type: integer
+        winner:
+          type: string
+          enum:
+          - home
+          - away
+        point_difference:
+          type: integer
+      example:
+        home_team_id: 6
+        winner: home
+        point_difference: 2
+        match_id: 0
+        away_team_score: 5
+        home_team_score: 5
+        away_team_id: 1
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        city_arena:
+          type: string
+        coach:
+          type: string
+        logo:
+          type: string
+          format: uri
+        roster:
+          type: array
+          items:
+            type: string
+      example:
+        roster:
+        - roster
+        - roster
+        name: name
+        city_arena: city_arena
+        logo: http://example.com/aeiou
+        id: 0
+        coach: coach
+    TeamAdvancedDetails:
+      type: object
+      properties:
+        recent_record:
+          $ref: '#/components/schemas/TeamAdvancedDetails_recent_record'
+        points:
+          $ref: '#/components/schemas/TeamAdvancedDetails_points'
+        recent_matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdvancedMatchDetails'
+      example:
+        recent_record:
+          wins: 0
+          losses: 6
+        recent_matches:
+        - home_team_id: 6
+          winner: home
+          point_difference: 2
+          match_id: 0
+          away_team_score: 5
+          home_team_score: 5
+          away_team_id: 1
+        - home_team_id: 6
+          winner: home
+          point_difference: 2
+          match_id: 0
+          away_team_score: 5
+          home_team_score: 5
+          away_team_id: 1
+        points:
+          conceded: 5
+          scored: 1
+    TeamAdvancedDetailedStatistics:
+      type: object
+      properties:
+        statistics:
+          $ref: '#/components/schemas/TeamAdvancedDetailedStatistics_statistics'
+      example:
+        statistics:
+          rebounds: null
+          free_throw_percentage: 5.63737665663332876420099637471139430999755859375
+          assists: null
+          blocks: null
+          turnovers: null
+          field_goal_percentage: 1.46581298050294517310021547018550336360931396484375
+          steals: null
+          three_point_percentage: 5.962133916683182377482808078639209270477294921875
+          points:
+            average: 6.02745618307040320615897144307382404804229736328125
+            total: 0
+    TeamBase:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ticker:
+          type: string
+        logo:
+          type: string
+          format: uri
+      example:
+        ticker: ticker
+        name: name
+        logo: http://example.com/aeiou
+        id: 6
+    Player:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        team:
+          $ref: '#/components/schemas/TeamBase'
+        role:
+          type: string
+        jersey_number:
+          type: integer
+        age:
+          type: integer
+        height:
+          type: string
+        weight:
+          type: string
+        photo:
+          type: string
+          format: uri
+        advanced_details:
+          $ref: '#/components/schemas/PlayerAdvancedDetails'
+      example:
+        role: role
+        name: name
+        weight: weight
+        photo: http://example.com/aeiou
+        id: 0
+        team:
+          ticker: ticker
+          name: name
+          logo: http://example.com/aeiou
+          id: 6
+        jersey_number: 6
+        advanced_details:
+          statistics:
+            rebounds: 5.63737665663332876420099637471139430999755859375
+            free_throw_percentage: 7.3862819483858839220147274318151175975799560546875
+            assists: 2.3021358869347654518833223846741020679473876953125
+            blocks: 7.061401241503109105224211816675961017608642578125
+            turnovers: 3.61607674925191080461672754609026014804840087890625
+            field_goal_percentage: 2.027123023002321833274663731572218239307403564453125
+            steals: 9.301444243932575517419536481611430644989013671875
+            three_point_percentage: 4.1456080298839363962315474054776132106781005859375
+            points: 5.962133916683182377482808078639209270477294921875
+        age: 1
+        height: height
+    PlayerAdvancedDetails:
+      type: object
+      properties:
+        statistics:
+          $ref: '#/components/schemas/PlayerAdvancedDetails_statistics'
+      example:
+        statistics:
+          rebounds: 5.63737665663332876420099637471139430999755859375
+          free_throw_percentage: 7.3862819483858839220147274318151175975799560546875
+          assists: 2.3021358869347654518833223846741020679473876953125
+          blocks: 7.061401241503109105224211816675961017608642578125
+          turnovers: 3.61607674925191080461672754609026014804840087890625
+          field_goal_percentage: 2.027123023002321833274663731572218239307403564453125
+          steals: 9.301444243932575517419536481611430644989013671875
+          three_point_percentage: 4.1456080298839363962315474054776132106781005859375
+          points: 5.962133916683182377482808078639209270477294921875
+    TeamAdvancedDetails_recent_record:
+      type: object
+      properties:
+        wins:
+          type: integer
+        losses:
+          type: integer
+      example:
+        wins: 0
+        losses: 6
+    TeamAdvancedDetails_points:
+      type: object
+      properties:
+        scored:
+          type: integer
+        conceded:
+          type: integer
+      example:
+        conceded: 5
+        scored: 1
+    TeamAdvancedDetailedStatistics_statistics_points:
+      type: object
+      properties:
+        total:
+          type: integer
+        average:
+          type: number
+      example:
+        average: 6.02745618307040320615897144307382404804229736328125
+        total: 0
+    TeamAdvancedDetailedStatistics_statistics:
+      type: object
+      properties:
+        points:
+          $ref: '#/components/schemas/TeamAdvancedDetailedStatistics_statistics_points'
+        rebounds:
+          $ref: '#/components/schemas/TeamAdvancedDetailedStatistics_statistics_points'
+        assists:
+          $ref: '#/components/schemas/TeamAdvancedDetailedStatistics_statistics_points'
+        steals:
+          $ref: '#/components/schemas/TeamAdvancedDetailedStatistics_statistics_points'
+        blocks:
+          $ref: '#/components/schemas/TeamAdvancedDetailedStatistics_statistics_points'
+        turnovers:
+          $ref: '#/components/schemas/TeamAdvancedDetailedStatistics_statistics_points'
+        field_goal_percentage:
+          type: number
+        three_point_percentage:
+          type: number
+        free_throw_percentage:
+          type: number
+      example:
+        rebounds: null
+        free_throw_percentage: 5.63737665663332876420099637471139430999755859375
+        assists: null
+        blocks: null
+        turnovers: null
+        field_goal_percentage: 1.46581298050294517310021547018550336360931396484375
+        steals: null
+        three_point_percentage: 5.962133916683182377482808078639209270477294921875
+        points:
+          average: 6.02745618307040320615897144307382404804229736328125
+          total: 0
+    PlayerAdvancedDetails_statistics:
+      type: object
+      properties:
+        points:
+          type: number
+        rebounds:
+          type: number
+        assists:
+          type: number
+        blocks:
+          type: number
+        steals:
+          type: number
+        turnovers:
+          type: number
+        field_goal_percentage:
+          type: number
+        three_point_percentage:
+          type: number
+        free_throw_percentage:
+          type: number
+      example:
+        rebounds: 5.63737665663332876420099637471139430999755859375
+        free_throw_percentage: 7.3862819483858839220147274318151175975799560546875
+        assists: 2.3021358869347654518833223846741020679473876953125
+        blocks: 7.061401241503109105224211816675961017608642578125
+        turnovers: 3.61607674925191080461672754609026014804840087890625
+        field_goal_percentage: 2.027123023002321833274663731572218239307403564453125
+        steals: 9.301444243932575517419536481611430644989013671875
+        three_point_percentage: 4.1456080298839363962315474054776132106781005859375
+        points: 5.962133916683182377482808078639209270477294921875
+
