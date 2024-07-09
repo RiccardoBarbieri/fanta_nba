@@ -6,7 +6,7 @@ def download_proxies():
 
     # proxies = requests.get(url).text.split('\n')
 
-    proxies = ["localhost:3128"]
+    proxies = ["192.168.1.20:8890"]
 
     checker = ProxyChecker()
 

@@ -3,7 +3,8 @@
 **/*.env
 *.class
 /odds-api-swagger/target
-/odds-api-swagger/target/maven-status
-/odds-api-swagger/target/maven-status/maven-compiler-plugin/compile/default-compile
-/odds-api-swagger/target/maven-status/maven-compiler-plugin/compile
-/odds-api-swagger/target/maven-status/maven-compiler-plugin
+*.jar
+*.original
+*.properties
+
+__pycache__
