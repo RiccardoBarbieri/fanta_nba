@@ -150,7 +150,7 @@ public class CustomInstantDeserializer<T extends Temporal>
         return value;
       }
     }
-    throw context.mappingException("Expected type float, integer, or string.");
+    throw context.instantiationException(IOException.class, "Expected type float, integer, or string.");
   }
 
   private ZoneId getZone(DeserializationContext context) {

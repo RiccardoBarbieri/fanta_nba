@@ -17,7 +17,7 @@ public class ApiKeyInterceptor implements ClientHttpRequestInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(ApiKeyInterceptor.class);
 
-    private final String apiKey;
+    public final String apiKey;
 
     public ApiKeyInterceptor(String apiKey) {
         this.apiKey = apiKey;

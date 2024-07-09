@@ -5,6 +5,8 @@ import io.swagger.model.Bookmaker;
 import io.swagger.model.Market;
 import io.swagger.model.Odds;
 import io.swagger.model.Outcome;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -12,10 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class OddsUtils {
 
     private static ScheduleBookmakers scheduleBookmakers;
 
+    @Autowired
     public OddsUtils(ScheduleBookmakers scheduleBookmakers) {
         OddsUtils.scheduleBookmakers = scheduleBookmakers;
     }

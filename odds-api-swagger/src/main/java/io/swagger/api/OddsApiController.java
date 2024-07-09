@@ -38,7 +38,7 @@ public class OddsApiController implements OddsApi {
     private List<Odds> getEventOdds(String sportKey, String eventId, String regions, String market) {
         log.debug("Fetching odds for sportKey: {}, eventId: {}, regions: {}, market: {}", sportKey, eventId, regions, market);
 
-        Odds odds = oddsApiService.getEventOdds(null, sportKey, eventId, regions, market, null, null, null, null, null, null);
+        Odds odds = oddsApiService.getEventOdds(sportKey, eventId, regions, market, null, null, null, null, null, null);
 
         try {
             OddsUtils.addBookmakersUrl(odds, regions);

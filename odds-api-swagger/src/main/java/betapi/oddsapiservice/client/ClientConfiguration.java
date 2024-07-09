@@ -1,35 +1,34 @@
 package betapi.oddsapiservice.client;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateCustomizer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class ClientConfiguration implements RestTemplateCustomizer {
+@Configuration
+public class ClientConfiguration {
+
+    @Value("${odds_api.url}")
+    public String baseUrl;
 
     @Value("${odds_api.key}")
     public String apiKey;
 
-    @Value("${odds_api.url}")
-    public String baseUrl;
-    @Override
-    public void customize(RestTemplate restTemplate) {
-        restTemplate.getInterceptors().add(new ApiKeyInterceptor(apiKey));
-    }
-
-
-/*
     @Bean
-    public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
+    public RestClient restClient() {
 
-        List<ClientHttpRequestInterceptor> interceptors
-                = restTemplate.getInterceptors();
-        if (CollectionUtils.isEmpty(interceptors)) {
-            interceptors = new ArrayList<>();
-        }
-        interceptors.add(new ApiKeyInterceptor(apiKey));
-        restTemplate.setInterceptors(interceptors);
-        return restTemplate;
-    }*/
+        return RestClient.builder()
+                .requestFactory(new HttpComponentsClientHttpRequestFactory()) //http request library apache
+                .baseUrl(baseUrl)
+                .requestInterceptor(new ApiKeyInterceptor(apiKey))
+//                .defaultStatusHandler() //use to add status handling if needed
+                .build();
+    }
 }
