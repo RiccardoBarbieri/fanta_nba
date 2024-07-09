@@ -61,14 +61,28 @@ def get_game_id_and_season_type(team_ticker: str, season: str, date_to: str, dat
 
 
 def isvalid(key: str) -> bool:
+    """
+    Check if a given key is valid to be considered in game stats.
+
+    :param key: The key to validate.
+    :return: True if the key is valid, False otherwise.
+    """
     if key is None or key == "team_id" or key == "w" or key == "l" or key == "w_pct" or key == "min":
         return False
     return True
 
 
-def calculate_sums_averages(data: List[Dict]) -> Tuple[Dict[str, float], Dict[str, float]]:
+def calculate_sums_averages(data: List[Dict]) -> tuple[dict[Any, int | float], dict[Any, float]] | tuple[int, int, dict[Any, float]]:
+    """
+    Calculate totals and averages of all given game stats.
+
+    :param data: List of dictionaries about game stats.
+    :return: A tuple containing total wins, total losses, and a dictionary of averages.
+    """
     sums = {}
     averages = {}
+    total_wins = 0
+    total_losses = 0
 
     n = len(data)
 
@@ -82,19 +96,32 @@ def calculate_sums_averages(data: List[Dict]) -> Tuple[Dict[str, float], Dict[st
                     sums[key] += value
                 else:
                     sums[key] = value
+            if key == "wl":
+                if value == "W":
+                    total_wins += 1
+                else:
+                    total_losses += 1
 
     for key, total in sums.items():
         averages[key] = total / n
 
-    return sums, averages
+    return total_wins, total_losses, averages
+
 
 def get_last_games_at_home_away(team_log: List[Dict[str, Any]], last_x: int | None, home_away: str | None) -> List[Dict[str, Any]]:
+    """
+    Filter and return the last 'x' games based on the home/away filter.
 
+    :param team_log: List of dictionaries representing team game logs.
+    :param last_x: Number of recent games to consider (optional).
+    :param home_away: Filter for home ('HOME') or away ('AWAY') games (optional).
+    :return: List of dictionaries representing filtered team game logs.
+    """
     if home_away is not None and (home_away == "HOME" or home_away == "AWAY"):
-       if home_away == "AWAY":
+        if home_away == "AWAY":
             team_log = list(filter(lambda team_log: '@' in team_log['matchup'], team_log))
-       else:
-           team_log = list(filter(lambda team_log: 'vs' in team_log['matchup'], team_log))
+        else:
+            team_log = list(filter(lambda team_log: 'vs' in team_log['matchup'], team_log))
 
     if last_x is not None and last_x > 0:
         team_log = team_log[:last_x]
@@ -103,7 +130,15 @@ def get_last_games_at_home_away(team_log: List[Dict[str, Any]], last_x: int | No
 
 
 def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str) -> List[Dict[str, Any]]:
-    date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d')
+    """
+    Retrieve all games for a team until a specified date.
+
+    :param team_id: The ID of the team.
+    :param season: The season in the format 'YYYY-YY'.
+    :param date_to: The cutoff date until which games are considered (format: 'YYYY-MM-DD').
+    :return: List of dictionaries representing all games for the team until the specified date.
+    """
+    date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d').strftime('%m/%d/%Y')
 
     reg_team_game_log = get_season_games_for_team_until_date_to(team_id, season, False, date_to)
     po_team_game_log = get_season_games_for_team_until_date_to(team_id, season, True, date_to)
@@ -114,8 +149,16 @@ def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str
         return reg_team_game_log + po_team_game_log
 
 
-def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs: bool, date_to: datetime) -> List[
-    Dict[str, Any]]:
+def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs: bool, date_to: datetime) -> List[Dict[str, Any]]:
+    """
+    Retrieve specific season games for a team until a specified date.
+
+    :param team_id: The ID of the team.
+    :param season: The season in the format 'YYYY-YY'.
+    :param playoffs: Flag indicating whether to retrieve playoffs games (True) or regular season games (False).
+    :param date_to: The cutoff date until which games are considered.
+    :return: List of dictionaries representing season games for the team until the specified date.
+    """
     fvcalc.validate_season_string(season)
 
     if playoffs:
@@ -126,8 +169,7 @@ def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs:
     team_game_log = TeamGameLog(team_id=int(team_id),
                                 season=season,
                                 season_type_all_star=season_type,
-                                # date_to_nullable=date_to,
-                                # headers={'User-Agent': next(user_agents_cycle)}
+                                date_to_nullable=date_to,
                                 ).get_normalized_dict()['TeamGameLog']
     time.sleep(0.3)
 
@@ -135,23 +177,41 @@ def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs:
 
 
 def get_team_info_by_ticker(team_ticker: str) -> Dict[str, str]:
+    """
+    Retrieve team information based on the team abbreviation.
+
+    :param team_ticker: The team abbreviation (ticker).
+    :return: Dictionary containing detailed information about the team.
+    """
     teams_info = teams.get_teams()
     validate_team_ticker(team_ticker)
-    return filter(lambda x: x['abbreviation'] == team_ticker, teams_info).__next__()
+    return next(filter(lambda x: x['abbreviation'] == team_ticker, teams_info))
 
 
 def get_all_ids_from_tickers(team_tickers: List[str]) -> List[Dict[str, str]]:
+    """
+    Retrieve team IDs for a list of team abbreviations (tickers).
+
+    :param team_tickers: List of team abbreviations (tickers).
+    :return: List of dictionaries, each containing the team abbreviation and its corresponding ID.
+    """
     teams_info = teams.get_teams()
 
     result = []
     for team_ticker in team_tickers:
         validate_team_ticker(team_ticker)
-        team_id = filter(lambda x: x['abbreviation'] == team_ticker, teams_info).__next__()['id']
+        team_id = next(filter(lambda x: x['abbreviation'] == team_ticker, teams_info))['id']
         result.append({'team_ticker': team_ticker, 'team_id': team_id})
 
     return result
 
 
 def get_team_info_by_id(team_id: str) -> Dict[str, str]:
+    """
+    Retrieve team information based on the team ID.
+
+    :param team_id: The ID of the team.
+    :return: Dictionary containing detailed information about the team.
+    """
     teams_info = teams.get_teams()
-    return filter(lambda x: x['id'] == team_id, teams_info).__next__()
+    return next(filter(lambda x: x['id'] == team_id, teams_info))
