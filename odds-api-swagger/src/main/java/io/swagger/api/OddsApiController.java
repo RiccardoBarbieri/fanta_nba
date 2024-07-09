@@ -98,11 +98,7 @@ public class OddsApiController implements OddsApi {
             } catch (IllegalArgumentException e) {
                 log.error("Bad request received: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }/*catch (AuthenticationException e) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            } catch (AccessDeniedException e) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }*/ catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Internal server error: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -137,11 +133,7 @@ public class OddsApiController implements OddsApi {
             } catch (IllegalArgumentException e) {
                 log.error("Bad request received: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }/*catch (AuthenticationException e) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            } catch (AccessDeniedException e) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }*/ catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Internal server error: {}", e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }

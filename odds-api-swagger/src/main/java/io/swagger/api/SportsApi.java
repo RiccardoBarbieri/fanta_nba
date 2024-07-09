@@ -31,7 +31,7 @@ import java.util.List;
 public interface SportsApi {
 
     @Operation(summary = "Get events list", description = "Returns all available events.", security = {
-            @SecurityRequirement(name = "ApiKeyAuth")}, tags = {})
+            @SecurityRequirement(name = "ApiKeyAuth")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available events", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Event.class)))),
 
@@ -39,32 +39,24 @@ public interface SportsApi {
 
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
 
-            @ApiResponse(responseCode = "401", description = "Unauthorized - API key is missing or invalid."),
-
-            @ApiResponse(responseCode = "403", description = "Forbidden - You do not have permission to access this resource."),
-
             @ApiResponse(responseCode = "500", description = "Internal Server Error - An error occurred on the server.")})
     @RequestMapping(value = "/sports/getEvents",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<List<Event>> sportsGetEventsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the events", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+    ResponseEntity<List<Event>> sportsGetEventsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the events", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey") String sportKey
             , @Parameter(in = ParameterIn.QUERY, description = "Filter to show games that commence on and after this parameter", schema = @Schema()) @Valid @RequestParam(value = "commenceTimeFrom", required = false) String commenceTimeFrom
             , @Parameter(in = ParameterIn.QUERY, description = "Filter to show games that commence on and before this parameter", schema = @Schema()) @Valid @RequestParam(value = "commenceTimeTo", required = false) String commenceTimeTo
     );
 
 
     @Operation(summary = "Get sport groups", description = "Returns all available sport groups.", security = {
-            @SecurityRequirement(name = "ApiKeyAuth")}, tags = {})
+            @SecurityRequirement(name = "ApiKeyAuth")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available sport groups", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))),
 
             @ApiResponse(responseCode = "201", description = "There are no available groups."),
 
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
-
-            @ApiResponse(responseCode = "401", description = "Unauthorized - API key is missing or invalid."),
-
-            @ApiResponse(responseCode = "403", description = "Forbidden - You do not have permission to access this resource."),
 
             @ApiResponse(responseCode = "500", description = "Internal Server Error - An error occurred on the server.")})
     @RequestMapping(value = "/sports/getSportGroups",
@@ -75,17 +67,13 @@ public interface SportsApi {
 
 
     @Operation(summary = "Get sports list", description = "Returns all available sports.", security = {
-            @SecurityRequirement(name = "ApiKeyAuth")}, tags = {})
+            @SecurityRequirement(name = "ApiKeyAuth")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available sports", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Sport.class)))),
 
             @ApiResponse(responseCode = "201", description = "There are no available sports."),
 
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
-
-            @ApiResponse(responseCode = "401", description = "Unauthorized - API key is missing or invalid."),
-
-            @ApiResponse(responseCode = "403", description = "Forbidden - You do not have permission to access this resource."),
 
             @ApiResponse(responseCode = "500", description = "Internal Server Error - An error occurred on the server.")})
     @RequestMapping(value = "/sports/getSports",

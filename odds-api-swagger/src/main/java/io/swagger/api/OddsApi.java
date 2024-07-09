@@ -15,15 +15,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.util.List;
 
 @jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-06-24T10:03:13.459259793Z[GMT]")
@@ -31,7 +30,7 @@ import java.util.List;
 public interface OddsApi {
 
     @Operation(summary = "Get head-to-head odds", description = "Returns the top 'X' head-to-head odds for a specific event.", security = {
-            @SecurityRequirement(name = "ApiKeyAuth")}, tags = {})
+            @SecurityRequirement(name = "ApiKeyAuth")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of the top 'X' head-to-head odds", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Odds.class)))),
 
@@ -39,22 +38,18 @@ public interface OddsApi {
 
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
 
-            @ApiResponse(responseCode = "401", description = "Unauthorized - API key is missing or invalid."),
-
-            @ApiResponse(responseCode = "403", description = "Forbidden - You do not have permission to access this resource."),
-
             @ApiResponse(responseCode = "500", description = "Internal Server Error - An error occurred on the server.")})
     @RequestMapping(value = "/odds/head2head",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<List<Odds>> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
-            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+    ResponseEntity<List<Odds>> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId") String eventId
+            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey") String sportKey
             , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
     );
 
 
     @Operation(summary = "Get head-to-head handicap (spread) odds", description = "Returns the top 'X' head-to-head handicap odds for a specific event.", security = {
-            @SecurityRequirement(name = "ApiKeyAuth")}, tags = {})
+            @SecurityRequirement(name = "ApiKeyAuth")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of the top 'X' head-to-head handicap odds", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Odds.class)))),
 
@@ -62,16 +57,12 @@ public interface OddsApi {
 
             @ApiResponse(responseCode = "400", description = "Bad Request - The request parameters are invalid."),
 
-            @ApiResponse(responseCode = "401", description = "Unauthorized - API key is missing or invalid."),
-
-            @ApiResponse(responseCode = "403", description = "Forbidden - You do not have permission to access this resource."),
-
             @ApiResponse(responseCode = "500", description = "Internal Server Error - An error occurred on the server.")})
     @RequestMapping(value = "/odds/spreads",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<List<Odds>> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
-            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+    ResponseEntity<List<Odds>> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId") String eventId
+            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey") String sportKey
             , @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
     );
 
