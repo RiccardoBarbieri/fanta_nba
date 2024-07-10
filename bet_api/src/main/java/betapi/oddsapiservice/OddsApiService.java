@@ -1,8 +1,8 @@
 package betapi.oddsapiservice;
 
-import io.swagger.model.Event;
-import io.swagger.model.Odds;
-import io.swagger.model.Sport;
+import betapi.swagger.model.Event;
+import betapi.swagger.model.Odds;
+import betapi.swagger.model.Sport;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;

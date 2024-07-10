@@ -1,7 +1,7 @@
-package io.swagger;
+package betapi.swagger;
 
-import io.swagger.configuration.LocalDateConverter;
-import io.swagger.configuration.LocalDateTimeConverter;
+import betapi.swagger.configuration.LocalDateConverter;
+import betapi.swagger.configuration.LocalDateTimeConverter;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
@@ -12,7 +12,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "io.swagger", "io.swagger.api", "io.swagger.configuration", "betapi", "betapi.oddsapiservice", "betapi.database" })
+@ComponentScan(basePackages = { "betapi.swagger", "betapi.swagger.api", "betapi.swagger.configuration", "betapi", "betapi.oddsapiservice", "betapi.database" })
 public class Swagger2SpringBoot implements CommandLineRunner {
 
     @Override

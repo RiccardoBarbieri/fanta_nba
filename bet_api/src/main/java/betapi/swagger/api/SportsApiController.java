@@ -1,8 +1,8 @@
-package io.swagger.api;
+package betapi.swagger.api;
 
 import betapi.oddsapiservice.OddsApiService;
-import io.swagger.model.Event;
-import io.swagger.model.Sport;
+import betapi.swagger.model.Event;
+import betapi.swagger.model.Sport;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;

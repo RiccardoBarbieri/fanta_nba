@@ -1,4 +1,4 @@
-package io.swagger.model;
+package betapi.swagger.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,4 +1,4 @@
-package io.swagger.api;
+package betapi.swagger.api;
 
 import jakarta.xml.bind.annotation.XmlTransient;
 

@@ -1,4 +1,4 @@
-package io.swagger.api;
+package betapi.swagger.api;
 
 import java.io.IOException;
 

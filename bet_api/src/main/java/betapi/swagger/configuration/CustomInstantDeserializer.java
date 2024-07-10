@@ -1,4 +1,4 @@
-package io.swagger.configuration;
+package betapi.swagger.configuration;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonParser;

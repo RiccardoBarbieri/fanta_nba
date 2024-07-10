@@ -1,10 +1,10 @@
-package io.swagger.api;
+package betapi.swagger.api;
 
 import betapi.database.ScheduleBookmakers;
-import io.swagger.model.Bookmaker;
-import io.swagger.model.Market;
-import io.swagger.model.Odds;
-import io.swagger.model.Outcome;
+import betapi.swagger.model.Bookmaker;
+import betapi.swagger.model.Market;
+import betapi.swagger.model.Odds;
+import betapi.swagger.model.Outcome;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

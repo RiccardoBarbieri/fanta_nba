@@ -3,10 +3,10 @@
  * https://github.com/swagger-api/swagger-codegen
  * Do not edit the class manually.
  */
-package io.swagger.api;
+package betapi.swagger.api;
 
-import io.swagger.model.Event;
-import io.swagger.model.Sport;
+import betapi.swagger.model.Event;
+import betapi.swagger.model.Sport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
