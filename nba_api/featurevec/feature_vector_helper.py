@@ -630,20 +630,18 @@ def get_arena(team_ticker: str, season: str, game_id: str | None, playoffs: bool
     return {'name': arena_name, 'city': arena_city, 'state': arena_state, 'country': arena_country}
 
 
-def get_player_efficiency(player_id: str, team_ticker: str, game_id_up_to: str, season: str) -> float:
+def get_player_efficiency(player_id: str, game_id_up_to: str, season: str) -> float:
     """
     Get the player efficiency rating for a specific player using the following formula:
 
 
     :param player_id: The player identifier.
-    :param team_ticker: The team abbreviation.
     :param game_id_up_to: The game identifier to calculate the player efficiency up to.
     :param season: A string representing the season in the format 'YYYY-YY'.
 
     :return: The player efficiency rating.
     """
     validate_season_string(season)
-    validate_team_ticker(team_ticker)
 
     start_time = time.time()
     player_game_log_reg = get_player_games_for_season(player_id, season, False)
