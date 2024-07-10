@@ -5,6 +5,5 @@
 bet_api/target
 *.jar
 *.original
-*.properties
 
 __pycache__
