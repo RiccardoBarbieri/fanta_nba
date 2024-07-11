@@ -36,7 +36,8 @@ from utils.constants import LOG_FILE, FV_COLS
 import featurevec.feature_vector_calculator as fvcalc
 
 
-def get_game_id_and_season_type(team_ticker: str, season: str, date_to: str, date_from: str) -> Dict[str, Any]:
+def get_game_id_and_season_type(team_ticker: str, season: str, date_from: str | None, date_to: str | None) -> list[
+    dict[str, bool | Any] | dict[str, bool | Any]]:
     """
     Get the game id of the game for the team.
 
@@ -48,17 +49,30 @@ def get_game_id_and_season_type(team_ticker: str, season: str, date_to: str, dat
     :return: A dict containing the game id and a boolean representing if the game is a playoff game.
     """
 
-    date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d')
-    date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d')
+    if date_from is not None:
+        date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d').strftime('%m/%d/%Y')
+    else:
+        date_from = datetime.datetime.strptime("1900-01-01", '%Y-%m-%d').strftime('%m/%d/%Y')
+    if date_to is not None:
+        date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d').strftime('%m/%d/%Y')
+    else:
+        date_to = datetime.datetime.strptime("2999-01-01", '%Y-%m-%d').strftime('%m/%d/%Y')
 
-    reg_team_game_log = get_season_games_for_team(team_ticker, season, False, date_from, date_to)
-    po_team_game_log = get_season_games_for_team(team_ticker, season, True, date_from, date_to)
+    team_id = get_team_id_from_ticker(team_ticker)
+    reg_team_game_log = get_season_games_for_team_until_date_to(team_id, season, False, date_from, date_to)
+    po_team_game_log = get_season_games_for_team_until_date_to(team_id, season, True, date_from, date_to)
 
-    for game in reg_team_game_log:
-        return {'match-up': game['MATCHUP'], 'game_id': game['game_id'], 'playoff': False}
+    res = []
+    if po_team_game_log is not None:
+        for game in po_team_game_log:
+            res.append({'match-up': game['matchup'], 'date': game['game_date'], 'game_id': game['game_id'], 'season': "po"})
 
-    for game in po_team_game_log:
-        return {'match-up': game['MATCHUP'], 'game_id': game['game_id'], 'playoff': True}
+    if reg_team_game_log is not None:
+        for game in reg_team_game_log:
+            res.append(
+                {'match-up': game['matchup'], 'date': game['game_date'], 'game_id': game['game_id'], 'season': "reg"})
+
+    return res
 
 
 def isvalid(key: str) -> bool:
@@ -110,16 +124,22 @@ def calculate_sums_averages(data: List[Dict]) -> tuple[dict[Any, int | float], d
     return total_wins, total_losses, averages
 
 
-def get_last_games_at_home_away(match_log: List[Dict[str, Any]], last_x: int | None, home_away: str | None) -> List[
-    Dict[str, Any]]:
+def get_last_games_at_home_away(match_log: List[Dict[str, Any]], last_x: int | None, home_away: str | None,
+                                opp_team_ticker: str | None) -> List[Dict[str, Any]]:
     """
     Filter and return the last 'x' games based on the home/away filter.
 
     :param match_log: List of dictionaries representing team game logs.
     :param last_x: Number of recent games to consider (optional).
     :param home_away: Filter for home ('HOME') or away ('AWAY') games (optional).
+    :param opp_team_ticker: Team ticker of the opposite team (optional)
     :return: List of dictionaries representing filtered team game logs.
     """
+
+    if opp_team_ticker is not None:
+        validate_team_ticker(opp_team_ticker)
+        match_log = list(filter(lambda match_log: opp_team_ticker in match_log['matchup'], match_log))
+
     if home_away is not None and (home_away == "HOME" or home_away == "AWAY"):
         if home_away == "AWAY":
             match_log = list(filter(lambda match_log: '@' in match_log['matchup'], match_log))
@@ -143,8 +163,8 @@ def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str
     """
     date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d').strftime('%m/%d/%Y')
 
-    reg_team_game_log = get_season_games_for_team_until_date_to(team_id, season, False, date_to)
-    po_team_game_log = get_season_games_for_team_until_date_to(team_id, season, True, date_to)
+    reg_team_game_log = get_season_games_for_team_until_date_to(team_id, season, False, None, date_to)
+    po_team_game_log = get_season_games_for_team_until_date_to(team_id, season, True, None, date_to)
 
     if po_team_game_log is None:
         return reg_team_game_log
@@ -152,14 +172,15 @@ def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str
         return reg_team_game_log + po_team_game_log
 
 
-def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs: bool, date_to: datetime) -> List[
-    Dict[str, Any]]:
+def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs: bool, date_from: datetime,
+                                            date_to: datetime) -> List[Dict[str, Any]]:
     """
     Retrieve specific season games for a team until a specified date.
 
     :param team_id: The ID of the team.
     :param season: The season in the format 'YYYY-YY'.
     :param playoffs: Flag indicating whether to retrieve playoffs games (True) or regular season games (False).
+    :param date_from: The cutoff date from which games are considered.
     :param date_to: The cutoff date until which games are considered.
     :return: List of dictionaries representing season games for the team until the specified date.
     """
@@ -174,6 +195,7 @@ def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs:
                                 season=season,
                                 season_type_all_star=season_type,
                                 date_to_nullable=date_to,
+                                date_from_nullable=date_from
                                 ).get_normalized_dict()['TeamGameLog']
     time.sleep(0.3)
 
