@@ -36,6 +36,7 @@ from geo.distance import get_distance_between_arenas
 # user_agents_cycle = cycle(user_agents)
 
 import logging
+
 logger = logging.getLogger(os.path.basename(__file__))
 logger.setLevel(logging.DEBUG)
 
@@ -328,7 +329,9 @@ def get_player_games_for_season(player_id: str, season: str, playoffs: bool) -> 
     """
     validate_season_string(season)
 
-    player_game_log = PlayerGameLog(player_id=player_id, season=season, season_type_all_star='Playoffs' if playoffs else 'Regular Season').get_normalized_dict()['PlayerGameLog']
+    player_game_log = PlayerGameLog(player_id=player_id, season=season,
+                                    season_type_all_star='Playoffs' if playoffs else 'Regular Season').get_normalized_dict()[
+        'PlayerGameLog']
 
     return all_keys_to_lower(player_game_log)
 
@@ -611,6 +614,10 @@ def get_arena(team_ticker: str, season: str, game_id: str | None, playoffs: bool
         first_home_game_id = df_team_game_log[df_team_game_log['matchup'].str.contains('vs.')].iloc[0, :]['game_id']
         game_id = first_home_game_id
 
+    return get_arena_by_id(game_id)
+
+
+def get_arena_by_id(game_id: str) -> dict[str, str]:
     response = requests.get('https://www.nba.com/game/' + game_id)
 
     if response.status_code != 200:
@@ -702,12 +709,10 @@ def print_df(df):
 
 
 if __name__ == '__main__':
-
     print(get_player_efficiency('1628369', 'BOS', '0022300159', '2023-24'))
 
-    #199 68 25 11 1 96 7 21 7
-    #25.714285714285715
-
+    # 199 68 25 11 1 96 7 21 7
+    # 25.714285714285715
 
     # Jayson Tatum 1628369
     #        team_id     game_id            game_date      matchup
