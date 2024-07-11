@@ -1,345 +1,718 @@
 openapi: 3.0.1
 info:
-  title: NBA Middleware API
-  description: Bridge to expose nba_api library through HTTP api
+  title: NBA API
+  description: API for retrieving NBA teams, matches, players, and their statistics
   version: 1.0.0
-servers:
-  - url: https://api.your-middleware.com
-    description: Main URL of the middleware
 paths:
-  /static/players:
+  /teams:
     get:
-      summary: Get all players
+      summary: Retrieve all teams by ticker and season
+      parameters:
+        - in: query
+          name: tickers
+          schema:
+            type: array
+            items:
+              type: string
+          required: true
+          description: List of team tickers
+          example: ["BOS", "LAL", "MIA"]
+        - in: query
+          name: season
+          schema:
+            type: string
+          required: true
+          description: NBA season (e.g., 2023-24)
+          example: "2023-24"
       responses:
         '200':
-          description: A list of players
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Player'
-        '400':
-          description: Bad Request - The request parameters are invalid.
-        '401':
-          description: Unauthorized - API key is missing or invalid.
-        '403':
-          description: Forbidden - You do not have permission to access this resource.
-        '500':
-          description: Internal Server Error - An error occurred on the server.
-
-  /static/teams:
-    get:
-      summary: Get all teams
-      responses:
-        '200':
-          description: A list of teams
+          description: A list of teams with their information and players
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Team'
-                example:
-                  - id: 1
-                    full_name: Atlanta Hawks
-                    abbreviation: ATL
-                    nickname: Hawks
-                    city: Atlanta
-                    state: Georgia
-                    year_founded: 1949
-        '400':
-          description: Bad Request - The request parameters are invalid.
-        '401':
-          description: Unauthorized - API key is missing or invalid.
-        '403':
-          description: Forbidden - You do not have permission to access this resource.
-        '500':
-          description: Internal Server Error - An error occurred on the server.
 
-  /storic/game/stats:
+  /teams/{ticker}:
     get:
-      summary: Get games statistics by date and teams
+      summary: Retrieve team information and players by ticker and season
       parameters:
-        - in: query
-          name: fromDate
-          schema:
-            type: string
-            format: date
-          required: true
-          description: The start date
-        - in: query
-          name: toDate
-          schema:
-            type: string
-            format: date
-          required: true
-          description: The end date
-        - in: query
-          name: teamTicker1
+        - in: path
+          name: ticker
           schema:
             type: string
           required: true
-          description: The first team ticker
+          description: Team ticker
+          example: "BOS"
         - in: query
-          name: teamTicker2
+          name: season
           schema:
             type: string
           required: true
-          description: The second team ticker
+          description: NBA season (e.g., 2023-24)
+          example: "2023-24"
       responses:
         '200':
-          description: A list of GameInfo
+          description: Team information and list of players
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+
+  /teams/{team_id}/stats:
+    get:
+      summary: Retrieve team stats by team ID, season, date, number of games, and location
+      parameters:
+        - in: path
+          name: team_id
+          schema:
+            type: integer
+          required: true
+          description: Team ID
+          example: 1610612738
+        - in: query
+          name: season
+          schema:
+            type: string
+          required: true
+          description: NBA season (e.g., 2023-24)
+          example: "2023-24"
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date
+          required: true
+          description: Match date up to consider (e.g., 2024-08-08)
+          example: "2024-08-08"
+        - in: query
+          name: num_games
+          schema:
+            type: integer
+          required: false
+          description: Number of last games to consider
+          example: 5
+        - in: query
+          name: location
+          schema:
+            type: string
+          required: false
+          description: Location of the games (HOME or AWAY)
+          example: "HOME"
+      responses:
+        '200':
+          description: A list of team stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamStats'
+
+  /matches:
+    get:
+      summary: Retrieve all matches by matchup, season and matchday
+      parameters:
+        - in: query
+          name: match-up
+          schema:
+            type: string
+          required: true
+          description: NBA teams tickers (e.g., GSW - UTA)
+          example: "GSW - UTA"
+        - in: query
+          name: season
+          schema:
+            type: string
+          required: true
+          description: NBA season (e.g., 2023-24)
+          example: "2023-24"
+        - in: query
+          name: matchday
+          schema:
+            type: string
+          required: true
+          description: Matchday
+          example: "1"
+      responses:
+        '200':
+          description: A list of matches
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GameInfo'
-        '400':
-          description: Bad Request - The request parameters are invalid.
-        '401':
-          description: Unauthorized - API key is missing or invalid.
-        '403':
-          description: Forbidden - You do not have permission to access this resource.
-        '500':
-          description: Internal Server Error - An error occurred on the server.
+                  $ref: '#/components/schemas/Match'
 
-# Team base stats and GameInfo stats make two endpoints:
-#  - one with last N as parameter
-#  - one with fromdate todate as parameters
+  /match:
+    get:
+      summary: Retrieve match information by match ID
+      parameters:
+        - in: query
+          name: match-up
+          schema:
+            type: string
+          required: true
+          description: NBA teams tickers (e.g., GSW - UTA)
+          example: "GSW - UTA"
+        - in: query
+          name: season
+          schema:
+            type: string
+          required: true
+          description: NBA season (e.g., 2023-24)
+          example: "2023-24"
+        - in: query
+          name: matchday
+          schema:
+            type: string
+          required: true
+          description: Matchday
+          example: "1"
+      responses:
+        '200':
+          description: Match information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+
+  /match/{match_id}/stats:
+    get:
+      summary: Retrieve match stats by match ID
+      parameters:
+        - in: path
+          name: match_id
+          schema:
+            type: integer
+          required: true
+          description: Match ID
+          example: 12345
+        - in: query
+          name: home ticker
+          schema:
+            type: string
+          required: true
+          description: NBA home team ticker (e.g., GSW)
+          example: "GSW"
+        - in: query
+          name: away ticker
+          schema:
+            type: string
+          required: true
+          description: NBA away team ticker (e.g., ATL)
+          example: "ATL"
+        - in: query
+          name: season
+          schema:
+            type: string
+          required: true
+          description: NBA season (e.g., 2023-24)
+          example: "2023-24"
+        - in: query
+          name: matchday
+          schema:
+            type: string
+          required: true
+          description: Matchday
+          example: "1"
+      responses:
+        '200':
+          description: Match stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchStats'
+
+  /players/{player_id}/stats:
+    get:
+      summary: Retrieve player stats by player ID, season, date, location and number of games
+      parameters:
+        - in: path
+          name: player_id
+          schema:
+            type: integer
+          required: true
+          description: Player ID
+          example: 203507
+        - in: query
+          name: season
+          schema:
+            type: string
+          required: true
+          description: NBA season (e.g., 2023-24)
+          example: "2023-24"
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date
+          required: false
+          description: Match date up to consider for the stats (e.g., 2024-08-08)
+          example: "2024-08-08"
+        - in: query
+          name: num_games
+          schema:
+            type: integer
+          required: false
+          description: Number of last games to consider
+          example: 5
+        - in: query
+          name: location
+          schema:
+            type: string
+          required: false
+          description: Location of the games (HOME or AWAY)
+          example: "HOME"
+      responses:
+        '200':
+          description: Player stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerStats'
 
 components:
   schemas:
-    Player:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: The player ID
-        full_name:
-          type: string
-          description: The player full name
-        first_name:
-          type: string
-          description: The player first name
-        last_name:
-          type: string
-          description: The player last name
-        is_active:
-          type: boolean
-          description: The player is active
     Team:
       type: object
       properties:
+        team_ticker:
+          type: string
+          example: "BOS"
+        team_info:
+          $ref: '#/components/schemas/TeamInfo'
+        team_players:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+
+    TeamInfo:
+      type: object
+      properties:
         id:
           type: integer
-          format: int64
-          description: The team ID
+          example: 1610612738
         full_name:
           type: string
-          description: The team full name
+          example: "Boston Celtics"
         abbreviation:
           type: string
-          description: The team abbreviation
+          example: "BOS"
         nickname:
           type: string
-          description: The team nickname
+          example: "Celtics"
         city:
           type: string
-          description: The team city
+          example: "Boston"
         state:
           type: string
-          description: The team state
+          example: "MA"
         year_founded:
           type: integer
-          format: int64
-          description: The team year founded
-    TeamBaseStats:
+          example: 1946
+
+    Player:
       type: object
       properties:
-        id:
+        PLAYER_ID:
           type: integer
-          format: int64
-          description: The team ID
-        wins:
+          example: 203507
+        PLAYER:
+          type: string
+          example: "Marcus Smart"
+        NUM:
+          type: string
+          example: "36"
+        POSITION:
+          type: string
+          example: "G"
+        HEIGHT:
+          type: string
+          example: "6-3"
+        WEIGHT:
           type: integer
-          format: int64
-          description: The number of wins
-        losses:
-          type: integer
-          format: int64
-          description: The number of losses
-        average_points:
+          example: 220
+        AGE:
           type: number
-          format: float
-          description: The average points per game
-        average_points_against:
-          type: number
-          format: float
-          description: The average points against per game
-    GameInfo:
+          example: 29
+        EXP:
+          type: string
+          example: "6"
+
+    TeamStats:
       type: object
       properties:
-        id:
+        all_stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stat'
+        totals:
+          type: object
+          items:
+            properties:
+              wins:
+                type: integer
+                example: 2
+              losses:
+                type: integer
+                example: 3
+        average:
+          $ref: '#/components/schemas/Average'
+            
+            
+    Average:
+          type: object
+          items:
+            properties:
+              fgm:
+                type: integer
+                example: 40
+              fga:
+                type: integer
+                example: 85
+              fg_pct:
+                type: number
+                example: 47.1
+              fg3m:
+                type: integer
+                example: 12
+              fg3a:
+                type: integer
+                example: 32
+              fg3_pct:
+                type: number
+                example: 37.5
+              ftm:
+                type: integer
+                example: 18
+              fta:
+                type: integer
+                example: 22
+              ft_pct:
+                type: number
+                example: 81.8
+              oreb:
+                type: integer
+                example: 10
+              dreb:
+                type: integer
+                example: 35
+              reb:
+                type: integer
+                example: 45
+              ast:
+                type: integer
+                example: 25
+              stl:
+                type: integer
+                example: 8
+              blk:
+                type: integer
+                example: 5
+              tov:
+                type: integer
+                example: 13
+              pf:
+                type: integer
+                example: 20
+              pts:
+                type: integer
+                example: 110
+
+    Match:
+      type: object
+      properties:
+        game_id:
           type: integer
-          format: int64
-          description: The game ID
+          example: 12345
+        match-up:
+          type: string
+          example: "BKN - WAS"
         date:
           type: string
           format: date
-          description: The game date
-        home_team_id:
+          example: "MAR 27, 2024"
+        home_team:
+          $ref: '#/components/schemas/TeamInfo'
+        away_team:
+          $ref: '#/components/schemas/TeamInfo'
+        referee:
+          $ref: '#/components/schemas/Referee'
+        arena:
+          $ref: '#/components/schemas/Arena'
+          
+    Referee:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Sean Corbin"
+        id:
           type: integer
-          format: int64
-          description: The home team ID
-        away_team_id:
-          type: integer
-          format: int64
-          description: The away team ID
+          example: 1151
+
+    Arena:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Capital One Arena"
+        city:
+          type: string
+          example: "Washington"
+        state:
+          type: string
+          example: "DC"
+        country:
+          type: string
+          example: "US"
+
+    MatchStats:
+      type: object
+      properties:
+        actual_match_stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActualMatchStats'
+        last_match_stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/LastMatchStats'
+
+    GlobalStats:
+      type: object
+      properties:
+        game_id:
+          type: string
+          example: "0022301198"
+        game_date:
+          type: string
+          example: "APR 14, 2024"
+        matchup:
+          type: string
+          example: "GSW vs. UTA"
         winner:
           type: string
-          enum: [ home, away ]
-          description: The winner team
-        home_wins_until_game:
+          example: "GSW"
+        home_point:
           type: integer
-          format: int64
-          description: The number of wins of the home team until this game
-        home_losses_until_game:
+          example: 123
+        away_point:
           type: integer
-          format: int64
-          description: The number of losses of the home team until this game
-        away_wins_until_game:
-          type: integer
-          format: int64
-          description: The number of wins of the away team until this game
-        away_losses_until_game:
-          type: integer
-          format: int64
-          description: The number of losses of the away team until this game
-        home_pts:
-          type: integer
-          format: int64
-          description: The winner team points
-        away_pts:
-          type: integer
-          format: int64
-          description: The loser team points
-        home_fgm:
-          type: integer
-          format: int64
-          description: The home team field goals made
-        home_fga:
-          type: integer
-          format: int64
-          description: The home team field goals attempted
-        home_fg3m:
-          type: integer
-          format: int64
-          description: The home team three points made
-        home_fg3a:
-          type: integer
-          format: int64
-          description: The home team three points attempted
-        home_ftm:
-          type: integer
-          format: int64
-          description: The home team free throws made
-        home_fta:
-          type: integer
-          format: int64
-          description: The home team free throws attempted
-        home_oreb:
-          type: integer
-          format: int64
-          description: The home team offensive rebounds
-        home_dreb:
-          type: integer
-          format: int64
-          description: The home team defensive rebounds
-        home_reb:
-          type: integer
-          format: int64
-          description: The home team total rebounds
-        home_ast:
-          type: integer
-          format: int64
-          description: The home team assists
-        home_stl:
-          type: integer
-          format: int64
-          description: The home team steals
-        home_blk:
-          type: integer
-          format: int64
-          description: The home team blocks
-        home_tov:
-          type: integer
-          format: int64
-          description: The home team turnovers
-        home_pf:
-          type: integer
-          format: int64
-          description: The home team personal fouls
+          example: 116
 
+    ActualMatchStats:
+      type: object
+      properties:
+        global_stats:
+          $ref: '#/components/schemas/GlobalStats'
+        by_home_stats:
+          $ref: '#/components/schemas/Stat'
+        by_away_stats:
+          $ref: '#/components/schemas/Stat'
 
-        away_fgm:
+    LastMatchStats:
+      type: object
+      properties:
+        global_stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/GlobalStats'
+        by_home_stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stat'
+        by_away_stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stat'
+            
+    Stat:
+      type: object
+      properties:
+        team_id:
           type: integer
-          format: int64
-          description: The away team field goals made
-        away_fga:
+          example: 1610612738
+        game_id:
+          type: string
+          example: "0022001074"
+        game_date:
+          type: string
+          example: "2024-01-23"
+        matchup:
+          type: string
+          example: "BOS vs LAL"
+        wl:
+          type: string
+          example: "W"
+        w:
           type: integer
-          format: int64
-          description: The away team field goals attempted
-        away_fg3m:
+          example: 20
+        l:
           type: integer
-          format: int64
-          description: The away team three points made
-        away_fg3a:
+          example: 5
+        w_pct:
+          type: number
+          example: 0.8
+        min:
           type: integer
-          format: int64
-          description: The away team three points attempted
-        away_ftm:
+          example: 240
+        fgm:
           type: integer
-          format: int64
-          description: The away team free throws made
-        away_fta:
+          example: 40
+        fga:
           type: integer
-          format: int64
-          description: The away team free throws attempted
-        away_oreb:
+          example: 85
+        fg_pct:
+          type: number
+          example: 47.1
+        fg3m:
           type: integer
-          format: int64
-          description: The away team offensive rebounds
-        away_dreb:
+          example: 12
+        fg3a:
           type: integer
-          format: int64
-          description: The away team defensive rebounds
-        away_reb:
+          example: 32
+        fg3_pct:
+          type: number
+          example: 37.5
+        ftm:
           type: integer
-          format: int64
-          description: The away team total rebounds
-        away_ast:
+          example: 18
+        fta:
           type: integer
-          format: int64
-          description: The away team assists
-        away_stl:
+          example: 22
+        ft_pct:
+          type: number
+          example: 81.8
+        oreb:
           type: integer
-          format: int64
-          description: The away team steals
-        away_blk:
+          example: 10
+        dreb:
           type: integer
-          format: int64
-          description: The away team blocks
-        away_tov:
+          example: 35
+        reb:
           type: integer
-          format: int64
-          description: The away team turnovers
-        away_pf:
+          example: 45
+        ast:
           type: integer
-          format: int64
-          description: The away team personal fouls
+          example: 25
+        stl:
+          type: integer
+          example: 8
+        blk:
+          type: integer
+          example: 5
+        tov:
+          type: integer
+          example: 13
+        pf:
+          type: integer
+          example: 20
+        pts:
+          type: integer
+          example: 110
 
+    PlayerStats:
+      type: object
+      properties:
+        all_stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlayerMatchStats'
+        totals:
+          type: object
+          items:
+            properties:
+              wins:
+                type: integer
+                example: 2
+              losses:
+                type: integer
+                example: 3
+        average:
+          $ref: '#/components/schemas/Average'
 
-
+    PlayerMatchStats:
+      type: object
+      properties:
+        season_id:
+          type: string
+          example: "22023"
+        player_id:
+          type: integer
+          example: 203507
+        game_id:
+          type: string
+          example: "0022001074"
+        game_date:
+          type: string
+          example: "2024-01-23"
+        matchup:
+          type: string
+          example: "BOS vs LAL"
+        wl:
+          type: string
+          example: "W"
+        min:
+          type: number
+          example: 36
+        fgm:
+          type: number
+          example: 8
+        fga:
+          type: number
+          example: 15
+        fg_pct:
+          type: number
+          example: 53.3
+        fg3m:
+          type: number
+          example: 4
+        fg3a:
+          type: number
+          example: 9
+        fg3_pct:
+          type: number
+          example: 44.4
+        ftm:
+          type: number
+          example: 2
+        fta:
+          type: number
+          example: 2
+        ft_pct:
+          type: number
+          example: 100
+        oreb:
+          type: number
+          example: 1
+        dreb:
+          type: number
+          example: 4
+        reb:
+          type: number
+          example: 5
+        ast:
+          type: number
+          example: 7
+        stl:
+          type: number
+          example: 2
+        blk:
+          type: number
+          example: 1
+        tov:
+          type: number
+          example: 3
+        pf:
+          type: number
+          example: 4
+        pts:
+          type: number
+          example: 22
+        plus_minus:
+          type: number
+          example: -6
+        video_available:
+          type: number
+          example: 1
