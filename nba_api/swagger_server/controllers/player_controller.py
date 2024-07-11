@@ -1,4 +1,4 @@
-import featurevec.feature_vector_helper as fvhelper
+import featurevec.feature_vector_helper as feature_vector_helper
 import featurevec.rest_api_functions_helper as helper
 
 # Rest Api Controller for player information and statistics
@@ -24,7 +24,7 @@ def get_player_stats(player_id: str, season: str, date_to: str, last_x: int | No
     filtered_player_efficiency = helper.get_filtered_matches_player_efficiency(filtered_stats)
 
     game_id_up_to = filtered_stats.__getitem__(0).get("game_id")
-    player_efficiency = fvhelper.get_player_efficiency(player_id, game_id_up_to, season)
+    player_efficiency = feature_vector_helper.get_player_efficiency(player_id, game_id_up_to, season)
 
     return {
         "all_stats": filtered_stats,

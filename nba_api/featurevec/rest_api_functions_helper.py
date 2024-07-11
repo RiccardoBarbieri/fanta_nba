@@ -1,54 +1,28 @@
 import datetime
-import functools
-import time
-from typing import Dict, Any, List, Tuple
-
 import sys
+import time
+from utils.helper_functions import all_keys_to_lower
+from utils.validation import validate_team_ticker, validate_season_string
+
+from nba_api.stats.endpoints.teamgamelog import TeamGameLog
+from nba_api.stats.endpoints.playergamelog import PlayerGameLog
+from nba_api.stats.static import teams
+from nba_api.stats.endpoints.commonteamroster import CommonTeamRoster
 
 sys.path.append('..')
-from utils.helper_functions import all_keys_to_lower
-from utils.validation import validate_season_string, validate_team_ticker
-
-from nba_api.stats.endpoints.boxscoreadvancedv2 import BoxScoreAdvancedV2
-from nba_api.stats.endpoints.leaguedashlineups import LeagueDashLineups
-from nba_api.stats.endpoints.teamgamelog import TeamGameLog
-from nba_api.stats.endpoints.playbyplayv2 import PlayByPlayV2
-from nba_api.stats.endpoints.scoreboardv2 import ScoreboardV2
-from nba_api.stats.endpoints.boxscoresummaryv2 import BoxScoreSummaryV2
-from nba_api.stats.endpoints.cumestatsplayer import CumeStatsPlayer
-from nba_api.stats.endpoints.playergamelog import PlayerGameLog
-from nba_api.stats.endpoints.commonplayerinfo import CommonPlayerInfo
-from nba_api.stats.endpoints.commonallplayers import CommonAllPlayers
-from nba_api.stats.static import teams
-from nba_api.stats.static import players
-from nba_api.stats.endpoints.commonteamroster import CommonTeamRoster
-from nba_api.stats.endpoints.leaguegamelog import LeagueGameLog
-from utils.validation import validate_season_string
-
-from nba_api.stats.static.teams import get_teams
-
-from featurevec.feature_vector_helper import get_season_games_for_team, get_referee, \
-    aggregate_simple_game_cume_stats, \
-    get_longest_lineup, get_offdef_rating, get_player_efficiency, get_date_from_game_id, print_df, \
-    get_league_game_log_for_season
-from utils.helper_functions import get_home_away_team, get_opponent, add_suffix_to_keys
-from utils.constants import LOG_FILE, FV_COLS
-import featurevec.feature_vector_calculator as fvcalc
 
 
-def get_game_id_and_season_type(team_ticker: str, season: str, date_from: str | None, date_to: str | None) -> list[
-    dict[str, bool | Any] | dict[str, bool | Any]]:
+def get_game_id_and_season_type(team_ticker: str, season: str, date_from: str | None, date_to: str | None) \
+        -> list[dict[str, any]]:
     """
     Get the game id of the game for the team.
 
-    :param date_from:
-    :param date_to:
     :param team_ticker: The team abbreviation.
     :param season: The season in the format 'YYYY-YY'.
-    :param date: The date of the game in the format 'YYYY-MM-DD'.
-    :return: A dict containing the game id and a boolean representing if the game is a playoff game.
+    :param date_from: The start date of the range in the format 'YYYY-MM-DD' (optional).
+    :param date_to: The end date of the range in the format 'YYYY-MM-DD' (optional).
+    :return: A list of dicts containing the match-up, date, game id, and season type (playoffs or regular season).
     """
-
     if date_from is not None:
         date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d').strftime('%m/%d/%Y')
     else:
@@ -65,7 +39,8 @@ def get_game_id_and_season_type(team_ticker: str, season: str, date_from: str | 
     res = []
     if po_team_game_log is not None:
         for game in po_team_game_log:
-            res.append({'match-up': game['matchup'], 'date': game['game_date'], 'game_id': game['game_id'], 'season': "po"})
+            res.append(
+                {'match-up': game['matchup'], 'date': game['game_date'], 'game_id': game['game_id'], 'season': "po"})
 
     if reg_team_game_log is not None:
         for game in reg_team_game_log:
@@ -82,13 +57,13 @@ def isvalid(key: str) -> bool:
     :param key: The key to validate.
     :return: True if the key is valid, False otherwise.
     """
-    if key is None or key == "team_id" or key == "player_id" or key == "video_available" or key == "w" or key == "l" or key == "w_pct" or key == "min":
+    if key is None or key in {"team_id", "player_id", "video_available", "w", "l", "w_pct", "min"}:
         return False
     return True
 
 
-def calculate_sums_averages(data: List[Dict]) -> tuple[dict[Any, int | float], dict[Any, float]] | tuple[
-    int, int, dict[Any, float]]:
+def calculate_sums_averages(data: list[dict]) \
+        -> tuple[dict[any, int | float], dict[any, float]] | tuple[int, int, dict[any, float]]:
     """
     Calculate totals and averages of all given game stats.
 
@@ -124,8 +99,8 @@ def calculate_sums_averages(data: List[Dict]) -> tuple[dict[Any, int | float], d
     return total_wins, total_losses, averages
 
 
-def get_last_games_at_home_away(match_log: List[Dict[str, Any]], last_x: int | None, home_away: str | None,
-                                opp_team_ticker: str | None) -> List[Dict[str, Any]]:
+def get_last_games_at_home_away(match_log: list[dict[str, any]], last_x: int | None, home_away: str | None,
+                                opp_team_ticker: str | None) -> list[dict[str, any]]:
     """
     Filter and return the last 'x' games based on the home/away filter.
 
@@ -135,7 +110,6 @@ def get_last_games_at_home_away(match_log: List[Dict[str, Any]], last_x: int | N
     :param opp_team_ticker: Team ticker of the opposite team (optional)
     :return: List of dictionaries representing filtered team game logs.
     """
-
     if opp_team_ticker is not None:
         validate_team_ticker(opp_team_ticker)
         match_log = list(filter(lambda match_log: opp_team_ticker in match_log['matchup'], match_log))
@@ -152,7 +126,7 @@ def get_last_games_at_home_away(match_log: List[Dict[str, Any]], last_x: int | N
     return match_log
 
 
-def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str) -> List[Dict[str, Any]]:
+def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str) -> list[dict[str, any]]:
     """
     Retrieve all games for a team until a specified date.
 
@@ -173,7 +147,7 @@ def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str
 
 
 def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs: bool, date_from: datetime,
-                                            date_to: datetime) -> List[Dict[str, Any]]:
+                                            date_to: datetime) -> list[dict[str, any]]:
     """
     Retrieve specific season games for a team until a specified date.
 
@@ -184,7 +158,7 @@ def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs:
     :param date_to: The cutoff date until which games are considered.
     :return: List of dictionaries representing season games for the team until the specified date.
     """
-    fvcalc.validate_season_string(season)
+    validate_season_string(season)
 
     if playoffs:
         season_type = 'Playoffs'
@@ -202,7 +176,7 @@ def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs:
     return all_keys_to_lower(team_game_log)
 
 
-def get_team_info_by_ticker(team_ticker: str) -> Dict[str, str]:
+def get_team_info_by_ticker(team_ticker: str) -> dict[str, str]:
     """
     Retrieve team information based on the team abbreviation.
 
@@ -214,53 +188,36 @@ def get_team_info_by_ticker(team_ticker: str) -> Dict[str, str]:
     return next(filter(lambda x: x['abbreviation'] == team_ticker, teams_info))
 
 
-def get_all_ids_from_tickers(team_tickers: List[str]) -> List[Dict[str, str]]:
+def get_players_by_team(team_ticker: str, season: str) -> list[dict[str, any]]:
     """
-    Retrieve team IDs for a list of team abbreviations (tickers).
+    Retrieve players information for a specific team and season.
 
-    :param team_tickers: List of team abbreviations (tickers).
-    :return: List of dictionaries, each containing the team abbreviation and its corresponding ID.
+    :param team_ticker: The team abbreviation.
+    :param season: The season in the format 'YYYY-YY'.
+    :return: List of dictionaries containing player information for the team.
     """
-    teams_info = teams.get_teams()
-
-    result = []
-    for team_ticker in team_tickers:
-        team_id = get_team_id_from_ticker(team_ticker)
-        result.append({'team_ticker': team_ticker, 'team_id': team_id})
-
-    return result
-
-
-def get_team_info_by_id(team_id: str) -> Dict[str, str]:
-    """
-    Retrieve team information based on the team ID.
-
-    :param team_id: The ID of the team.
-    :return: Dictionary containing detailed information about the team.
-    """
-    teams_info = teams.get_teams()
-    return next(filter(lambda x: x['id'] == team_id, teams_info))
-
-
-def get_players_by_team(team_ticker: str, season: str):
     keys_of_interest = ['PLAYER_ID', 'PLAYER', 'NUM', 'POSITION', 'HEIGHT', 'WEIGHT', 'AGE', 'EXP']
 
     team_id = get_team_id_from_ticker(team_ticker)
-    players_data = CommonTeamRoster(team_id=team_id, season=season,
-                                    ).get_normalized_dict()[
-        'CommonTeamRoster']
+    players_data = CommonTeamRoster(team_id=team_id, season=season).get_normalized_dict()['CommonTeamRoster']
 
     return [{key: player[key] for key in keys_of_interest} for player in players_data]
 
 
-def get_team_id_from_ticker(team_ticker: str):
+def get_team_id_from_ticker(team_ticker: str) -> str:
+    """
+    Retrieve the team ID based on the team abbreviation.
+
+    :param team_ticker: The team abbreviation.
+    :return: The team ID.
+    """
     teams_info = teams.get_teams()
     validate_team_ticker(team_ticker)
-    return filter(lambda x: x['abbreviation'] == team_ticker, teams_info).__next__()['id']
+    return next(filter(lambda x: x['abbreviation'] == team_ticker, teams_info))['id']
 
 
-def get_player_games_for_season_until_date_to(player_id: str, season: str, playoffs: bool, date_to: datetime) -> List[
-    Dict]:
+def get_player_games_for_season_until_date_to(player_id: str, season: str, playoffs: bool, date_to: datetime) \
+        -> list[dict[str, any]]:
     """
     Get all the games played by a player in a season.
 
@@ -274,13 +231,12 @@ def get_player_games_for_season_until_date_to(player_id: str, season: str, playo
 
     player_game_log = PlayerGameLog(player_id=player_id, season=season,
                                     season_type_all_star='Playoffs' if playoffs else 'Regular Season',
-                                    date_to_nullable=date_to).get_normalized_dict()[
-        'PlayerGameLog']
+                                    date_to_nullable=date_to).get_normalized_dict()['PlayerGameLog']
 
     return all_keys_to_lower(player_game_log)
 
 
-def get_all_player_games_until_date_to(player_id: str, season: str, date_to: str) -> List[Dict[str, Any]]:
+def get_all_player_games_until_date_to(player_id: str, season: str, date_to: str) -> list[dict[str, any]]:
     """
     Retrieve all games for a player until a specified date.
 
@@ -300,14 +256,13 @@ def get_all_player_games_until_date_to(player_id: str, season: str, date_to: str
         return reg_player_game_log + po_player_game_log
 
 
-def get_filtered_matches_player_efficiency(filtered_stats: List[Dict[str, Any]]):
+def get_filtered_matches_player_efficiency(filtered_stats: list[dict[str, any]]) -> float:
     """
-    Get the player efficiency rating for a specific player based on selected matches:
+    Get the player efficiency rating for a specific player based on selected matches.
 
-    :param filtered_stats: The player states in selected matches.
+    :param filtered_stats: The player stats in selected matches.
     :return: The player efficiency rating.
     """
-
     pts = 0
     ast = 0
     stl = 0

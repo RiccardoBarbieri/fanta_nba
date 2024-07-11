@@ -1,6 +1,8 @@
 import featurevec.feature_vector_helper as feature_vector_helper
 import featurevec.rest_api_functions_helper as helper
 
+# Rest Api Controller for match information and statistics
+
 
 def get_all_match_infos(home_away_tickers_date: list[dict[str, str]], season: str) -> list[dict[str, str]]:
     """
@@ -10,6 +12,7 @@ def get_all_match_infos(home_away_tickers_date: list[dict[str, str]], season: st
     :param season: The season in the format 'YYYY-YY'.
     :return: List of dictionaries containing detailed match information for each match.
     """
+
     res = []
     for item in home_away_tickers_date:
         res.append(get_match_info(item["match-up"], item["date"], season))
@@ -25,6 +28,7 @@ def get_match_info(home_away_ticker: str, match_date: str, season: str) -> dict[
     :param season: The season in the format 'YYYY-YY'.
     :return: Dictionary containing detailed match information.
     """
+
     home_ticker = home_away_ticker.split("-")[0].strip()
     away_ticker = home_away_ticker.split("-")[1].strip()
     matches = helper.get_game_id_and_season_type(home_ticker, season, match_date, match_date)
@@ -53,6 +57,7 @@ def calculate_stats(match_stats: dict[str, any], away_points: int) -> dict[str, 
     :param away_points: Points scored by the away team.
     :return: Dictionary containing calculated match statistics.
     """
+
     return {"game_id": match_stats["game_id"],
             "game_date": match_stats["game_date"],
             "matchup": match_stats["matchup"],
@@ -73,6 +78,7 @@ def get_match_stats(match_id: str, home_team_ticker: str, away_team_ticker: str,
     :param season: The season in the format 'YYYY-YY'.
     :return: Dictionary containing actual and last match statistics.
     """
+
     home_team_id = helper.get_team_id_from_ticker(home_team_ticker)
     away_team_id = helper.get_team_id_from_ticker(away_team_ticker)
 
