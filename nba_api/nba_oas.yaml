@@ -110,10 +110,10 @@ paths:
 
   /matches:
     get:
-      summary: Retrieve all matches by matchup, season and matchday
+      summary: Retrieve all matches by match_up, season and matchday
       parameters:
         - in: query
-          name: match-up
+          name: match_up
           schema:
             type: string
           required: true
@@ -148,7 +148,7 @@ paths:
       summary: Retrieve match information by match ID
       parameters:
         - in: query
-          name: match-up
+          name: match_up
           schema:
             type: string
           required: true
@@ -425,7 +425,7 @@ components:
         game_id:
           type: integer
           example: 12345
-        match-up:
+        match_up:
           type: string
           example: "BKN - WAS"
         date:
@@ -488,7 +488,7 @@ components:
         game_date:
           type: string
           example: "APR 14, 2024"
-        matchup:
+        match_up:
           type: string
           example: "GSW vs. UTA"
         winner:
@@ -539,7 +539,7 @@ components:
         game_date:
           type: string
           example: "2024-01-23"
-        matchup:
+        match_up:
           type: string
           example: "BOS vs LAL"
         wl:
@@ -647,7 +647,7 @@ components:
         game_date:
           type: string
           example: "2024-01-23"
-        matchup:
+        match_up:
           type: string
           example: "BOS vs LAL"
         wl:
