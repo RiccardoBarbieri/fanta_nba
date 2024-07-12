@@ -1,8 +1,9 @@
 import datetime
 import sys
 import time
+from typing import Dict, List
 
-from nba_api.stats.endpoints import LeagueGameLog, LeagueGameFinder, TeamDetails
+from nba_api.stats.endpoints import LeagueGameLog, LeagueGameFinder, TeamDetails, Scoreboard, ScoreboardV2
 
 from utils.helper_functions import all_keys_to_lower
 from utils.validation import validate_team_ticker, validate_season_string
@@ -156,6 +157,19 @@ def get_team_info_by_ticker(team_ticker: str) -> dict[str, str]:
     return res
 
 
+def get_team_base_info_by_id(team_id: str) -> dict[str, str]:
+    """
+    Retrieve team information based on the team ID.
+
+    :param team_id: The ID of the team.
+    :return: Dictionary containing detailed information about the team.
+    """
+    teams_info = teams.get_teams()
+    res = next(filter(lambda x: x['id'] == team_id, teams_info))
+
+    return {"ticker": res["abbreviation"], "name": res["full_name"]}
+
+
 def get_players_by_team(team_ticker: str, season: str) -> list[dict[str, any]]:
     """
     Retrieve players information for a specific team and season.
@@ -272,7 +286,7 @@ def get_league_game_log_by_date(date_from: str, date_to: str) -> list[dict]:
     return all_keys_to_lower(league_game_log)
 
 
-def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetime, date_to: datetime)\
+def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetime, date_to: datetime) \
         -> list[dict[str, any]]:
     """
     Find all direct matchups' statistic.
@@ -324,3 +338,20 @@ def calculate_stats(match_stats: dict[str, any], away_points: int) -> dict[str, 
             "winner": match_stats["matchup"][:3] if match_stats["wl"] == "W" else match_stats["matchup"][-3:],
             "home_point": match_stats["pts"],
             "away_point": away_points}
+
+
+def get_standing_by_date(date: str) -> dict[str, dict | list[dict]]:
+    """
+    Calculate standings at the date specified.
+
+    :param date: Date to be considered to evaluate the standing (format: 'YYYY-MM-DD')
+    :return: Dictionary containing east and west conference standings
+    """
+    res = ScoreboardV2(game_date=date,
+                       league_id="00",
+                       day_offset="0"
+                       # headers={'User-Agent': next(user_agents_cycle)}
+                       )
+
+    return {"west": all_keys_to_lower(res.get_normalized_dict()['WestConfStandingsByDay']),
+            "east": all_keys_to_lower(res.get_normalized_dict()['EastConfStandingsByDay'])}

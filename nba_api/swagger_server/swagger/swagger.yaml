@@ -261,8 +261,85 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlayerStats'
       x-openapi-router-controller: swagger_server.controllers.player_controller
+  /standings:
+    get:
+      summary: Retrieve east and west conference standings
+      operationId: standings_get
+      parameters:
+        - name: date
+          in: query
+          description: Date to be considered to evaluate the standing (format:'YYYY-MM-DD')
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 2024-04-14
+      responses:
+        "200":
+          description: East and West conference standings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Standings'
+      x-openapi-router-controller: swagger_server.controllers.league_standing_controller
 components:
   schemas:
+    Standings:
+      type: object
+      properties:
+        west:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamStandings'
+        east:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamStandings'
+    TeamStandings:
+      type: object
+      properties:
+        team_id:
+          type: integer
+          example: 1610612743
+        league_id:
+          type: string
+          example: "00"
+        season_id:
+          type: string
+          example: "22023"
+        standingsdate:
+          type: string
+          format: date
+          example: "2024-02-08"
+        conference:
+          type: string
+          example: "West"
+        team:
+          type: string
+          example: "Cleveland Cavaliers"
+        team_ticker:
+          type: string
+          example: "CLE"
+        g:
+          type: integer
+          example: 52
+        w:
+          type: integer
+          example: 36
+        l:
+          type: integer
+          example: 16
+        w_pct:
+          type: number
+          format: float
+          example: 0.692
+        home_record:
+          type: string
+          example: "21-4"
+        road_record:
+          type: string
+          example: "15-12"
     Team:
       type: object
       properties:
