@@ -6,6 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.player import Player  # noqa: F401,E501
+from swagger_server.models.team_info import TeamInfo  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,45 +16,30 @@ class Team(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, name: str=None, city_arena: str=None, coach: str=None, logo: str=None, roster: List[str]=None):  # noqa: E501
+    def __init__(self, team_ticker: str=None, team_info: TeamInfo=None, team_players: List[Player]=None):  # noqa: E501
         """Team - a model defined in Swagger
 
-        :param id: The id of this Team.  # noqa: E501
-        :type id: int
-        :param name: The name of this Team.  # noqa: E501
-        :type name: str
-        :param city_arena: The city_arena of this Team.  # noqa: E501
-        :type city_arena: str
-        :param coach: The coach of this Team.  # noqa: E501
-        :type coach: str
-        :param logo: The logo of this Team.  # noqa: E501
-        :type logo: str
-        :param roster: The roster of this Team.  # noqa: E501
-        :type roster: List[str]
+        :param team_ticker: The team_ticker of this Team.  # noqa: E501
+        :type team_ticker: str
+        :param team_info: The team_info of this Team.  # noqa: E501
+        :type team_info: TeamInfo
+        :param team_players: The team_players of this Team.  # noqa: E501
+        :type team_players: List[Player]
         """
         self.swagger_types = {
-            'id': int,
-            'name': str,
-            'city_arena': str,
-            'coach': str,
-            'logo': str,
-            'roster': List[str]
+            'team_ticker': str,
+            'team_info': TeamInfo,
+            'team_players': List[Player]
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'name': 'name',
-            'city_arena': 'city_arena',
-            'coach': 'coach',
-            'logo': 'logo',
-            'roster': 'roster'
+            'team_ticker': 'team_ticker',
+            'team_info': 'team_info',
+            'team_players': 'team_players'
         }
-        self._id = id
-        self._name = name
-        self._city_arena = city_arena
-        self._coach = coach
-        self._logo = logo
-        self._roster = roster
+        self._team_ticker = team_ticker
+        self._team_info = team_info
+        self._team_players = team_players
 
     @classmethod
     def from_dict(cls, dikt) -> 'Team':
@@ -66,127 +53,64 @@ class Team(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self) -> int:
-        """Gets the id of this Team.
+    def team_ticker(self) -> str:
+        """Gets the team_ticker of this Team.
 
 
-        :return: The id of this Team.
-        :rtype: int
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id: int):
-        """Sets the id of this Team.
-
-
-        :param id: The id of this Team.
-        :type id: int
-        """
-
-        self._id = id
-
-    @property
-    def name(self) -> str:
-        """Gets the name of this Team.
-
-
-        :return: The name of this Team.
+        :return: The team_ticker of this Team.
         :rtype: str
         """
-        return self._name
+        return self._team_ticker
 
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this Team.
+    @team_ticker.setter
+    def team_ticker(self, team_ticker: str):
+        """Sets the team_ticker of this Team.
 
 
-        :param name: The name of this Team.
-        :type name: str
+        :param team_ticker: The team_ticker of this Team.
+        :type team_ticker: str
         """
 
-        self._name = name
+        self._team_ticker = team_ticker
 
     @property
-    def city_arena(self) -> str:
-        """Gets the city_arena of this Team.
+    def team_info(self) -> TeamInfo:
+        """Gets the team_info of this Team.
 
 
-        :return: The city_arena of this Team.
-        :rtype: str
+        :return: The team_info of this Team.
+        :rtype: TeamInfo
         """
-        return self._city_arena
+        return self._team_info
 
-    @city_arena.setter
-    def city_arena(self, city_arena: str):
-        """Sets the city_arena of this Team.
+    @team_info.setter
+    def team_info(self, team_info: TeamInfo):
+        """Sets the team_info of this Team.
 
 
-        :param city_arena: The city_arena of this Team.
-        :type city_arena: str
+        :param team_info: The team_info of this Team.
+        :type team_info: TeamInfo
         """
 
-        self._city_arena = city_arena
+        self._team_info = team_info
 
     @property
-    def coach(self) -> str:
-        """Gets the coach of this Team.
+    def team_players(self) -> List[Player]:
+        """Gets the team_players of this Team.
 
 
-        :return: The coach of this Team.
-        :rtype: str
+        :return: The team_players of this Team.
+        :rtype: List[Player]
         """
-        return self._coach
+        return self._team_players
 
-    @coach.setter
-    def coach(self, coach: str):
-        """Sets the coach of this Team.
-
-
-        :param coach: The coach of this Team.
-        :type coach: str
-        """
-
-        self._coach = coach
-
-    @property
-    def logo(self) -> str:
-        """Gets the logo of this Team.
+    @team_players.setter
+    def team_players(self, team_players: List[Player]):
+        """Sets the team_players of this Team.
 
 
-        :return: The logo of this Team.
-        :rtype: str
-        """
-        return self._logo
-
-    @logo.setter
-    def logo(self, logo: str):
-        """Sets the logo of this Team.
-
-
-        :param logo: The logo of this Team.
-        :type logo: str
+        :param team_players: The team_players of this Team.
+        :type team_players: List[Player]
         """
 
-        self._logo = logo
-
-    @property
-    def roster(self) -> List[str]:
-        """Gets the roster of this Team.
-
-
-        :return: The roster of this Team.
-        :rtype: List[str]
-        """
-        return self._roster
-
-    @roster.setter
-    def roster(self, roster: List[str]):
-        """Sets the roster of this Team.
-
-
-        :param roster: The roster of this Team.
-        :type roster: List[str]
-        """
-
-        self._roster = roster
+        self._team_players = team_players
