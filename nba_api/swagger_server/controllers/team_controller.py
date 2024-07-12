@@ -3,8 +3,8 @@ import featurevec.rest_api_functions_helper as helper
 # Rest Api Controller for team information and statistics
 
 
-def teams_team_id_stats_get(team_id: str, season: str, date_to: str, last_x: int | None, home_away_filter: str | None) -> (
-        dict)[str, list[dict]]:
+def teams_team_id_stats_get(team_id: str, season: str, date_to: str, last_x: int | None, home_away_filter: str | None) \
+        -> dict[str, list[dict]]:
     """
     Retrieve team statistics based on provided parameters.
 
@@ -53,7 +53,7 @@ def teams_get(team_tickers: list[str], season: str) -> list[dict[str, dict[str, 
 
     result = []
     for team_ticker in team_tickers:
-        team_info = get_team_by_ticker(team_ticker, season)
+        team_info = teams_team_ticker_get(team_ticker, season)
         result.append(team_info)
 
     return result
