@@ -1,4 +1,5 @@
 import datetime
+import functools
 import sys
 import time
 from typing import Dict, List
@@ -92,6 +93,7 @@ def get_last_games_at_home_away(match_log: list[dict[str, any]], last_x: int | N
     return match_log
 
 
+@functools.lru_cache
 def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str) -> list[dict[str, any]]:
     """
     Retrieve all games for a team until a specified date.
@@ -112,6 +114,7 @@ def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str
         return reg_team_game_log + po_team_game_log
 
 
+@functools.lru_cache
 def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs: bool, date_from: datetime,
                                             date_to: datetime) -> list[dict[str, any]]:
     """
@@ -142,6 +145,7 @@ def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs:
     return all_keys_to_lower(team_game_log)
 
 
+@functools.lru_cache
 def get_team_info_by_ticker(team_ticker: str) -> dict[str, str]:
     """
     Retrieve team information based on the team abbreviation.
@@ -157,6 +161,7 @@ def get_team_info_by_ticker(team_ticker: str) -> dict[str, str]:
     return res
 
 
+@functools.lru_cache
 def get_team_base_info_by_id(team_id: str) -> dict[str, str]:
     """
     Retrieve team information based on the team ID.
@@ -170,6 +175,7 @@ def get_team_base_info_by_id(team_id: str) -> dict[str, str]:
     return {"ticker": res["abbreviation"], "name": res["full_name"]}
 
 
+@functools.lru_cache
 def get_players_by_team(team_ticker: str, season: str) -> list[dict[str, any]]:
     """
     Retrieve players information for a specific team and season.
@@ -186,6 +192,7 @@ def get_players_by_team(team_ticker: str, season: str) -> list[dict[str, any]]:
     return all_keys_to_lower([{key: player[key] for key in keys_of_interest} for player in players_data])
 
 
+@functools.lru_cache
 def get_team_id_from_ticker(team_ticker: str) -> str:
     """
     Retrieve the team ID based on the team abbreviation.
@@ -198,6 +205,7 @@ def get_team_id_from_ticker(team_ticker: str) -> str:
     return next(filter(lambda x: x['abbreviation'] == team_ticker, teams_info))['id']
 
 
+@functools.lru_cache
 def get_player_games_for_season_until_date_to(player_id: str, season: str, playoffs: bool, date_to: datetime) \
         -> list[dict[str, any]]:
     """
@@ -218,6 +226,7 @@ def get_player_games_for_season_until_date_to(player_id: str, season: str, playo
     return all_keys_to_lower(player_game_log)
 
 
+@functools.lru_cache
 def get_all_player_games_until_date_to(player_id: str, season: str, date_to: str) -> list[dict[str, any]]:
     """
     Retrieve all games for a player until a specified date.
@@ -267,6 +276,7 @@ def get_filtered_matches_player_efficiency(filtered_stats: list[dict[str, any]])
     return (pts + reb + ast + stl + blk - (missed_fg + missed_ft + tov)) / gp
 
 
+@functools.lru_cache
 def get_league_game_log_by_date(date_from: str, date_to: str) -> list[dict]:
     """
     Get all the games played in a season.
@@ -286,6 +296,7 @@ def get_league_game_log_by_date(date_from: str, date_to: str) -> list[dict]:
     return all_keys_to_lower(league_game_log)
 
 
+@functools.lru_cache
 def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetime, date_to: datetime) \
         -> list[dict[str, any]]:
     """
@@ -309,6 +320,7 @@ def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetim
     return all_keys_to_lower(league_game_log)
 
 
+@functools.lru_cache
 def get_arena_by_team_id(team_id: str) -> str:
     """
     Get team arena name from team id.
@@ -340,6 +352,7 @@ def calculate_stats(match_stats: dict[str, any], away_points: int) -> dict[str, 
             "away_point": away_points}
 
 
+@functools.lru_cache
 def get_standing_by_date(date: str) -> dict[str, dict | list[dict]]:
     """
     Calculate standings at the date specified.

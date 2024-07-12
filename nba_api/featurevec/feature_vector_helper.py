@@ -41,7 +41,7 @@ logger = logging.getLogger(os.path.basename(__file__))
 logger.setLevel(logging.DEBUG)
 
 
-@functools.cache
+@functools.lru_cache
 def get_season_games_for_team(team_ticker: str, season: str, playoffs: bool) -> List[Dict]:
     """
     Get all the games played by a team in a season.
@@ -74,7 +74,7 @@ def get_season_games_for_team(team_ticker: str, season: str, playoffs: bool) -> 
     return all_keys_to_lower(team_game_log)
 
 
-@functools.cache
+@functools.lru_cache
 def get_league_game_log_for_season(season: str, playoffs: bool) -> List[Dict]:
     """
     Get all the games played in a season.
@@ -99,7 +99,7 @@ def get_league_game_log_for_season(season: str, playoffs: bool) -> List[Dict]:
     return all_keys_to_lower(league_game_log)
 
 
-@functools.cache
+@functools.lru_cache
 def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, season: str, playoffs: bool) -> List:
     """
     Get the starting lineup and the bench for a specific game.
@@ -146,7 +146,7 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, seaso
     return all_keys_to_lower(dash_lineups)
 
 
-@functools.cache
+@functools.lru_cache
 def get_boxscore_teamstats(game_id: str) -> Dict:
     """
     Get the boxscore for a specific game.
@@ -163,7 +163,7 @@ def get_boxscore_teamstats(game_id: str) -> Dict:
     return all_keys_to_lower(boxscore)
 
 
-# @functools.cache
+# @functools.lru_cache
 # def get_live_boxscore(game_id: str) -> Dict:
 #     """
 #     Get the live boxscore for a specific game.
@@ -177,7 +177,7 @@ def get_boxscore_teamstats(game_id: str) -> Dict:
 #     return all_keys_to_lower(boxscore)
 
 
-@functools.cache
+@functools.lru_cache
 def get_scoreboard(date: str) -> Dict[AnyStr, List]:
     """
     Get the scoreboard for a specific date.
@@ -193,7 +193,7 @@ def get_scoreboard(date: str) -> Dict[AnyStr, List]:
     return all_keys_to_lower(scoreboard)
 
 
-@functools.cache
+@functools.lru_cache
 def get_date_from_game_id(game_id: str) -> str:
     """
     Get the date from a game identifier.
@@ -209,7 +209,7 @@ def get_date_from_game_id(game_id: str) -> str:
     return datetime.datetime.strptime(date_stupid_format, '%A, %B %d, %Y').strftime('%Y-%m-%d')
 
 
-@functools.cache
+@functools.lru_cache
 def get_boxscore_summary(game_id: str):
     """
     Get the boxscore summary for a specific game.
@@ -225,7 +225,7 @@ def get_boxscore_summary(game_id: str):
     return all_keys_to_lower(boxscore_summary)
 
 
-@functools.cache
+@functools.lru_cache
 def get_playbyplay(game_id: str) -> Dict:
     """
     Get the play by play for a specific game.
@@ -241,7 +241,7 @@ def get_playbyplay(game_id: str) -> Dict:
     return all_keys_to_lower(playbyplay)
 
 
-@functools.cache
+@functools.lru_cache
 def get_common_all_players(season: str) -> List[Dict]:
     """
     Get all the players in the NBA.
@@ -255,7 +255,7 @@ def get_common_all_players(season: str) -> List[Dict]:
     return all_keys_to_lower(common_all_players)
 
 
-@functools.cache
+@functools.lru_cache
 def get_common_player_info(player_id: str) -> Dict:
     """
     Get the common info for a specific player.
@@ -272,7 +272,7 @@ def get_common_player_info(player_id: str) -> Dict:
     return all_keys_to_lower(common_player_info)
 
 
-@functools.cache
+@functools.lru_cache
 def get_cumestats_player(player_id: str, game_ids: Tuple[AnyStr]) -> Dict:
     """
     Get the cumulative stats for a specific player.
@@ -317,7 +317,7 @@ def get_common_team_roster(team_id: str, season: str) -> List[Dict]:
     return all_keys_to_lower(common_team_roster)
 
 
-@functools.cache
+@functools.lru_cache
 def get_player_games_for_season(player_id: str, season: str, playoffs: bool) -> List[Dict]:
     """
     Get all the games played by a player in a season.
