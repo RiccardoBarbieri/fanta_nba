@@ -5,7 +5,7 @@ import featurevec.rest_api_functions_helper as helper
 
 # Rest Api Controller for match information and statistics
 
-def get_match_stats(match_id: str, match_date: str) -> dict[str, any]:
+def match_match_id_stats_get(match_id: str, match_date: str) -> dict[str, any]:
     """
     Retrieve match statistics for a specific match.
 
@@ -59,7 +59,7 @@ def get_match_stats(match_id: str, match_date: str) -> dict[str, any]:
                                                                   "game_id"] != match_id, direct_matchups))}}
 
 
-def get_matches_by_date(date_from: str, date_to: str | None) -> list[dict[str, str]]:
+def matches_get(date_from: str, date_to: str | None) -> list[dict[str, str]]:
     if date_to is None:
         date_to = date_from
 
