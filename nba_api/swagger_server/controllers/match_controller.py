@@ -91,10 +91,9 @@ def get_matches_by_date(date_from: str, date_to: str) -> list[dict[str, str]]:
         away_team = helper.get_team_info_by_ticker(match["matchup"][-3:])
 
         referee = feature_vector_helper.get_referee(game_id)
-        arena = feature_vector_helper.get_arena_by_id(game_id)
 
         res.append(
             {"match_up": match["matchup"], "game_id": game_id, "date": match["game_date"], "home_team": home_team,
-             "away_team": away_team, "referee": referee, "arena": arena})
+             "away_team": away_team, "referee": referee})
 
     return res
