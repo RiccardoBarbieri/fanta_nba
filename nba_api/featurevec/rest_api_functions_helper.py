@@ -15,44 +15,6 @@ from nba_api.stats.endpoints.commonteamroster import CommonTeamRoster
 sys.path.append('..')
 
 
-def get_game_id_and_season_type(team_ticker: str, season: str, date_from: str | None, date_to: str | None) \
-        -> list[dict[str, any]]:
-    """
-    Get the game id of the game for the team.
-
-    :param team_ticker: The team abbreviation.
-    :param season: The season in the format 'YYYY-YY'.
-    :param date_from: The start date of the range in the format 'YYYY-MM-DD' (optional).
-    :param date_to: The end date of the range in the format 'YYYY-MM-DD' (optional).
-    :return: A list of dicts containing the match-up, date, game id, and season type (playoffs or regular season).
-    """
-    if date_from is not None:
-        date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d').strftime('%m/%d/%Y')
-    else:
-        date_from = datetime.datetime.strptime("1900-01-01", '%Y-%m-%d').strftime('%m/%d/%Y')
-    if date_to is not None:
-        date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d').strftime('%m/%d/%Y')
-    else:
-        date_to = datetime.datetime.strptime("2999-01-01", '%Y-%m-%d').strftime('%m/%d/%Y')
-
-    team_id = get_team_id_from_ticker(team_ticker)
-    reg_team_game_log = get_season_games_for_team_until_date_to(team_id, season, False, date_from, date_to)
-    po_team_game_log = get_season_games_for_team_until_date_to(team_id, season, True, date_from, date_to)
-
-    res = []
-    if po_team_game_log is not None:
-        for game in po_team_game_log:
-            res.append(
-                {'match-up': game['matchup'], 'date': game['game_date'], 'game_id': game['game_id'], 'season': "po"})
-
-    if reg_team_game_log is not None:
-        for game in reg_team_game_log:
-            res.append(
-                {'match-up': game['matchup'], 'date': game['game_date'], 'game_id': game['game_id'], 'season': "reg"})
-
-    return res
-
-
 def isvalid(key: str) -> bool:
     """
     Check if a given key is valid to be considered in game stats.
@@ -295,10 +257,10 @@ def get_league_game_log_by_date(date_from: str, date_to: str) -> list[dict]:
     """
     Get all the games played in a season.
 
-    :param season: A string representing the season in the format 'YYYY-YY'.
-    :param playoffs: true to get the playoff games, false to get the regular season games.
+    :param date_to: The cutoff date until which games are considered (format: 'YYYY-MM-DD').
+    :param date_from: The cutoff date from which games are considered (format: 'YYYY-MM-DD').
 
-    :return: A list of dictionaries containing the games played in the season.
+    :return: A list of dictionaries containing the games played in the date range.
     """
     league_game_log = LeagueGameLog(
         date_from_nullable=date_from,
@@ -310,7 +272,17 @@ def get_league_game_log_by_date(date_from: str, date_to: str) -> list[dict]:
     return all_keys_to_lower(league_game_log)
 
 
-def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetime, date_to: datetime):
+def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetime, date_to: datetime)\
+        -> list[dict[str, any]]:
+    """
+    Find all direct matchups' statistic.
+
+    :param home_team_id: The home team ID.
+    :param away_team_id: The away team ID.
+    :param date_to: The cutoff date until which games are considered (format: 'YYYY-MM-DD').
+    :param date_from: The cutoff date from which games are considered (format: 'YYYY-MM-DD').
+    :return: List of dictionaries containing direct matchups' statistics.
+    """
     league_game_log = LeagueGameFinder(player_or_team_abbreviation="T",
                                        team_id_nullable=home_team_id,
                                        vs_team_id_nullable=away_team_id,
@@ -323,11 +295,32 @@ def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetim
     return all_keys_to_lower(league_game_log)
 
 
-def get_arena_by_team_id(team_id):
+def get_arena_by_team_id(team_id: str) -> str:
+    """
+    Get team arena name from team id.
 
+    :param team_id: The ID of the team.
+    :return: The name of the arena where the team plays.
+    """
     team_details = TeamDetails(team_id=team_id
-                                       # headers={'User-Agent': next(user_agents_cycle)}
-                                       ).get_normalized_dict()[
+                               # headers={'User-Agent': next(user_agents_cycle)}
+                               ).get_normalized_dict()[
         'TeamBackground']
 
     return team_details.__getitem__(0)["ARENA"]
+
+
+def calculate_stats(match_stats: dict[str, any], away_points: int) -> dict[str, any]:
+    """
+    Calculate match statistics.
+
+    :param match_stats: Dictionary containing match statistics.
+    :param away_points: Points scored by the away team.
+    :return: Dictionary containing calculated match statistics.
+    """
+    return {"game_id": match_stats["game_id"],
+            "game_date": match_stats["game_date"],
+            "matchup": match_stats["matchup"],
+            "winner": match_stats["matchup"][:3] if match_stats["wl"] == "W" else match_stats["matchup"][-3:],
+            "home_point": match_stats["pts"],
+            "away_point": away_points}

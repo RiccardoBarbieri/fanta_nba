@@ -1,28 +1,9 @@
 import datetime
-
 import featurevec.feature_vector_helper as feature_vector_helper
 import featurevec.rest_api_functions_helper as helper
 
 
 # Rest Api Controller for match information and statistics
-
-
-def calculate_stats(match_stats: dict[str, any], away_points: int) -> dict[str, any]:
-    """
-    Calculate match statistics.
-
-    :param match_stats: Dictionary containing match statistics.
-    :param away_points: Points scored by the away team.
-    :return: Dictionary containing calculated match statistics.
-    """
-
-    return {"game_id": match_stats["game_id"],
-            "game_date": match_stats["game_date"],
-            "matchup": match_stats["matchup"],
-            "winner": match_stats["matchup"][:3] if match_stats["wl"] == "W" else match_stats["matchup"][-3:],
-            "home_point": match_stats["pts"],
-            "away_point": away_points}
-
 
 def get_match_stats(match_id: str, match_date: str) -> dict[str, any]:
     """
@@ -48,9 +29,9 @@ def get_match_stats(match_id: str, match_date: str) -> dict[str, any]:
         date_from, date_to)
 
     if "vs" in actual_matches.__getitem__(0)["matchup"]:
-        actual_stats = calculate_stats(actual_matches.__getitem__(0), actual_matches.__getitem__(1)["pts"])
+        actual_stats = helper.calculate_stats(actual_matches.__getitem__(0), actual_matches.__getitem__(1)["pts"])
     else:
-        actual_stats = calculate_stats(actual_matches.__getitem__(1), actual_matches.__getitem__(0)["pts"])
+        actual_stats = helper.calculate_stats(actual_matches.__getitem__(1), actual_matches.__getitem__(0)["pts"])
 
     final_stats = []
     half_index = int(len(direct_matchups) / 2)
@@ -60,9 +41,9 @@ def get_match_stats(match_id: str, match_date: str) -> dict[str, any]:
         if stats_0["game_id"] == match_id:
             continue
         if "vs" in stats_0["matchup"]:
-            final_stats.append(calculate_stats(stats_0, stats_1["pts"]))
+            final_stats.append(helper.calculate_stats(stats_0, stats_1["pts"]))
         else:
-            final_stats.append(calculate_stats(stats_1, stats_0["pts"]))
+            final_stats.append(helper.calculate_stats(stats_1, stats_0["pts"]))
 
     return {"actual_match_stats": {"global_stats": actual_stats,
                                    "by_home_stats": actual_matches.__getitem__(1),
@@ -78,7 +59,10 @@ def get_match_stats(match_id: str, match_date: str) -> dict[str, any]:
                                                                   "game_id"] != match_id, direct_matchups))}}
 
 
-def get_matches_by_date(date_from: str, date_to: str) -> list[dict[str, str]]:
+def get_matches_by_date(date_from: str, date_to: str | None) -> list[dict[str, str]]:
+    if date_to is None:
+        date_to = date_from
+
     matches = helper.get_league_game_log_by_date(date_from, date_to)
 
     res = []
