@@ -1,6 +1,9 @@
 import datetime
 import sys
 import time
+
+from nba_api.stats.endpoints import LeagueGameLog, LeagueGameFinder
+
 from utils.helper_functions import all_keys_to_lower
 from utils.validation import validate_team_ticker, validate_season_string
 
@@ -201,7 +204,7 @@ def get_players_by_team(team_ticker: str, season: str) -> list[dict[str, any]]:
     team_id = get_team_id_from_ticker(team_ticker)
     players_data = CommonTeamRoster(team_id=team_id, season=season).get_normalized_dict()['CommonTeamRoster']
 
-    return [{key: player[key] for key in keys_of_interest} for player in players_data]
+    return all_keys_to_lower([{key: player[key] for key in keys_of_interest} for player in players_data])
 
 
 def get_team_id_from_ticker(team_ticker: str) -> str:
@@ -283,3 +286,35 @@ def get_filtered_matches_player_efficiency(filtered_stats: list[dict[str, any]])
         tov += stats["tov"]
 
     return (pts + reb + ast + stl + blk - (missed_fg + missed_ft + tov)) / gp
+
+
+def get_league_game_log_by_date(date_from: str, date_to: str) -> list[dict]:
+    """
+    Get all the games played in a season.
+
+    :param season: A string representing the season in the format 'YYYY-YY'.
+    :param playoffs: true to get the playoff games, false to get the regular season games.
+
+    :return: A list of dictionaries containing the games played in the season.
+    """
+    league_game_log = LeagueGameLog(
+        date_from_nullable=date_from,
+        date_to_nullable=date_to
+        # headers={'User-Agent': next(user_agents_cycle)}
+    ).get_normalized_dict()[
+        'LeagueGameLog']
+
+    return all_keys_to_lower(league_game_log)
+
+
+def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetime, date_to: datetime):
+    league_game_log = LeagueGameFinder(player_or_team_abbreviation="T",
+                                       team_id_nullable=home_team_id,
+                                       vs_team_id_nullable=away_team_id,
+                                       date_from_nullable=date_from,
+                                       date_to_nullable=date_to
+                                       # headers={'User-Agent': next(user_agents_cycle)}
+                                       ).get_normalized_dict()[
+        'LeagueGameFinderResults']
+
+    return all_keys_to_lower(league_game_log)
