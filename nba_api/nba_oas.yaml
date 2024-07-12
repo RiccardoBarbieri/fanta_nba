@@ -9,7 +9,7 @@ paths:
       summary: Retrieve all teams by ticker and season
       parameters:
         - in: query
-          name: tickers
+          name: team_tickers
           schema:
             type: array
             items:
@@ -34,12 +34,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/Team'
 
-  /teams/{ticker}:
+  /teams/{team_ticker}:
     get:
       summary: Retrieve team information and players by ticker and season
       parameters:
         - in: path
-          name: ticker
+          name: team_ticker
           schema:
             type: string
           required: true
@@ -79,22 +79,22 @@ paths:
           description: NBA season (e.g., 2023-24)
           example: "2023-24"
         - in: query
-          name: date
+          name: date_to
           schema:
             type: string
             format: date
           required: true
-          description: Match date up to consider (e.g., 2024-08-08)
+          description: Match date up to consider for the stats (format:'YYYY-MM-DD')
           example: "2024-08-08"
         - in: query
-          name: num_games
+          name: last_x
           schema:
             type: integer
           required: false
           description: Number of last games to consider
           example: 5
         - in: query
-          name: location
+          name: home_away_filter
           schema:
             type: string
           required: false
@@ -110,29 +110,22 @@ paths:
 
   /matches:
     get:
-      summary: Retrieve all matches by match_up, season and matchday
+      summary: Retrieve all matches beetween two dates
       parameters:
         - in: query
-          name: match_up
+          name: date_from
           schema:
             type: string
           required: true
-          description: NBA teams tickers (e.g., GSW - UTA)
-          example: "GSW - UTA"
+          description: The cutoff date from which games are considered (format:'YYYY-MM-DD')
+          example: "2024-04-14"
         - in: query
-          name: season
+          name: date_to
           schema:
             type: string
-          required: true
-          description: NBA season (e.g., 2023-24)
-          example: "2023-24"
-        - in: query
-          name: matchday
-          schema:
-            type: string
-          required: true
-          description: Matchday
-          example: "1"
+          required: false
+          description: The cutoff date until which games are considered (format:'YYYY-MM-DD')
+          example: "2024-04-14"
       responses:
         '200':
           description: A list of matches
@@ -143,39 +136,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/Match'
 
-  /match:
-    get:
-      summary: Retrieve match information by match ID
-      parameters:
-        - in: query
-          name: match_up
-          schema:
-            type: string
-          required: true
-          description: NBA teams tickers (e.g., GSW - UTA)
-          example: "GSW - UTA"
-        - in: query
-          name: season
-          schema:
-            type: string
-          required: true
-          description: NBA season (e.g., 2023-24)
-          example: "2023-24"
-        - in: query
-          name: matchday
-          schema:
-            type: string
-          required: true
-          description: Matchday
-          example: "1"
-      responses:
-        '200':
-          description: Match information
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Match'
-
   /match/{match_id}/stats:
     get:
       summary: Retrieve match stats by match ID
@@ -183,38 +143,17 @@ paths:
         - in: path
           name: match_id
           schema:
-            type: integer
+            type: string
           required: true
           description: Match ID
-          example: 12345
+          example: "0022301187"
         - in: query
-          name: home ticker
+          name: match_date
           schema:
             type: string
           required: true
-          description: NBA home team ticker (e.g., GSW)
-          example: "GSW"
-        - in: query
-          name: away ticker
-          schema:
-            type: string
-          required: true
-          description: NBA away team ticker (e.g., ATL)
-          example: "ATL"
-        - in: query
-          name: season
-          schema:
-            type: string
-          required: true
-          description: NBA season (e.g., 2023-24)
-          example: "2023-24"
-        - in: query
-          name: matchday
-          schema:
-            type: string
-          required: true
-          description: Matchday
-          example: "1"
+          description: The date of the match (format:'YYYY-MM-DD')
+          example: "2024-04-14"
       responses:
         '200':
           description: Match stats
@@ -230,10 +169,10 @@ paths:
         - in: path
           name: player_id
           schema:
-            type: integer
+            type: string
           required: true
           description: Player ID
-          example: 203507
+          example: "1629027"
         - in: query
           name: season
           schema:
@@ -242,22 +181,22 @@ paths:
           description: NBA season (e.g., 2023-24)
           example: "2023-24"
         - in: query
-          name: date
+          name: date_to
           schema:
             type: string
             format: date
-          required: false
-          description: Match date up to consider for the stats (e.g., 2024-08-08)
+          required: true
+          description: Match date up to consider for the stats (format:'YYYY-MM-DD')
           example: "2024-08-08"
         - in: query
-          name: num_games
+          name: last_x
           schema:
             type: integer
           required: false
           description: Number of last games to consider
           example: 5
         - in: query
-          name: location
+          name: home_away_filter
           schema:
             type: string
           required: false
@@ -310,32 +249,35 @@ components:
         year_founded:
           type: integer
           example: 1946
+        arena:
+          type: string
+          example: "TD Garden"
 
     Player:
       type: object
       properties:
-        PLAYER_ID:
+        player_id:
           type: integer
-          example: 203507
-        PLAYER:
+          example: 1630552
+        player:
           type: string
           example: "Marcus Smart"
-        NUM:
+        num:
           type: string
           example: "36"
-        POSITION:
+        position:
           type: string
           example: "G"
-        HEIGHT:
+        height:
           type: string
           example: "6-3"
-        WEIGHT:
+        weight:
           type: integer
           example: 220
-        AGE:
+        age:
           type: number
           example: 29
-        EXP:
+        exp:
           type: string
           example: "6"
 
@@ -345,7 +287,7 @@ components:
         all_stats:
           type: array
           items:
-            $ref: '#/components/schemas/Stat'
+            $ref: '#/components/schemas/TeamMatchStat'
         totals:
           type: object
           items:
@@ -358,7 +300,16 @@ components:
                 example: 3
         average:
           $ref: '#/components/schemas/Average'
-            
+       
+       
+    AveragePlayer:
+      allOf:
+        - $ref: '#/components/schemas/Average'
+        - type: object
+          properties:
+            plus_minus:
+                type: number
+                example: -2.2
             
     Average:
           type: object
@@ -366,80 +317,78 @@ components:
             properties:
               fgm:
                 type: integer
-                example: 40
+                example: 40.4
               fga:
                 type: integer
-                example: 85
+                example: 85.5
               fg_pct:
                 type: number
-                example: 47.1
+                example: 0.4367
               fg3m:
-                type: integer
-                example: 12
+                type: number
+                example: 12.2
               fg3a:
-                type: integer
-                example: 32
+                type: number
+                example: 32.0
               fg3_pct:
                 type: number
-                example: 37.5
+                example: 0.4367
               ftm:
-                type: integer
-                example: 18
+                type: number
+                example: 18.3
               fta:
-                type: integer
-                example: 22
+                type: number
+                example: 22.0
               ft_pct:
                 type: number
-                example: 81.8
+                example: 0.4367
               oreb:
-                type: integer
-                example: 10
+                type: number
+                example: 10.1
               dreb:
-                type: integer
-                example: 35
+                type: number
+                example: 35.8
               reb:
-                type: integer
-                example: 45
+                type: number
+                example: 45.9
               ast:
-                type: integer
+                type: number
                 example: 25
               stl:
-                type: integer
-                example: 8
+                type: number
+                example: 8.4
               blk:
-                type: integer
-                example: 5
+                type: number
+                example: 5.4
               tov:
-                type: integer
-                example: 13
+                type: number
+                example: 13.4
               pf:
-                type: integer
-                example: 20
+                type: number
+                example: 20.0
               pts:
-                type: integer
-                example: 110
+                type: number
+                example: 16.4
 
     Match:
       type: object
       properties:
-        game_id:
-          type: integer
-          example: 12345
         match_up:
           type: string
-          example: "BKN - WAS"
+          example: "CLE vs. CHA"
+        game_id:
+          type: string
+          example: "0022301187"
         date:
           type: string
           format: date
-          example: "MAR 27, 2024"
+          example: "2024-04-14"
         home_team:
           $ref: '#/components/schemas/TeamInfo'
         away_team:
           $ref: '#/components/schemas/TeamInfo'
         referee:
           $ref: '#/components/schemas/Referee'
-        arena:
-          $ref: '#/components/schemas/Arena'
           
     Referee:
       type: object
@@ -450,22 +399,6 @@ components:
         id:
           type: integer
           example: 1151
-
-    Arena:
-      type: object
-      properties:
-        name:
-          type: string
-          example: "Capital One Arena"
-        city:
-          type: string
-          example: "Washington"
-        state:
-          type: string
-          example: "DC"
-        country:
-          type: string
-          example: "US"
 
     MatchStats:
       type: object
@@ -487,7 +420,8 @@ components:
           example: "0022301198"
         game_date:
           type: string
-          example: "APR 14, 2024"
+          format: date
+          example: "2024-04-14"
         match_up:
           type: string
           example: "GSW vs. UTA"
@@ -526,34 +460,41 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Stat'
-            
-    Stat:
+         
+    TeamMatchStat:
       type: object
       properties:
         team_id:
           type: integer
           example: 1610612738
+        team_abbreviation:
+          type: string
+          example: "BOS"
+        team_name:
+          type: string
+          example: "Boston Celtics"
         game_id:
           type: string
           example: "0022001074"
         game_date:
           type: string
+          format: date
           example: "2024-01-23"
         match_up:
           type: string
-          example: "BOS vs LAL"
+          example: "BOS vs. LAL"
         wl:
           type: string
           example: "W"
         w:
           type: integer
-          example: 20
+          example: 36
         l:
           type: integer
-          example: 5
+          example: 44
         w_pct:
           type: number
-          example: 0.8
+          example: 0.45
         min:
           type: integer
           example: 240
@@ -611,6 +552,98 @@ components:
         pts:
           type: integer
           example: 110
+          
+    Stat:
+      type: object
+      properties:
+        season_id:
+          type: string
+          example: "22023"
+        team_id:
+          type: integer
+          example: 1610612738
+        team_abbreviation:
+          type: string
+          example: "BOS"
+        team_name:
+          type: string
+          example: "Boston Celtics"
+        game_id:
+          type: string
+          example: "0022001074"
+        game_date:
+          type: string
+          format: date
+          example: "2024-01-23"
+        match_up:
+          type: string
+          example: "BOS vs. LAL"
+        wl:
+          type: string
+          example: "W"
+        min:
+          type: integer
+          example: 240
+        fgm:
+          type: integer
+          example: 40
+        fga:
+          type: integer
+          example: 85
+        fg_pct:
+          type: number
+          example: 47.1
+        fg3m:
+          type: integer
+          example: 12
+        fg3a:
+          type: integer
+          example: 32
+        fg3_pct:
+          type: number
+          example: 37.5
+        ftm:
+          type: integer
+          example: 18
+        fta:
+          type: integer
+          example: 22
+        ft_pct:
+          type: number
+          example: 81.8
+        oreb:
+          type: integer
+          example: 10
+        dreb:
+          type: integer
+          example: 35
+        reb:
+          type: integer
+          example: 45
+        ast:
+          type: integer
+          example: 25
+        stl:
+          type: integer
+          example: 8
+        blk:
+          type: integer
+          example: 5
+        tov:
+          type: integer
+          example: 13
+        pf:
+          type: integer
+          example: 20
+        pts:
+          type: integer
+          example: 110
+        plus_minus:
+          type: number
+          example: -6
+        video_available:
+          type: number
+          example: 1
 
     PlayerStats:
       type: object
@@ -630,7 +663,17 @@ components:
                 type: integer
                 example: 3
         average:
-          $ref: '#/components/schemas/Average'
+          $ref: '#/components/schemas/AveragePlayer'
+        player_efficiency:
+          type: object
+          items:
+            properties:
+              all:
+                type: number
+                example: 19.5192
+              filtered_matches:
+                type: number
+                example: 14.6
 
     PlayerMatchStats:
       type: object
@@ -646,10 +689,11 @@ components:
           example: "0022001074"
         game_date:
           type: string
-          example: "2024-01-23"
+          format: date
+          example: "APR 10, 2024"
         match_up:
           type: string
-          example: "BOS vs LAL"
+          example: "BOS vs. LAL"
         wl:
           type: string
           example: "W"
