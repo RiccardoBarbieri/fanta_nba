@@ -5,104 +5,100 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
-from swagger_server.models.advanced_match_details import AdvancedMatchDetails  # noqa: E501
-from swagger_server.models.match_up import MatchUp  # noqa: E501
-from swagger_server.models.player import Player  # noqa: E501
-from swagger_server.models.player_advanced_details import PlayerAdvancedDetails  # noqa: E501
+from swagger_server.models.match import Match  # noqa: E501
+from swagger_server.models.match_stats import MatchStats  # noqa: E501
+from swagger_server.models.player_stats import PlayerStats  # noqa: E501
 from swagger_server.models.team import Team  # noqa: E501
-from swagger_server.models.team_advanced_detailed_statistics import TeamAdvancedDetailedStatistics  # noqa: E501
-from swagger_server.models.team_advanced_details import TeamAdvancedDetails  # noqa: E501
+from swagger_server.models.team_stats import TeamStats  # noqa: E501
 from swagger_server.test import BaseTestCase
 
 
 class TestDefaultController(BaseTestCase):
     """DefaultController integration test stubs"""
 
-    def test_matchup_id_advanced_get(self):
-        """Test case for matchup_id_advanced_get
+    def test_match_match_id_stats_get(self):
+        """Test case for match_match_id_stats_get
 
-        Get advanced details of a match-up
+        Retrieve match stats by match ID
         """
-        query_string = [('x', 56)]
+        query_string = [('match_date', 'match_date_example')]
         response = self.client.open(
-            '/matchup/{id}/advanced'.format(id=56),
+            '/match/{match_id}/stats'.format(match_id='match_id_example'),
             method='GET',
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_matchup_id_get(self):
-        """Test case for matchup_id_get
+    def test_matches_get(self):
+        """Test case for matches_get
 
-        Get basic details of a match-up
+        Retrieve all matches beetween two dates
         """
+        query_string = [('date_from', 'date_from_example'),
+                        ('date_to', 'date_to_example')]
         response = self.client.open(
-            '/matchup/{id}'.format(id=56),
-            method='GET')
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
-
-    def test_player_id_advanced_get(self):
-        """Test case for player_id_advanced_get
-
-        Get advanced details of a player
-        """
-        query_string = [('x', 56),
-                        ('filter', 'filter_example')]
-        response = self.client.open(
-            '/player/{id}/advanced'.format(id=56),
+            '/matches',
             method='GET',
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_player_id_get(self):
-        """Test case for player_id_get
+    def test_players_player_id_stats_get(self):
+        """Test case for players_player_id_stats_get
 
-        Get basic details of a player
+        Retrieve player stats by player ID, season, date, location and number of games
         """
+        query_string = [('season', 'season_example'),
+                        ('date_to', '2013-10-20'),
+                        ('last_x', 56),
+                        ('home_away_filter', 'home_away_filter_example')]
         response = self.client.open(
-            '/player/{id}'.format(id=56),
-            method='GET')
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
-
-    def test_team_id_advanced_details_get(self):
-        """Test case for team_id_advanced_details_get
-
-        Get detailed advanced statistics of a team
-        """
-        query_string = [('x', 56),
-                        ('filter', 'filter_example')]
-        response = self.client.open(
-            '/team/{id}/advanced/details'.format(id=56),
+            '/players/{player_id}/stats'.format(player_id='player_id_example'),
             method='GET',
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_team_id_advanced_get(self):
-        """Test case for team_id_advanced_get
+    def test_teams_get(self):
+        """Test case for teams_get
 
-        Get advanced details of a team
+        Retrieve all teams by ticker and season
         """
-        query_string = [('x', 56),
-                        ('filter', 'filter_example')]
+        query_string = [('team_tickers', 'team_tickers_example'),
+                        ('season', 'season_example')]
         response = self.client.open(
-            '/team/{id}/advanced'.format(id=56),
+            '/teams',
             method='GET',
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_team_id_get(self):
-        """Test case for team_id_get
+    def test_teams_team_id_stats_get(self):
+        """Test case for teams_team_id_stats_get
 
-        Get basic details of a team
+        Retrieve team stats by team ID, season, date, number of games, and location
         """
+        query_string = [('season', 'season_example'),
+                        ('date_to', '2013-10-20'),
+                        ('last_x', 56),
+                        ('home_away_filter', 'home_away_filter_example')]
         response = self.client.open(
-            '/team/{id}'.format(id=56),
-            method='GET')
+            '/teams/{team_id}/stats'.format(team_id=56),
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_teams_team_ticker_get(self):
+        """Test case for teams_team_ticker_get
+
+        Retrieve team information and players by ticker and season
+        """
+        query_string = [('season', 'season_example')]
+        response = self.client.open(
+            '/teams/{team_ticker}'.format(team_ticker='team_ticker_example'),
+            method='GET',
+            query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
