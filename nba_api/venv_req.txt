@@ -21,3 +21,10 @@ six==1.16.0
 tqdm==4.66.4
 tzdata==2024.1
 urllib3==2.2.1
+connexion >= 2.6.0
+connexion[swagger-ui] >= 2.6.0
+connexion[flask] >= 2.6.0
+connexion[uvicorn] >= 2.6.0
+python_dateutil == 2.6.0
+setuptools >= 21.0.0
+swagger-ui-bundle >= 0.0.2
