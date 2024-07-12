@@ -617,24 +617,35 @@ def get_arena(team_ticker: str, season: str, game_id: str | None, playoffs: bool
     return get_arena_by_id(game_id)
 
 
-def get_arena_by_id(game_id: str) -> dict[str, str]:
-    response = requests.get('https://www.nba.com/game/' + game_id)
+def get_arena_by_id(game_id: str, timeout: float = 5.0) -> dict[str, str]:
+    try:
+        response = requests.get('https://www.nba.com/game/' + game_id, timeout=timeout)
 
-    if response.status_code != 200:
-        raise ValueError('Failed to get the arena information, status code: ' + str(response.status_code) + '.')
+        if response.status_code != 200:
+            raise ValueError('Failed to get the arena information, status code: ' + str(response.status_code) + '.')
 
-    index_start = response.text.find('"arenaName"')
-    index_end = response.text.find('"arenaCountry"') + 19
-    arena_info = response.text[index_start:index_end]
+        index_start = response.text.find('"arenaName"')
+        index_end = response.text.find('"arenaCountry"') + 19
+        arena_info = response.text[index_start:index_end]
 
-    arena_info = arena_info.split(',')
+        arena_info = arena_info.split(',')
 
-    arena_name = arena_info[0].split(':')[1].replace('"', '')
-    arena_city = arena_info[1].split(':')[1].replace('"', '')
-    arena_state = arena_info[2].split(':')[1].replace('"', '')
-    arena_country = arena_info[3].split(':')[1].replace('"', '')
+        arena_name = arena_info[0].split(':')[1].replace('"', '')
+        arena_city = arena_info[1].split(':')[1].replace('"', '')
+        arena_state = arena_info[2].split(':')[1].replace('"', '')
+        arena_country = arena_info[3].split(':')[1].replace('"', '')
 
-    return {'name': arena_name, 'city': arena_city, 'state': arena_state, 'country': arena_country}
+        return {'name': arena_name, 'city': arena_city, 'state': arena_state, 'country': arena_country}
+
+    except requests.Timeout:
+        print("Request timed out.")
+        return {'name': '', 'city': '', 'state': '', 'country': ''}
+    except ValueError as ve:
+        print(ve)
+        return {'name': '', 'city': '', 'state': '', 'country': ''}
+    except Exception as e:
+        print("An unexpected error occurred: ", e)
+        return {'name': '', 'city': '', 'state': '', 'country': ''}
 
 
 def get_player_efficiency(player_id: str, game_id_up_to: str, season: str) -> float:
