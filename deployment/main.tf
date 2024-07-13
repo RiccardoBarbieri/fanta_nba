@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=3.104.0"
+      version = "=3.111.0"
     }
     azapi = {
       source  = "azure/azapi"
@@ -37,22 +37,10 @@ data "azurerm_client_config" "current" {}
 # _____________________________________________________________
 # OUTPUTS
 
-output "resource_group_name" {
-  value = data.azurerm_resource_group.main_group.name
+output "container_app_id" {
+  value = azurerm_container_app.bet_api.id
 }
 
-output "container_app_env_name" {
-  value = azurerm_container_app_environment.app_env.name
-}
-
-output "custom_domain" {
-  value = "helloworld.autoboost.it"
-}
-
-output "container_app_name" {
-  value = azurerm_container_app.container.name
-}
-
-output "container_app_ip" {
-  value = azurerm_container_app.container.outbound_ip_addresses[0]
+output "container_app_identity" {
+  value = azurerm_container_app.bet_api.identity
 }
