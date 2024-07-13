@@ -1,0 +1,21 @@
+<p-card header="{{title}}">
+  <p-table
+    [value]="teams"
+    [scrollable]="true"
+    styleClass="p-datatable-sm p-datatable-striped">
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn>Team</th>
+        <th>W</th>
+        <th>L</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-team let-i="rowIndex">
+      <tr [ngClass]="{'playoff': i <= 6, 'playon': i >= 7 && i <= 10}">
+        <td pFrozenColumn ><a class="font-medium no-underline text-900" routerLink="./team/{{team.ticker}}">{{ team.name }}</a></td>
+        <td>{{ team.w }}</td>
+        <td>{{ team.l }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

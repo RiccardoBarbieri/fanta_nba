@@ -1,0 +1,18 @@
+<p-card header="Standings">
+  <ng-template pTemplate="footer">
+    <div class="flex align-items-center justify-content-between">
+      <div class="flex flex-row flex-wrap">
+        <div class="mr-2">Last update:</div> <div>{{ last_update | date: 'M/d/yy, H:mm' }}</div>
+      </div>
+      <p-button icon="pi pi-refresh" [rounded]="true" [text]="true" (click)="refreshStandings()"/>
+    </div>
+  </ng-template>
+<div class="flex">
+  <div class="col-6">
+    <app-standings-list [title]="'East Coast'" [teams]="teams"/>
+  </div>
+  <div class="col-6">
+    <app-standings-list [title]="'West Coast'" [teams]="teams"/>
+  </div>
+</div>
+</p-card>

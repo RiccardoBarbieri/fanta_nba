@@ -1,0 +1,8 @@
+
+::ng-deep .playoff {
+  background-color: rgba(0, 128, 0, 0.1) !important;
+}
+
+::ng-deep .playon {
+  background-color: rgba(0, 0, 255, 0.1) !important;
+}

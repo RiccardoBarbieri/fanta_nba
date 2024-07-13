@@ -1,20 +1,15 @@
-import { Component } from '@angular/core';
-import { SportDetailsComponent } from "../sport-details/sport-details.component";
-import { Sport } from '../sport';
-import { CommonModule } from '@angular/common';
+import { Injectable } from '@angular/core';
+import { Sport } from './sport';
 
-@Component({
-  selector: 'app-sport-showcase',
-  standalone: true,
-  imports: [CommonModule, SportDetailsComponent],
-  templateUrl: './sport-showcase.component.html',
-  styleUrl: './sport-showcase.component.css'
+@Injectable({
+  providedIn: 'root'
 })
-export class SportShowcaseComponent {
-  availableSports: Sport[] = []
+export class SportsService {
+
+  sports: Sport[] = []
 
   constructor() {
-    this.availableSports = [
+    this.sports = [
       {
         name: "Basket",
         features: [
@@ -72,5 +67,9 @@ export class SportShowcaseComponent {
         url: undefined,
       },
     ]
+  }
+
+  getAllSports() {
+    return this.sports;
   }
 }

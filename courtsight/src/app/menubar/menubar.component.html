@@ -1,1 +1,18 @@
-<p>menubar works!</p>
+<p-menubar [model]="items">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center">
+      <p-avatar image="favicon.ico" class="ml-2" size="normal"/>
+      <h2 class="ml-1 mr-3">{{ title }}</h2>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="item" let-item>
+    <a [routerLink]="item.route" class="p-menuitem-link">
+      <span [class]="item.icon"></span>
+      <span class="ml-2">{{ item.label }}</span>
+    </a>
+  </ng-template>
+  <!--  <ng-template pTemplate="end">-->
+  <!--      <input type="text" pInputText placeholder="Search" class="w-8rem sm:w-auto" />-->
+  <!--      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />-->
+  <!--  </ng-template>-->
+</p-menubar>

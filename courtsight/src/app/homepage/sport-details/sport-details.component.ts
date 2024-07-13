@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { Sport } from '../sport';
+import { Sport } from '../../shared/sport';
 import { RouterModule } from '@angular/router';
 
 @Component({
