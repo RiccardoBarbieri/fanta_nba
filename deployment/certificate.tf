@@ -1,24 +1,14 @@
-# variable "resource_group_name" {
-#   description = "name of the resource group"
-#   type = string
-# }
-#
-# variable "container_app_env_name" {
-#   description = "name of the container app environment name"
-#   type = string
-# }
-#
-# variable "services" {
-#   type = list(object({
-#     key = string
-#     custom_domain = string
-#     container_app_name = string
-#   }))
-# }
-#
-#
+variable "services" {
+  type = list(object({
+    key = string
+    custom_domain = string
+    container_app_name = string
+  }))
+}
+
+
 resource "null_resource" "null" {
-#   for_each = { for svc in var.services : svc.key => svc }
+  for_each = { for svc in var.services : svc.key => svc }
 
   lifecycle {
     create_before_destroy = false
@@ -26,15 +16,11 @@ resource "null_resource" "null" {
 
   triggers = {
     rg_name       = data.azurerm_resource_group.main_group.name
-    ca_env_name   = azurerm_container_app_environment.app_env.name
-    custom_domain = "helloworld.autoboost.it"
-    ca_name       = azurerm_container_app.container.name
+    ca_env_name   = data.azurerm_container_app_environment.app_env.name
+    custom_domain = each.value.custom_domain
+    ca_name       = each.value.container_app_name
     # Added to give chage to state between runs
-    ca_ip         = azurerm_container_app.container.outbound_ip_addresses[0]
-
-#     Use if multiple services, specify in var.tfvars
-#     custom_domain = each.value.custom_domain
-#     ca_name       = each.value.container_app_name
+    ca_ip         = azurerm_container_app.bet_api.outbound_ip_addresses[0]
   }
 
   # provision a managed cert and apply it to the container app
