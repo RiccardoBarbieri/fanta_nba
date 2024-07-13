@@ -4,21 +4,20 @@ data "azurerm_dns_zone" "autoboost" {
 }
 
 resource "azurerm_dns_cname_record" "cname_helloworld" {
-  name                = "helloworld"
+  name                = "betapi"
   zone_name           = data.azurerm_dns_zone.autoboost.name
   resource_group_name = data.azurerm_dns_zone.autoboost.resource_group_name
   ttl                 = 60
-  record              = azurerm_container_app.container.ingress[0].fqdn
-
+  record              = azurerm_container_app.bet_api.ingress[0].fqdn
 }
 
 resource "azurerm_dns_txt_record" "txt_autoboost" {
-  name                = "asuid.helloworld"
+  name                = "asuid.betapi"
   zone_name           = data.azurerm_dns_zone.autoboost.name
   resource_group_name = data.azurerm_dns_zone.autoboost.resource_group_name
   ttl                 = 60
 
   record {
-    value = azurerm_container_app_environment.app_env.custom_domain_verification_id
+    value = data.azurerm_container_app_environment.app_env.custom_domain_verification_id
   }
 }

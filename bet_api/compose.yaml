@@ -1,0 +1,8 @@
+version: '3'
+services:
+  betapi:
+    image: fantanba/bet_api:1.0.0
+    ports:
+      - "8123:8123"
+    env_file:
+      - src/main/resources/betapi.env
