@@ -8,7 +8,7 @@ import java.util.*
 plugins {
     id("org.springframework.boot") version "3.3.0"
     id("io.spring.dependency-management") version "1.1.3"
-    id("com.bmuschko.docker-spring-boot-application") version "9.3.2"
+    id("com.bmuschko.docker-spring-boot-application") version "9.4.0"
     id("application")
     kotlin("jvm") version "1.9.20" // Adjust Kotlin version as needed
 }
@@ -44,30 +44,17 @@ tasks.withType<KotlinCompile> {
 }
 
 val springProps = Properties()
-
 //properties["activeProfile"]?.let {
 //    println("Loading properties from application-$it.properties")
 //    springProps.load(file("src/main/resources/application-$it.properties").inputStream())
 //}
+springProps.load(file("src/main/resources/application.properties").inputStream())
 
-properties["activeProfile"]?.let {
-    println("Loading properties from application.properties")
-    springProps.load(file("src/main/resources/application.properties").inputStream())
+fun loadJsonFile(file: File): Map<String, String> {
+    val json = groovy.json.JsonSlurper().parseText(file.readText())
+    return json as Map<String, String>
 }
-
-//tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
-//    systemProperty("spring.profiles.active", properties["activeProfile"] ?: "dev")
-//}
-
-//tasks.register<Copy>("propcopy") {
-//    dependsOn("processResources")
-//    group = "help"
-//    description = "Copy properties file to resources"
-//    val activeProfile = properties["activeProfile"] ?: "dev"
-//    from("src/main/resources/application-$activeProfile.properties")
-//    into("src/main/resources/")
-//    rename("application-$activeProfile.properties", "application.properties")
-//}
+val regCreds = loadJsonFile(file("registry.json"))
 
 tasks.register<Dockerfile>("createDockerfile") {
     mustRunAfter("bootDistTar")
@@ -106,6 +93,16 @@ tasks.register<DockerPushImage>("pushImage") {
     dependsOn("buildImage")
     group = "fantanbadocker"
     description = "Push the docker image to the repository"
+
+    docker {
+
+        registryCredentials {
+            url.set(regCreds["server"])
+            username.set(regCreds["username"])
+            password.set(regCreds["password"])
+        }
+    }
+
     val dockerRepository = properties["dockerRepository"] ?: throw GradleException("dockerRepository property not set")
     images.add("${dockerRepository}/" + project.name + ":latest")
     images.add("${dockerRepository}/" + project.name + ":${project.version}")
