@@ -1,6 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.bmuschko.gradle.docker.tasks.image.DockerListImages
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import java.util.*
@@ -50,11 +49,25 @@ val springProps = Properties()
 //}
 springProps.load(file("src/main/resources/application.properties").inputStream())
 
-fun loadJsonFile(file: File): Map<String, String> {
-    val json = groovy.json.JsonSlurper().parseText(file.readText())
-    return json as Map<String, String>
+var registryUrl = ""
+var registryUsername = ""
+var registryPassword = ""
+
+fun loadRegistryInfo(file: File) {
+    if (!file.exists()) {
+        registryUrl = System.getenv()["ACR_SERVER"] ?: throw GradleException("ACR_SERVER environment variable not set")
+        registryUsername = System.getenv()["ACR_USERNAME"] ?: throw GradleException("ACR_USERNAME environment variable not set")
+        registryPassword = System.getenv()["ACR_PASSWORD"] ?: throw GradleException("ACR_PASSWORD environment variable not set")
+    }
+    else {
+        val json = groovy.json.JsonSlurper().parseText(file.readText()) as Map<String, String>
+        registryUrl = json["server"].toString()
+        registryUsername = json["username"].toString()
+        registryPassword = json["password"].toString()
+    }
 }
-val regCreds = loadJsonFile(file("registry.json"))
+
+loadRegistryInfo(file("registry.json"))
 
 tasks.register<Dockerfile>("createDockerfile") {
     mustRunAfter("bootDistTar")
@@ -97,9 +110,9 @@ tasks.register<DockerPushImage>("pushImage") {
     docker {
 
         registryCredentials {
-            url.set(regCreds["server"])
-            username.set(regCreds["username"])
-            password.set(regCreds["password"])
+            url.set(registryUrl)
+            username.set(registryUsername)
+            password.set(registryPassword)
         }
     }
 
