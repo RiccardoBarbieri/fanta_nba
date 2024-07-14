@@ -1,55 +1,7 @@
 <div class="grid">
-
   <div class="col-12">
     <p-card header="This Week's Matches" subheader="{{today | date: 'EEEE - MMMM d, y'}}">
-      <p-dataView [value]="matches" layout="grid">
-        <ng-template pTemplate="grid">
-          <div class="grid">
-            <div class="col-12 sm:col-12 md:col-6 xl:col-4" *ngFor="let match of matches">
-              <!-- [style]="{'cursor':'pointer'}"-->
-              <div class="p-0 border-2 surface-border surface-card border-round flex flex-column">
-                <div class="flex flex-column p-4">
-                  <div class="flex flex-row justify-content-between align-items-center gap-2">
-                    <div>
-                      <span class="font-medium text-secondary text-sm">{{ match.arena.name }}</span>
-                      <div class="text-lg font-medium text-900 mt-1">
-                        {{ match.arena.city }}, {{ match.arena.state }} <!-- TODO cambiare -->
-                      </div>
-                    </div>
-                    <div class="surface-100 p-1" style="border-radius: 30px">
-                      <div class="surface-0 flex align-items-center gap-2 justify-content-center py-1 px-2"
-                           style="border-radius: 30px">
-                        <i class="pi pi-calendar text-blue-500"></i>
-                        <span class="text-900 font-medium text-sm">{{ match.date }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex flex-row align-items-baseline align-self-center justify-content-center gap-1 mt-2">
-                    <div class="flex flex-column align-items-end justify-content-end align-self-center">
-                      <span class="font-medium text-secondary text-sm">{{ match.home_team.abbreviation }}</span>
-                      <a class="text-lg font-medium text-900 text-green-500 text-right mt-1 no-underline" routerLink="./team/{{ match.home_team.abbreviation }}">
-                        {{ match.home_team.full_name }}
-                      </a>
-                    </div>
-                    <p-divider layout="vertical"><b class="text-red-700">VS</b></p-divider>
-                    <!-- TODO center the element -->
-                    <div class="flex flex-column align-items-start justify-content-start align-self-center">
-                      <span class="font-medium text-secondary text-sm">{{ match.away_team.abbreviation }}</span>
-                      <a class="text-lg font-medium text-900 text-orange-500 text-left mt-1 no-underline" routerLink="./team/{{ match.home_team.abbreviation }}">
-                        {{ match.away_team.full_name }}
-                      </a>
-                    </div>
-                  </div>
-                  <div class="flex align-self-end mt-3">
-                    <p-button icon="pi pi-arrow-right" iconPos="right" [text]="true" [raised]="true"
-                              class="flex-auto md:flex-initial white-space-nowrap" label="See details" routerLink="./match/{{match.game_id}}"/>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-template>
-      </p-dataView>
+      <app-match-list [matches]="matches"></app-match-list>
     </p-card>
   </div>
 

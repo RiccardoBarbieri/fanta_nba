@@ -1,12 +1,90 @@
-<div class="grid ml-6">
-  <div class="flex flex-column">
-    <div class="flex flex-row gap-1 align-items-baseline">
-      <div class="text-6xl font-bold mr-3">{{ team?.team_info?.full_name }}</div>
-      <div class="text-4xl text-color-secondary">{{team?.team_info?.abbreviation}}</div>
+<div class="grid m-6">
+  <div class="flex flex-column gap-2">
+    <div class="flex flex-row justify-content-start align-content-start mb-8">
+      <div class="flex align-items-start flex-column lg:justify-content-between">
+        <div class="flex flex-row gap-1 align-items-baseline">
+          <div class="text-6xl font-bold mr-3">{{ team?.team_info?.full_name }}</div>
+          <div class="text-4xl text-color-secondary">{{ team?.team_info?.abbreviation }}</div>
+        </div>
+        <div class="flex flex-row align-items-center text-700 flex-wrap">
+          <div class="mr-5 flex align-items-center mt-3">
+            <i class="pi pi-calendar mr-2"></i>
+            <span>Founded: {{ team?.team_info?.year_founded }}</span>
+          </div>
+          <div class="mr-5 flex align-items-center mt-3">
+            <i class="pi pi-map-marker mr-2"></i>
+            <span>{{ team?.team_info?.city }}, {{ team?.team_info?.state }}</span>
+          </div>
+          <div class="flex align-items-center mt-3">
+            <i class="pi pi-home mr-2"></i>
+            <span>{{ team?.team_info?.arena }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <div class="flex flex-row">
+      <p-card header="Players">
+        <p-dataView #dv [value]="team?.team_players!" [rows]="4" [paginator]="true" layout="grid">
+          <ng-template pTemplate="grid" let-players>
+            <div class="grid ">
+              <div class="" *ngFor="let player of players; let first = first"> <!--col-12 sm:col-12 md:col-6 xl:col-4-->
+                <!--                <div class="flex flex-column sm:flex-row sm:align-items-center p-4 gap-3" >-->
+                <div class="border-1 surface-border border-round m-2 p-3">
+                  <div class="flex flex-row justify-content-between align-items-center gap-4">
+                    <div>
+                      <div class="text-lg font-medium text-900 mt-1">
+                        {{ player.player }}
+                      </div>
+                    </div>
+                    <div class="surface-100 p-1" style="border-radius: 30px">
+                      <div class="surface-0 flex align-items-center gap-2 justify-content-center py-1 px-2"
+                           style="border-radius: 30px">
+                        <i class="pi pi-user font-bold"></i>
+                        <span class="text-900 font-bold text-purple-500">{{ player.num }} / {{player.position}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!--          <div class="mb-3">-->
+                  <!--            <div class="relative mx-auto">-->
+                  <!--              <img-->
+                  <!--                src="https://primefaces.org/cdn/primeng/images/demo/product/{{ product.image }}"-->
+                  <!--                [alt]="product.name"-->
+                  <!--                class="w-full border-round"/>-->
+                  <!--                    <p-tag [value]="item.inventoryStatus" [severity]="getSeverity(item)" class="absolute" [style.left.px]="4" [style.top.px]="4" />-->
+                  <!--            </div>-->
+                  <!--          </div>-->
+                  <div class="flex justify-content-between align-items-center gap-2">
+                    <div class="mt-0 font-semibold">
+                      {{ player.age }} y/o
+                    </div>
+                    <div class="mt-0 font-semibold">
+                      {{ player.weight }} lb
+                    </div>
+                    <div class="mt-0 font-semibold">
+                      {{ player.height }} ft
+                    </div>
+<!--                    <div class="mt-0 font-semibold">-->
+<!--                      {{ player.exp }}-->
+<!--                    </div>-->
+                    <!--            <span>-->
+                    <!--                            <p-button icon="pi pi-heart" severity="secondary" [outlined]="true"/>-->
+                    <!--                            <p-button icon="pi pi-shopping-cart" styleClass="ml-2"/>-->
+                    <!--                        </span>-->
+                  </div>
+                  <!--                  </div>-->
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </p-dataView>
+      </p-card>
+    </div>
+    <div class="flex flex-row">
+      <p-card header="Next Matches" subheader="From {{today | date: 'MM/d/y'}} to {{next_week | date: 'MM/d/y'}}">
+        <app-match-list [matches]="matches"></app-match-list>
+      </p-card>
 
+    </div>
   </div>
-
-
 </div>

@@ -8,14 +8,14 @@ export interface GlobalStats {
 }
 
 export interface TeamMatchStats {
+  season_id: string
   team_id: number,
+  team_abbreviation: string,
+  team_name: string,
   game_id: string,
   game_date: string,
   match_up: string,
   wl: string,
-  w: number,
-  l: number,
-  w_pct: number,
   min: number,
   fgm: number,
   fga: number,
@@ -35,6 +35,8 @@ export interface TeamMatchStats {
   tov: number,
   pf: number,
   pts: number,
+  plus_minus: number,
+  video_available: number,
 }
 
 export interface PlayerMatchStats {
@@ -69,12 +71,12 @@ export interface PlayerMatchStats {
 
 export interface MatchStats {
   global_stats: GlobalStats,
-  by_home_stats: MatchStats,
-  by_away_stats: MatchStats,
+  by_home_stats: TeamMatchStats,
+  by_away_stats: TeamMatchStats,
 }
 
 export interface ActualAndLastMatchStats {
-  actual_match_stats: MatchStats,
+  actual_match_stats: MatchStats
   last_match_stats: MatchStats,
 }
 

@@ -8,6 +8,7 @@ import {DataViewModule} from "primeng/dataview";
 import {TagModule} from "primeng/tag";
 import {RouterLink} from "@angular/router";
 import {Button} from "primeng/button";
+import {MatchListComponent} from "../match-list/match-list.component";
 
 
 @Component({
@@ -22,7 +23,8 @@ import {Button} from "primeng/button";
     TagModule,
     CommonModule,
     RouterLink,
-    Button
+    Button,
+    MatchListComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'

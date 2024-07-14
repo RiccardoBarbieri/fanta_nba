@@ -27,7 +27,7 @@ export class MatchesService {
   //   return await data.json() ?? {};
   // }
   //
-  // async getMatch(match_up: string, season: string, matchday: string): Promise<Match> { // TODO: mi sa che è sbagliata...
+  // async getMatch(match_up: string, season: string, matchday: string): Promise<Match> {
   //   const data = await fetch(this.nba_api_url + 'match/' + new URLSearchParams({
   //     match_up: match_up,
   //     season: season,
