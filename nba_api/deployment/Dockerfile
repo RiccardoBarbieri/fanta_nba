@@ -1,7 +1,8 @@
 FROM python:3.10-slim-bullseye
 
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PRODUCTION=1
 
 WORKDIR /app
 
@@ -18,4 +19,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 8124
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind=127.0.0.1:8124", "--chdir", "swagger_server", "'app:app()'"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:8124", "--chdir", "swagger_server", "app:app()"]
