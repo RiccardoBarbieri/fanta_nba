@@ -18,4 +18,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE <port>
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind=127.0.0.1:8124", "--chdir", "swagger_server", "'app:app()'"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind=127.0.0.1:<port>", "--chdir", "swagger_server", "'app:app()'"]

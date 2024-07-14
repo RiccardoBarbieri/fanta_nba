@@ -8,6 +8,8 @@ REGISTRY=$(cat deployment/registry)
 VERSION=$(cat deployment/version)
 PORT=$(cat deployment/port)
 
-sed -e "s|<port>|$PORT|" deployment/Dockerfile.template > deployment/Dockerfile
+echo "Updating Dockerfile"
+
+sed -e "s|<port>|$PORT|g" deployment/Dockerfile.template > deployment/Dockerfile
 
 #docker build -t "$REGISTRY"/nba_api:"$VERSION" -f deployment/Dockerfile .
