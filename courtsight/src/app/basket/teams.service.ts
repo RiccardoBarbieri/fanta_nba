@@ -6,7 +6,7 @@ import {TeamStats} from "./stats";
   providedIn: 'root'
 })
 export class TeamsService {
-  nba_api_url = "http://localhost:8080/api/teams";
+  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io/teams";
 
   constructor() {
   }
@@ -17,12 +17,21 @@ export class TeamsService {
       params.append('team_tickers', ticker);
     }
 
-    const data = await fetch(this.nba_api_url + params.toString());
+    const data = await fetch(this.nba_api_url + params.toString(), {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      }
+    );
     return await data.json() ?? [];
   }
 
   async getTeamFromTicker(team_ticker: string, season: string): Promise<Team> {
-    const data = await fetch(`${this.nba_api_url}/${team_ticker}` + new URLSearchParams({season: season}).toString());
+    const data = await fetch(`${this.nba_api_url}/${team_ticker}` + new URLSearchParams({season: season}).toString(), {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
     return await data.json() ?? {};
   }
 
@@ -39,7 +48,11 @@ export class TeamsService {
       params.append('location', home_away_filter);
     }
 
-    const data = await fetch(`${this.nba_api_url}/${team_id}/stats` + params.toString());
+    const data = await fetch(`${this.nba_api_url}/${team_id}/stats` + params.toString(), {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
     return await data.json() ?? {};
   }
 }

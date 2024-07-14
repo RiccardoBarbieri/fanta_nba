@@ -5,7 +5,7 @@ import {PlayerStats} from "./stats";
   providedIn: 'root'
 })
 export class PlayersService {
-  nba_api_url = "http://localhost:8080/api/players";
+  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io/players";
 
   constructor() { }
 
@@ -24,7 +24,11 @@ export class PlayersService {
       params.append('home_away_filter', home_away_filter);
     }
 
-    const data = await fetch(`${this.nba_api_url}/${player_id}/stats` + params.toString());
+    const data = await fetch(`${this.nba_api_url}/${player_id}/stats` + params.toString(), {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
     return await data.json() ?? {};
   }
 }
