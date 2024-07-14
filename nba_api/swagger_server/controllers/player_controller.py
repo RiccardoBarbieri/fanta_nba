@@ -4,7 +4,7 @@ import featurevec.rest_api_functions_helper as helper
 # Rest Api Controller for player information and statistics
 
 
-def players_player_id_stats_get(player_id: str, season: str, date_to: str, last_x: int | None, home_away_filter: str | None) -> (
+def players_player_id_stats_get(player_id: str, season: str, date_to: str, last_x: int | None = None, home_away_filter: str | None = None) -> (
         dict)[str, list[dict]]:
     """
     Retrieve team statistics based on provided parameters.
