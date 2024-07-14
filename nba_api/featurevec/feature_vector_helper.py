@@ -4,7 +4,6 @@ import os
 import pickle
 import sys
 import time
-from pprint import pprint
 from typing import List, Dict, AnyStr, Tuple
 
 import pandas as pd
@@ -27,12 +26,8 @@ from nba_api.stats.endpoints.commonteamroster import CommonTeamRoster
 from nba_api.stats.endpoints.leaguegamelog import LeagueGameLog
 
 from utils.helper_functions import all_keys_to_lower
-from utils.constants import LOG_FILE
-from utils.validation import validate_season_string, validate_team_ticker, validate_game_number
+from utils.validation import validate_season_string, validate_team_ticker
 from geo.distance import get_distance_between_arenas
-
-from fake_useragent import UserAgent
-from itertools import cycle
 
 # ua = UserAgent(fallback='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.2592.87')
 #
@@ -41,11 +36,12 @@ from itertools import cycle
 # user_agents_cycle = cycle(user_agents)
 
 import logging
+
 logger = logging.getLogger(os.path.basename(__file__))
 logger.setLevel(logging.DEBUG)
 
 
-@functools.cache
+@functools.lru_cache
 def get_season_games_for_team(team_ticker: str, season: str, playoffs: bool) -> List[Dict]:
     """
     Get all the games played by a team in a season.
@@ -78,7 +74,7 @@ def get_season_games_for_team(team_ticker: str, season: str, playoffs: bool) -> 
     return all_keys_to_lower(team_game_log)
 
 
-@functools.cache
+@functools.lru_cache
 def get_league_game_log_for_season(season: str, playoffs: bool) -> List[Dict]:
     """
     Get all the games played in a season.
@@ -103,7 +99,7 @@ def get_league_game_log_for_season(season: str, playoffs: bool) -> List[Dict]:
     return all_keys_to_lower(league_game_log)
 
 
-@functools.cache
+@functools.lru_cache
 def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, season: str, playoffs: bool) -> List:
     """
     Get the starting lineup and the bench for a specific game.
@@ -150,7 +146,7 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, seaso
     return all_keys_to_lower(dash_lineups)
 
 
-@functools.cache
+@functools.lru_cache
 def get_boxscore_teamstats(game_id: str) -> Dict:
     """
     Get the boxscore for a specific game.
@@ -167,7 +163,7 @@ def get_boxscore_teamstats(game_id: str) -> Dict:
     return all_keys_to_lower(boxscore)
 
 
-# @functools.cache
+# @functools.lru_cache
 # def get_live_boxscore(game_id: str) -> Dict:
 #     """
 #     Get the live boxscore for a specific game.
@@ -181,7 +177,7 @@ def get_boxscore_teamstats(game_id: str) -> Dict:
 #     return all_keys_to_lower(boxscore)
 
 
-@functools.cache
+@functools.lru_cache
 def get_scoreboard(date: str) -> Dict[AnyStr, List]:
     """
     Get the scoreboard for a specific date.
@@ -197,7 +193,7 @@ def get_scoreboard(date: str) -> Dict[AnyStr, List]:
     return all_keys_to_lower(scoreboard)
 
 
-@functools.cache
+@functools.lru_cache
 def get_date_from_game_id(game_id: str) -> str:
     """
     Get the date from a game identifier.
@@ -213,7 +209,7 @@ def get_date_from_game_id(game_id: str) -> str:
     return datetime.datetime.strptime(date_stupid_format, '%A, %B %d, %Y').strftime('%Y-%m-%d')
 
 
-@functools.cache
+@functools.lru_cache
 def get_boxscore_summary(game_id: str):
     """
     Get the boxscore summary for a specific game.
@@ -229,7 +225,7 @@ def get_boxscore_summary(game_id: str):
     return all_keys_to_lower(boxscore_summary)
 
 
-@functools.cache
+@functools.lru_cache
 def get_playbyplay(game_id: str) -> Dict:
     """
     Get the play by play for a specific game.
@@ -245,7 +241,7 @@ def get_playbyplay(game_id: str) -> Dict:
     return all_keys_to_lower(playbyplay)
 
 
-@functools.cache
+@functools.lru_cache
 def get_common_all_players(season: str) -> List[Dict]:
     """
     Get all the players in the NBA.
@@ -259,7 +255,7 @@ def get_common_all_players(season: str) -> List[Dict]:
     return all_keys_to_lower(common_all_players)
 
 
-@functools.cache
+@functools.lru_cache
 def get_common_player_info(player_id: str) -> Dict:
     """
     Get the common info for a specific player.
@@ -276,7 +272,7 @@ def get_common_player_info(player_id: str) -> Dict:
     return all_keys_to_lower(common_player_info)
 
 
-@functools.cache
+@functools.lru_cache
 def get_cumestats_player(player_id: str, game_ids: Tuple[AnyStr]) -> Dict:
     """
     Get the cumulative stats for a specific player.
@@ -321,7 +317,7 @@ def get_common_team_roster(team_id: str, season: str) -> List[Dict]:
     return all_keys_to_lower(common_team_roster)
 
 
-@functools.cache
+@functools.lru_cache
 def get_player_games_for_season(player_id: str, season: str, playoffs: bool) -> List[Dict]:
     """
     Get all the games played by a player in a season.
@@ -333,7 +329,9 @@ def get_player_games_for_season(player_id: str, season: str, playoffs: bool) -> 
     """
     validate_season_string(season)
 
-    player_game_log = PlayerGameLog(player_id=player_id, season=season, season_type_all_star='Playoffs' if playoffs else 'Regular Season').get_normalized_dict()['PlayerGameLog']
+    player_game_log = PlayerGameLog(player_id=player_id, season=season,
+                                    season_type_all_star='Playoffs' if playoffs else 'Regular Season').get_normalized_dict()[
+        'PlayerGameLog']
 
     return all_keys_to_lower(player_game_log)
 
@@ -616,39 +614,52 @@ def get_arena(team_ticker: str, season: str, game_id: str | None, playoffs: bool
         first_home_game_id = df_team_game_log[df_team_game_log['matchup'].str.contains('vs.')].iloc[0, :]['game_id']
         game_id = first_home_game_id
 
-    response = requests.get('https://www.nba.com/game/' + game_id)
-
-    if response.status_code != 200:
-        raise ValueError('Failed to get the arena information, status code: ' + str(response.status_code) + '.')
-
-    index_start = response.text.find('"arenaName"')
-    index_end = response.text.find('"arenaCountry"') + 19
-    arena_info = response.text[index_start:index_end]
-
-    arena_info = arena_info.split(',')
-
-    arena_name = arena_info[0].split(':')[1].replace('"', '')
-    arena_city = arena_info[1].split(':')[1].replace('"', '')
-    arena_state = arena_info[2].split(':')[1].replace('"', '')
-    arena_country = arena_info[3].split(':')[1].replace('"', '')
-
-    return {'name': arena_name, 'city': arena_city, 'state': arena_state, 'country': arena_country}
+    return get_arena_by_id(game_id)
 
 
-def get_player_efficiency(player_id: str, team_ticker: str, game_id_up_to: str, season: str) -> float:
+def get_arena_by_id(game_id: str, timeout: float = 5.0) -> dict[str, str]:
+    try:
+        response = requests.get('https://www.nba.com/game/' + game_id, timeout=timeout)
+
+        if response.status_code != 200:
+            raise ValueError('Failed to get the arena information, status code: ' + str(response.status_code) + '.')
+
+        index_start = response.text.find('"arenaName"')
+        index_end = response.text.find('"arenaCountry"') + 19
+        arena_info = response.text[index_start:index_end]
+
+        arena_info = arena_info.split(',')
+
+        arena_name = arena_info[0].split(':')[1].replace('"', '')
+        arena_city = arena_info[1].split(':')[1].replace('"', '')
+        arena_state = arena_info[2].split(':')[1].replace('"', '')
+        arena_country = arena_info[3].split(':')[1].replace('"', '')
+
+        return {'name': arena_name, 'city': arena_city, 'state': arena_state, 'country': arena_country}
+
+    except requests.Timeout:
+        print("Request timed out.")
+        return {'name': '', 'city': '', 'state': '', 'country': ''}
+    except ValueError as ve:
+        print(ve)
+        return {'name': '', 'city': '', 'state': '', 'country': ''}
+    except Exception as e:
+        print("An unexpected error occurred: ", e)
+        return {'name': '', 'city': '', 'state': '', 'country': ''}
+
+
+def get_player_efficiency(player_id: str, game_id_up_to: str, season: str) -> float:
     """
     Get the player efficiency rating for a specific player using the following formula:
 
 
     :param player_id: The player identifier.
-    :param team_ticker: The team abbreviation.
     :param game_id_up_to: The game identifier to calculate the player efficiency up to.
     :param season: A string representing the season in the format 'YYYY-YY'.
 
     :return: The player efficiency rating.
     """
     validate_season_string(season)
-    validate_team_ticker(team_ticker)
 
     start_time = time.time()
     player_game_log_reg = get_player_games_for_season(player_id, season, False)
@@ -709,12 +720,10 @@ def print_df(df):
 
 
 if __name__ == '__main__':
-
     print(get_player_efficiency('1628369', 'BOS', '0022300159', '2023-24'))
 
-    #199 68 25 11 1 96 7 21 7
-    #25.714285714285715
-
+    # 199 68 25 11 1 96 7 21 7
+    # 25.714285714285715
 
     # Jayson Tatum 1628369
     #        team_id     game_id            game_date      matchup

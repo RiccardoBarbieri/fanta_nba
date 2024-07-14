@@ -2,7 +2,6 @@ from typing import Dict
 
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim, DataBC, Photon
-from geopy.location import Location, Point
 
 geocoders = [Nominatim(user_agent='fanta_nba'), DataBC(user_agent='fanta_nba'), Photon(user_agent='fanta_nba')]
 

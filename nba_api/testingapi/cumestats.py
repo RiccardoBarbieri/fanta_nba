@@ -1,10 +1,4 @@
-import requests
-from nba_api.stats.endpoints import teaminfocommon
-from nba_api.stats.endpoints import cumestatsteamgames
 from nba_api.stats.static import teams
-from pprint import pprint
-import pandas
-import json
 
 teams = teams.get_teams()
 
