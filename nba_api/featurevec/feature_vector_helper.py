@@ -64,11 +64,18 @@ def get_season_games_for_team(team_ticker: str, season: str, playoffs: bool) -> 
     else:
         season_type = 'Regular Season'
 
-    team_game_log = TeamGameLog(team_id=team_id,
-                                season=season,
-                                season_type_all_star=season_type,
-                                # headers={'User-Agent': next(user_agents_cycle)}
-                                ).get_normalized_dict()['TeamGameLog']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        team_game_log = TeamGameLog(team_id=team_id,
+                                    season=season,
+                                    season_type_all_star=season_type,
+                                    proxy="http://proxy.riccardob.dev:8890"
+                                    ).get_normalized_dict()['TeamGameLog']
+    else:
+        team_game_log = TeamGameLog(team_id=team_id,
+                                    season=season,
+                                    season_type_all_star=season_type,
+                                    # headers={'User-Agent': next(user_agents_cycle)}
+                                    ).get_normalized_dict()['TeamGameLog']
     time.sleep(0.3)
 
     return all_keys_to_lower(team_game_log)
@@ -91,10 +98,14 @@ def get_league_game_log_for_season(season: str, playoffs: bool) -> List[Dict]:
     else:
         season_type = 'Regular Season'
 
-    league_game_log = LeagueGameLog(season=season, season_type_all_star=season_type,
-                                    # headers={'User-Agent': next(user_agents_cycle)}
-                                    ).get_normalized_dict()[
-        'LeagueGameLog']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        league_game_log = LeagueGameLog(season=season, season_type_all_star=season_type,
+                                        proxy="http://proxy.riccardob.dev:8890"
+                                        ).get_normalized_dict()['LeagueGameLog']
+    else:
+        league_game_log = LeagueGameLog(season=season, season_type_all_star=season_type,
+                                        # headers={'User-Agent': next(user_agents_cycle)}
+                                        ).get_normalized_dict()['LeagueGameLog']
 
     return all_keys_to_lower(league_game_log)
 
@@ -130,14 +141,24 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, seaso
         season_type = 'Regular Season'
 
     start_time = time.time()
-    dash_lineups = LeagueDashLineups(team_id_nullable=team_id,
-                                     opponent_team_id=opp_team_id,
-                                     season=season,
-                                     date_from_nullable=date,
-                                     date_to_nullable=date,
-                                     season_type_all_star=season_type,
-                                     # headers={'User-Agent': next(user_agents_cycle)}
-                                     )
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        dash_lineups = LeagueDashLineups(team_id_nullable=team_id,
+                                         opponent_team_id=opp_team_id,
+                                         season=season,
+                                         date_from_nullable=date,
+                                         date_to_nullable=date,
+                                         season_type_all_star=season_type,
+                                         proxy="http://proxy.riccardob.dev:8890"
+                                         ).get_normalized_dict()['Lineups']
+    else:
+        dash_lineups = LeagueDashLineups(team_id_nullable=team_id,
+                                         opponent_team_id=opp_team_id,
+                                         season=season,
+                                         date_from_nullable=date,
+                                         date_to_nullable=date,
+                                         season_type_all_star=season_type,
+                                         # headers={'User-Agent': next(user_agents_cycle)}
+                                         )
     logger.debug(f'get_dash_lineups took {time.time() - start_time} seconds')
     time.sleep(0.3)
 
@@ -155,9 +176,15 @@ def get_boxscore_teamstats(game_id: str) -> Dict:
 
     :return: A dictionary containing the boxscore for the game.
     """
-    boxscore = BoxScoreAdvancedV2(game_id=game_id,
-                                  # headers={'User-Agent': next(user_agents_cycle)}
-                                  ).get_normalized_dict()['TeamStats']
+
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        boxscore = BoxScoreAdvancedV2(game_id=game_id,
+                                      proxy="http://proxy.riccardob.dev:8890"
+                                      ).get_normalized_dict()['TeamStats']
+    else:
+        boxscore = BoxScoreAdvancedV2(game_id=game_id,
+                                      # headers={'User-Agent': next(user_agents_cycle)}
+                                      ).get_normalized_dict()['TeamStats']
     time.sleep(0.15)
 
     return all_keys_to_lower(boxscore)
@@ -186,9 +213,14 @@ def get_scoreboard(date: str) -> Dict[AnyStr, List]:
 
     :return: A list of dictionaries containing the games played on the date.
     """
-    scoreboard = ScoreboardV2(game_date=date,
-                              # headers={'User-Agent': next(user_agents_cycle)}
-                              ).get_normalized_dict()
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        scoreboard = ScoreboardV2(game_date=date,
+                                  proxy="http://proxy.riccardob.dev:8890"
+                                  ).get_normalized_dict()
+    else:
+        scoreboard = ScoreboardV2(game_date=date,
+                                  # headers={'User-Agent': next(user_agents_cycle)}
+                                  ).get_normalized_dict()
 
     return all_keys_to_lower(scoreboard)
 
@@ -218,9 +250,14 @@ def get_boxscore_summary(game_id: str):
 
     :return: A dictionary containing the boxscore summary for the game.
     """
-    boxscore_summary = BoxScoreSummaryV2(game_id=game_id,
-                                         # headers={'User-Agent': next(user_agents_cycle)}
-                                         ).get_normalized_dict()
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        boxscore_summary = BoxScoreSummaryV2(game_id=game_id,
+                                             proxy="http://proxy.riccardob.dev:8890"
+                                             ).get_normalized_dict()
+    else:
+        boxscore_summary = BoxScoreSummaryV2(game_id=game_id,
+                                             # headers={'User-Agent': next(user_agents_cycle)}
+                                             ).get_normalized_dict()
 
     return all_keys_to_lower(boxscore_summary)
 
@@ -234,9 +271,14 @@ def get_playbyplay(game_id: str) -> Dict:
 
     :return: A dictionary containing the play by play for the game.
     """
-    playbyplay = PlayByPlayV2(game_id=game_id,
-                              # headers={'User-Agent': next(user_agents_cycle)}
-                              ).get_normalized_dict()['PlayByPlay']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        playbyplay = PlayByPlayV2(game_id=game_id,
+                                  proxy="http://proxy.riccardob.dev:8890"
+                                  ).get_normalized_dict()['PlayByPlay']
+    else:
+        playbyplay = PlayByPlayV2(game_id=game_id,
+                                  # headers={'User-Agent': next(user_agents_cycle)}
+                                  ).get_normalized_dict()['PlayByPlay']
 
     return all_keys_to_lower(playbyplay)
 
@@ -264,10 +306,14 @@ def get_common_player_info(player_id: str) -> Dict:
 
     :return: A dictionary containing the common info for the player.
     """
-    common_player_info = CommonPlayerInfo(player_id=player_id,
-                                          # headers={'User-Agent': next(user_agents_cycle)}
-                                          ).get_normalized_dict()[
-        'CommonPlayerInfo'][0]
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        common_player_info = CommonPlayerInfo(player_id=player_id,
+                                              proxy="http://proxy.riccardob.dev:8890"
+                                              ).get_normalized_dict()['CommonPlayerInfo']
+    else:
+        common_player_info = CommonPlayerInfo(player_id=player_id,
+                                              # headers={'User-Agent': next(user_agents_cycle)}
+                                              ).get_normalized_dict()['CommonPlayerInfo'][0]
 
     return all_keys_to_lower(common_player_info)
 
@@ -284,10 +330,16 @@ def get_cumestats_player(player_id: str, game_ids: Tuple[AnyStr]) -> Dict:
     """
     game_ids_str = '|'.join(game_ids)
 
-    cume_stats_player = CumeStatsPlayer(player_id=player_id,
-                                        game_ids=game_ids_str,
-                                        # headers={'User-Agent': next(user_agents_cycle)}
-                                        ).get_normalized_dict()[
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        cume_stats_player = CumeStatsPlayer(player_id=player_id,
+                                            game_ids=game_ids_str,
+                                            proxy="http://proxy.riccardob.dev:8890"
+                                            ).get_normalized_dict()['TotalPlayerStats']
+    else:
+        cume_stats_player = CumeStatsPlayer(player_id=player_id,
+                                            game_ids=game_ids_str,
+                                            # headers={'User-Agent': next(user_agents_cycle)}
+                                            ).get_normalized_dict()[
         'TotalPlayerStats']
 
     return all_keys_to_lower(cume_stats_player)[0]
@@ -303,10 +355,14 @@ def get_common_team_roster(team_id: str, season: str) -> List[Dict]:
     :return: A list of dictionaries containing the common team roster for the team.
     """
     if not os.path.exists(f'../data/rosters/{team_id}_{season}.pickle'):
-        common_team_roster = CommonTeamRoster(team_id=team_id, season=season,
-                                              # headers={'User-Agent': next(user_agents_cycle)}
-                                              ).get_normalized_dict()[
-            'CommonTeamRoster']
+        if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+            common_team_roster = CommonTeamRoster(team_id=team_id, season=season,
+                                                  proxy="http://proxy.riccardob.dev:8890"
+                                                  ).get_normalized_dict()['CommonTeamRoster']
+        else:
+            common_team_roster = CommonTeamRoster(team_id=team_id, season=season,
+                                                  # headers={'User-Agent': next(user_agents_cycle)}
+                                                  ).get_normalized_dict()['CommonTeamRoster']
         with open(f'../data/rosters/{team_id}_{season}.pickle', 'wb') as f:
             pickle.dump(common_team_roster, f)
         time.sleep(2)
@@ -329,9 +385,14 @@ def get_player_games_for_season(player_id: str, season: str, playoffs: bool) -> 
     """
     validate_season_string(season)
 
-    player_game_log = PlayerGameLog(player_id=player_id, season=season,
-                                    season_type_all_star='Playoffs' if playoffs else 'Regular Season').get_normalized_dict()[
-        'PlayerGameLog']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        player_game_log = PlayerGameLog(player_id=player_id, season=season,
+                                        season_type_all_star='Playoffs' if playoffs else 'Regular Season',
+                                        proxy="http://proxy.riccardob.dev:8890"
+                                        ).get_normalized_dict()['PlayerGameLog']
+    else:
+        player_game_log = PlayerGameLog(player_id=player_id, season=season,
+                                        season_type_all_star='Playoffs' if playoffs else 'Regular Season').get_normalized_dict()['PlayerGameLog']
 
     return all_keys_to_lower(player_game_log)
 

@@ -1,18 +1,17 @@
 import datetime
 import functools
+import os
 import sys
 import time
-from typing import Dict, List
 
-from nba_api.stats.endpoints import LeagueGameLog, LeagueGameFinder, TeamDetails, Scoreboard, ScoreboardV2
+from nba_api.stats.endpoints import LeagueGameLog, LeagueGameFinder, TeamDetails, ScoreboardV2
+from nba_api.stats.endpoints.commonteamroster import CommonTeamRoster
+from nba_api.stats.endpoints.playergamelog import PlayerGameLog
+from nba_api.stats.endpoints.teamgamelog import TeamGameLog
+from nba_api.stats.static import teams
 
 from utils.helper_functions import all_keys_to_lower
 from utils.validation import validate_team_ticker, validate_season_string
-
-from nba_api.stats.endpoints.teamgamelog import TeamGameLog
-from nba_api.stats.endpoints.playergamelog import PlayerGameLog
-from nba_api.stats.static import teams
-from nba_api.stats.endpoints.commonteamroster import CommonTeamRoster
 
 sys.path.append('..')
 
@@ -93,7 +92,6 @@ def get_last_games_at_home_away(match_log: list[dict[str, any]], last_x: int | N
     return match_log
 
 
-@functools.lru_cache
 def get_all_games_for_team_until_date_to(team_id: str, season: str, date_to: str) -> list[dict[str, any]]:
     """
     Retrieve all games for a team until a specified date.
@@ -134,18 +132,27 @@ def get_season_games_for_team_until_date_to(team_id: str, season: str, playoffs:
     else:
         season_type = 'Regular Season'
 
-    team_game_log = TeamGameLog(team_id=int(team_id),
-                                season=season,
-                                season_type_all_star=season_type,
-                                date_to_nullable=date_to,
-                                date_from_nullable=date_from
-                                ).get_normalized_dict()['TeamGameLog']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+
+        team_game_log = TeamGameLog(team_id=int(team_id),
+                                    season=season,
+                                    season_type_all_star=season_type,
+                                    date_to_nullable=date_to,
+                                    date_from_nullable=date_from,
+                                    proxy="http://proxy.riccardob.dev:8890"
+                                    ).get_normalized_dict()['TeamGameLog']
+    else:
+        team_game_log = TeamGameLog(team_id=int(team_id),
+                                    season=season,
+                                    season_type_all_star=season_type,
+                                    date_to_nullable=date_to,
+                                    date_from_nullable=date_from
+                                    ).get_normalized_dict()['TeamGameLog']
     time.sleep(0.3)
 
     return all_keys_to_lower(team_game_log)
 
 
-@functools.lru_cache
 def get_team_info_by_ticker(team_ticker: str) -> dict[str, str]:
     """
     Retrieve team information based on the team abbreviation.
@@ -161,7 +168,6 @@ def get_team_info_by_ticker(team_ticker: str) -> dict[str, str]:
     return res
 
 
-@functools.lru_cache
 def get_team_base_info_by_id(team_id: str) -> dict[str, str]:
     """
     Retrieve team information based on the team ID.
@@ -187,12 +193,16 @@ def get_players_by_team(team_ticker: str, season: str) -> list[dict[str, any]]:
     keys_of_interest = ['PLAYER_ID', 'PLAYER', 'NUM', 'POSITION', 'HEIGHT', 'WEIGHT', 'AGE', 'EXP']
 
     team_id = get_team_id_from_ticker(team_ticker)
-    players_data = CommonTeamRoster(team_id=team_id, season=season).get_normalized_dict()['CommonTeamRoster']
+
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        players_data = CommonTeamRoster(team_id=team_id, season=season, proxy="http://proxy.riccardob.dev:8890") \
+            .get_normalized_dict()['CommonTeamRoster']
+    else:
+        players_data = CommonTeamRoster(team_id=team_id, season=season).get_normalized_dict()['CommonTeamRoster']
 
     return all_keys_to_lower([{key: player[key] for key in keys_of_interest} for player in players_data])
 
 
-@functools.lru_cache
 def get_team_id_from_ticker(team_ticker: str) -> str:
     """
     Retrieve the team ID based on the team abbreviation.
@@ -219,14 +229,19 @@ def get_player_games_for_season_until_date_to(player_id: str, season: str, playo
     """
     validate_season_string(season)
 
-    player_game_log = PlayerGameLog(player_id=player_id, season=season,
-                                    season_type_all_star='Playoffs' if playoffs else 'Regular Season',
-                                    date_to_nullable=date_to).get_normalized_dict()['PlayerGameLog']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        player_game_log = PlayerGameLog(player_id=player_id, season=season,
+                                        season_type_all_star='Playoffs' if playoffs else 'Regular Season',
+                                        date_to_nullable=date_to, proxy="http://proxy.riccardob.dev:8890") \
+            .get_normalized_dict()['PlayerGameLog']
+    else:
+        player_game_log = PlayerGameLog(player_id=player_id, season=season,
+                                        season_type_all_star='Playoffs' if playoffs else 'Regular Season',
+                                        date_to_nullable=date_to).get_normalized_dict()['PlayerGameLog']
 
     return all_keys_to_lower(player_game_log)
 
 
-@functools.lru_cache
 def get_all_player_games_until_date_to(player_id: str, season: str, date_to: str) -> list[dict[str, any]]:
     """
     Retrieve all games for a player until a specified date.
@@ -286,12 +301,18 @@ def get_league_game_log_by_date(date_from: str, date_to: str) -> list[dict]:
 
     :return: A list of dictionaries containing the games played in the date range.
     """
-    league_game_log = LeagueGameLog(
-        date_from_nullable=date_from,
-        date_to_nullable=date_to
-        # headers={'User-Agent': next(user_agents_cycle)}
-    ).get_normalized_dict()[
-        'LeagueGameLog']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        league_game_log = LeagueGameLog(date_from_nullable=date_from,
+                                        date_to_nullable=date_to,
+                                        proxy="http://proxy.riccardob.dev:8890").get_normalized_dict()[
+            'LeagueGameLog']
+    else:
+        league_game_log = LeagueGameLog(
+            date_from_nullable=date_from,
+            date_to_nullable=date_to
+            # headers={'User-Agent': next(user_agents_cycle)}
+        ).get_normalized_dict()[
+            'LeagueGameLog']
 
     return all_keys_to_lower(league_game_log)
 
@@ -308,14 +329,24 @@ def get_direct_matchups(home_team_id: str, away_team_id: str, date_from: datetim
     :param date_from: The cutoff date from which games are considered (format: 'YYYY-MM-DD').
     :return: List of dictionaries containing direct matchups' statistics.
     """
-    league_game_log = LeagueGameFinder(player_or_team_abbreviation="T",
-                                       team_id_nullable=home_team_id,
-                                       vs_team_id_nullable=away_team_id,
-                                       date_from_nullable=date_from,
-                                       date_to_nullable=date_to
-                                       # headers={'User-Agent': next(user_agents_cycle)}
-                                       ).get_normalized_dict()[
-        'LeagueGameFinderResults']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        league_game_log = LeagueGameFinder(player_or_team_abbreviation="T",
+                                           team_id_nullable=home_team_id,
+                                           vs_team_id_nullable=away_team_id,
+                                           date_from_nullable=date_from,
+                                           date_to_nullable=date_to,
+                                           proxy="http://proxy.riccardob.dev:8890"
+                                           # headers={'User-Agent': next(user_agents_cycle)}
+                                           ).get_normalized_dict()[
+            'LeagueGameFinderResults']
+    else:
+        league_game_log = LeagueGameFinder(player_or_team_abbreviation="T",
+                                           team_id_nullable=home_team_id,
+                                           vs_team_id_nullable=away_team_id,
+                                           date_from_nullable=date_from,
+                                           date_to_nullable=date_to
+                                           # headers={'User-Agent': next(user_agents_cycle)}
+                                           ).get_normalized_dict()['LeagueGameFinderResults']
 
     return all_keys_to_lower(league_game_log)
 
@@ -328,10 +359,13 @@ def get_arena_by_team_id(team_id: str) -> str:
     :param team_id: The ID of the team.
     :return: The name of the arena where the team plays.
     """
-    team_details = TeamDetails(team_id=team_id
-                               # headers={'User-Agent': next(user_agents_cycle)}
-                               ).get_normalized_dict()[
-        'TeamBackground']
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        team_details = TeamDetails(team_id=team_id, proxy="http://proxy.riccardob.dev:8890") \
+            .get_normalized_dict()['TeamBackground']
+    else:
+        team_details = TeamDetails(team_id=team_id
+                                   # headers={'User-Agent': next(user_agents_cycle)}
+                                   ).get_normalized_dict()['TeamBackground']
 
     return team_details.__getitem__(0)["ARENA"]
 
@@ -360,11 +394,19 @@ def get_standing_by_date(date: str) -> dict[str, dict | list[dict]]:
     :param date: Date to be considered to evaluate the standing (format: 'YYYY-MM-DD')
     :return: Dictionary containing east and west conference standings
     """
-    res = ScoreboardV2(game_date=date,
-                       league_id="00",
-                       day_offset="0"
-                       # headers={'User-Agent': next(user_agents_cycle)}
-                       )
+    if (PRODUCTION := os.getenv('PRODUCTION')) is not None:
+        res = ScoreboardV2(game_date=date,
+                           league_id="00",
+                           day_offset="0",
+                           proxy="http://proxy.riccardob.dev:8890"
+                           # headers={'User-Agent': next(user_agents_cycle)}
+                           )
+    else:
+        res = ScoreboardV2(game_date=date,
+                           league_id="00",
+                           day_offset="0"
+                           # headers={'User-Agent': next(user_agents_cycle)}
+                           )
 
     return {"west": all_keys_to_lower(res.get_normalized_dict()['WestConfStandingsByDay']),
             "east": all_keys_to_lower(res.get_normalized_dict()['EastConfStandingsByDay'])}
