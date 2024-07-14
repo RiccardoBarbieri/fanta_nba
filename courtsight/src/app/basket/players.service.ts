@@ -5,7 +5,7 @@ import {PlayerStats} from "./stats";
   providedIn: 'root'
 })
 export class PlayersService {
-  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io/players";
+  nba_api_url = "/api/players";
 
   constructor() { }
 

@@ -140,10 +140,10 @@ export class TeamDetailsComponent implements OnInit {
   constructor(private titleService: Title) {
     this.titleService.setTitle('Team Details');
     const ticker = this.route.snapshot.params["ticker"];
-    this.team = mockTeam; // TODO debug
-    // this.teamsService.getTeamFromTicker(ticker, "2023-24").then((team: Team) => {
-    //   this.team = team;
-    // });
+    // this.team = mockTeam; // TODO debug
+    this.teamsService.getTeamFromTicker(ticker, "2023-24").then((team: Team) => {
+      this.team = team;
+    });
   }
 
   ngOnInit(): void {

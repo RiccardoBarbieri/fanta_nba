@@ -6,7 +6,7 @@ import {ActualAndLastMatchStats} from "./stats";
   providedIn: 'root'
 })
 export class MatchesService {
-  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io/";
+  nba_api_url = "/api/";
 
   constructor() {
   }
@@ -44,7 +44,7 @@ export class MatchesService {
     if (date_to) {
       params.append('date_to', date_to);
     }
-    const data = await fetch(this.nba_api_url + 'matches' + params.toString(), {
+    const data = await fetch(this.nba_api_url + 'matches?' + params.toString(), {
       headers: {
         "Content-Type": "application/json",
       }
@@ -53,7 +53,7 @@ export class MatchesService {
   }
 
   async getMatchStatsById(match_id: number, match_date: string): Promise<ActualAndLastMatchStats[]> {
-    const data = await fetch(this.nba_api_url + 'match/' + match_id + '/stats' + new URLSearchParams({
+    const data = await fetch(this.nba_api_url + 'match/' + match_id + '/stats?' + new URLSearchParams({
       match_date: match_date,
     }), {
       headers: {
