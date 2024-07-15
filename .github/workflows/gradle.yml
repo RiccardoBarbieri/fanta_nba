@@ -42,12 +42,10 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3.4.2
 
-    - name: Generate new distribution
-      run: ./bet_api/gradlew bootDistTar
-#      with:
-#        working-directory: bet_api
+#    - name: Generate new distribution
+#      run: ./gradlew bootDistTar
+#      working-directory: bet_api
 
     - name: Push image with gradle wrapper
-      run: ./bet_api/gradlew pushImage
-#      with:
-#        working-directory: bet_api
+      run: ./gradlew pushImage
+      working-directory: bet_api
