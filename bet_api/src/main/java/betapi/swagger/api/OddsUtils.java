@@ -31,6 +31,8 @@ public class OddsUtils {
         // Ordina i bookmakers per la squadra di casa
         List<Bookmaker> sortedByHomeTeam = oddsCopyForHomeTeam.getBookmakers().stream()
                 .sorted((b1, b2) -> {
+                    filterMarkets(b1);
+                    filterMarkets(b2);
                     Float price1 = getPriceForTeam(b1, odds.getHomeTeam());
                     Float price2 = getPriceForTeam(b2, odds.getHomeTeam());
                     return price2.compareTo(price1); // Ordine decrescente
@@ -40,6 +42,8 @@ public class OddsUtils {
         // Ordina i bookmakers per la squadra in trasferta
         List<Bookmaker> sortedByAwayTeam = oddsCopyForAwayTeam.getBookmakers().stream()
                 .sorted((b1, b2) -> {
+                    filterMarkets(b1);
+                    filterMarkets(b2);
                     Float price1 = getPriceForTeam(b1, odds.getAwayTeam());
                     Float price2 = getPriceForTeam(b2, odds.getAwayTeam());
                     return price2.compareTo(price1); // Ordine decrescente
@@ -52,6 +56,14 @@ public class OddsUtils {
 
         // Ritorna entrambe le copie
         return Arrays.asList(oddsCopyForHomeTeam, oddsCopyForAwayTeam);
+    }
+
+    private static void filterMarkets(Bookmaker bookmaker) {
+        bookmaker.setMarkets(
+                bookmaker.getMarkets().stream()
+                        .filter(market -> market.getKey() != null)
+                        .collect(Collectors.toList())
+        );
     }
 
     private static Float getPriceForTeam(Bookmaker bookmaker, String team) {

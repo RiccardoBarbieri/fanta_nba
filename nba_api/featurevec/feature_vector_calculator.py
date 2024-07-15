@@ -1,4 +1,5 @@
 import datetime
+import functools
 import os.path
 import pickle
 import sys
@@ -7,6 +8,7 @@ import traceback
 from pprint import pprint
 from typing import List, Dict, AnyStr, Any
 
+import numpy
 import pandas as pd
 
 sys.path.append('..')
@@ -134,6 +136,7 @@ def get_starting_dataset(seasons: List[str]):
     return team_season_by_game
 
 
+@functools.lru_cache
 def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_team_home: bool,
                        game_id: str, playoffs: bool) -> Dict[AnyStr, Any]:
     """
@@ -150,56 +153,56 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
 
     start_time = time.time()
     simple_season_stats = aggregate_simple_game_cume_stats(team_ticker, season, playoffs, game_id)
-    logger.debug(f'Aggregate simple game cume stats took {time.time() - start_time} seconds')
+    print(f'Aggregate simple game cume stats took {time.time() - start_time} seconds')
 
     start_time = time.time()
     # distance_travelled = get_distance_travelled(team_ticker, game_id, season, playoffs)
     longest_lineup = get_longest_lineup(team_ticker, opp_team_ticker, game_id, season, playoffs)
-    logger.debug(f'Get longest lineup took {time.time() - start_time} seconds')
+    print(f'Get longest lineup took {time.time() - start_time} seconds')
 
     start_time = time.time()
     off_def_rating = get_offdef_rating(team_ticker, season, game_id, playoffs)
-    logger.debug(f'Get offdef rating took {time.time() - start_time} seconds')
+    print(f'Get offdef rating took {time.time() - start_time} seconds')
 
     start_time = time.time()
     simple_season_stats_opp = aggregate_simple_game_cume_stats(opp_team_ticker, season, playoffs, game_id)
-    logger.debug(f'Aggregate simple game cume stats for opponent took {time.time() - start_time} seconds')
+    print(f'Aggregate simple game cume stats for opponent took {time.time() - start_time} seconds')
 
     start_time = time.time()
     # distance_travelled_opp = get_distance_travelled(opp_team_ticker, game_id, season, playoffs)
     longest_lineup_opp = get_longest_lineup(opp_team_ticker, team_ticker, game_id, season, playoffs)
-    logger.debug(f'Get longest lineup for opponent took {time.time() - start_time} seconds')
+    print(f'Get longest lineup for opponent took {time.time() - start_time} seconds')
 
     start_time = time.time()
     off_def_rating_opp = get_offdef_rating(opp_team_ticker, season, game_id, playoffs)
-    logger.debug(f'Get offdef rating for opponent took {time.time() - start_time} seconds')
+    print(f'Get offdef rating for opponent took {time.time() - start_time} seconds')
 
     start_time = time.time()
     lineup_efficiency = 0
     for lineup_player in longest_lineup['lineup']:
-        lineup_efficiency += get_player_efficiency(lineup_player['id'], team_ticker, game_id, season)
-    logger.debug(f'Get player efficiency for lineup took {time.time() - start_time} seconds')
+        lineup_efficiency += get_player_efficiency(lineup_player['id'], game_id, season)
+    print(f'Get player efficiency for lineup took {time.time() - start_time} seconds')
     lineup_efficiency /= len(longest_lineup['lineup'])
 
     # start_time = time.time()
     # bench_efficiency = 0
     # for bench_player in longest_lineup['bench']:
     #     bench_efficiency += get_player_efficiency(bench_player['id'], team_ticker, game_id, season)
-    # logger.debug(f'Get player efficiency for bench took {time.time() - start_time} seconds')
+    # print(f'Get player efficiency for bench took {time.time() - start_time} seconds')
     # bench_efficiency /= len(longest_lineup['bench'])
 
     start_time = time.time()
     lineup_efficiency_opp = 0
     for lineup_player in longest_lineup_opp['lineup']:
-        lineup_efficiency_opp += get_player_efficiency(lineup_player['id'], opp_team_ticker, game_id, season)
-    logger.debug(f'Get player efficiency for lineup opponent took {time.time() - start_time} seconds')
+        lineup_efficiency_opp += get_player_efficiency(lineup_player['id'], game_id, season)
+    print(f'Get player efficiency for lineup opponent took {time.time() - start_time} seconds')
     lineup_efficiency_opp /= len(longest_lineup_opp['lineup'])
 
     # start_time = time.time()
     # bench_efficiency_opp = 0
     # for bench_player in longest_lineup_opp['bench']:
     #     bench_efficiency_opp += get_player_efficiency(bench_player['id'], opp_team_ticker, game_id, season)
-    # logger.debug(f'Get player efficiency for bench opponent took {time.time() - start_time} seconds')
+    # print(f'Get player efficiency for bench opponent took {time.time() - start_time} seconds')
     # bench_efficiency_opp /= len(longest_lineup_opp['bench'])
 
     regseas_gamelog = get_league_game_log_for_season(season, playoffs=False)
@@ -210,9 +213,9 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
     gamelog.reset_index(drop=True, inplace=True)
 
     game_team = gamelog.loc[(gamelog['game_id'] == game_id) & (
-                gamelog['team_abbreviation'] == team_ticker)]
+            gamelog['team_abbreviation'] == team_ticker)]
     game_opponent = gamelog.loc[(gamelog['game_id'] == game_id) & (
-                gamelog['team_abbreviation'] == opp_team_ticker)]
+            gamelog['team_abbreviation'] == opp_team_ticker)]
 
     home_team_game = game_team if is_team_home else game_opponent
     away_team_game = game_team if not is_team_home else game_opponent
@@ -232,8 +235,8 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
         'away_team': opp_team_ticker if is_team_home else team_ticker,
         'game_id': game_id,
         'winner': 'home' if home_team_game['pts'].values[0] > away_team_game['pts'].values[0] else 'away',
-        'pts_H': home_team_game['pts'].values[0],
-        'pts_A': away_team_game['pts'].values[0],
+        'pts_H': int(home_team_game['pts'].values[0]),
+        'pts_A': int(away_team_game['pts'].values[0]),
     }
 
     simple_season_stats.pop('team_id')
@@ -259,7 +262,7 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
 
     referee = get_referee(game_id)
 
-    return {
+    final = {
         **simple_season_stats,
         **simple_season_stats_opp,
         **off_def_rating,
@@ -274,7 +277,18 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
         'referee_id': referee['id']
     }
 
+    # cast all numpy values like int64 to int and float64 to float
+    for key in final:
+        if isinstance(final[key], numpy.int64):
+            final[key] = int(final[key])
+        elif isinstance(final[key], numpy.float64):
+            final[key] = float(final[key])
 
+
+    return final
+
+
+@functools.lru_cache
 def is_team_home(team_ticker: str, game_id: str, season: str) -> bool:
     """
     Check if the team is the home team in a game.
@@ -291,6 +305,7 @@ def is_team_home(team_ticker: str, game_id: str, season: str) -> bool:
             return get_home_away_team(game['matchup'])['home_team'] == team_ticker
 
 
+@functools.lru_cache
 def get_game_id_and_season_type(team_ticker: str, season: str, date: str) -> Dict[str, Any]:
     """
     Get the game id of the game for the team.
@@ -316,21 +331,22 @@ def get_game_id_and_season_type(team_ticker: str, season: str, date: str) -> Dic
 
 import logging
 
-log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s] [%(name)s] %(message)s")
-root_logger = logging.getLogger()
+if __name__ == '__mDain__':
 
-fileHandler = logging.FileHandler(f"{LOG_FILE}")
-fileHandler.setFormatter(log_formatter)
-root_logger.addHandler(fileHandler)
+    log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s] [%(name)s] %(message)s")
+    root_logger = logging.getLogger()
+    #
+    fileHandler = logging.FileHandler(f"{LOG_FILE}")
+    fileHandler.setFormatter(log_formatter)
+    root_logger.addHandler(fileHandler)
+    #
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setFormatter(log_formatter)
+    root_logger.addHandler(consoleHandler)
 
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(log_formatter)
-root_logger.addHandler(consoleHandler)
+    logger = logging.getLogger(os.path.basename(__file__))
+    logger.setLevel(logging.DEBUG)
 
-logger = logging.getLogger(os.path.basename(__file__))
-logger.setLevel(logging.DEBUG)
-
-if __name__ == '__main__':
     seasons = ['2022-23', '2023-24']
     # seasons = ['2021-22', '2022-23', '2023-24']
     # seasons = ['2020-21', '2021-22', '2022-23', '2023-24']

@@ -209,7 +209,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlayerStats'
-
+  /feature_vector:
+    get:
+      summary: Retrieve feature vector 
+      operationId: feature_vector_get
+      parameters:
+        - name: team_ticker
+          in: query
+          description: Team ticker
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+          example: BOS
+        - name: opp_team_ticker
+          in: query
+          description: Opposite team ticker
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+          example: BOS
+        - name: season
+          in: query
+          description: "NBA season (e.g., 2023-24)"
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 2023-24
+        - name: date
+          in: query
+          description: Date of the match (format:'YYYY-MM-DD')
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 2024-04-14
+      responses:
+        "200":
+          description: Feature vector
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureVector'
+      x-openapi-router-controller: swagger_server.controllers.feature_vector_controller
 components:
   schemas:
     Team:
@@ -760,3 +808,182 @@ components:
         video_available:
           type: number
           example: 1
+    FeatureVector:
+      type: object
+      properties:
+        fg_pct_H:
+          type: number
+          format: float
+          description: Field goal percentage for the home team
+        fg3_pct_H:
+          type: number
+          format: float
+          description: Three-point field goal percentage for the home team
+        ft_pct_H:
+          type: number
+          format: float
+          description: Free throw percentage for the home team
+        reb_H:
+          type: integer
+          description: Total rebounds for the home team
+        tot_ast_H:
+          type: integer
+          description: Total assists for the home team
+        tot_tov_H:
+          type: integer
+          description: Total turnovers for the home team
+        tot_stl_H:
+          type: integer
+          description: Total steals for the home team
+        tot_blk_H:
+          type: integer
+          description: Total blocks for the home team
+        ts_pct_H:
+          type: number
+          format: float
+          description: True shooting percentage for the home team
+        w_pct_H:
+          type: number
+          format: float
+          description: Winning percentage for the home team
+        w_pct_last_5_games_H:
+          type: number
+          format: float
+          description: Winning percentage in the last 5 games for the home team
+        fg_pct_A:
+          type: number
+          format: float
+          description: Field goal percentage for the away team
+        fg3_pct_A:
+          type: number
+          format: float
+          description: Three-point field goal percentage for the away team
+        ft_pct_A:
+          type: number
+          format: float
+          description: Free throw percentage for the away team
+        reb_A:
+          type: integer
+          description: Total rebounds for the away team
+        tot_ast_A:
+          type: integer
+          description: Total assists for the away team
+        tot_tov_A:
+          type: integer
+          description: Total turnovers for the away team
+        tot_stl_A:
+          type: integer
+          description: Total steals for the away team
+        tot_blk_A:
+          type: integer
+          description: Total blocks for the away team
+        ts_pct_A:
+          type: number
+          format: float
+          description: True shooting percentage for the away team
+        w_pct_A:
+          type: number
+          format: float
+          description: Winning percentage for the away team
+        w_pct_last_5_games_A:
+          type: number
+          format: float
+          description: Winning percentage in the last 5 games for the away team
+        off_rating_H:
+          type: number
+          format: float
+          description: Offensive rating for the home team
+        def_rating_H:
+          type: number
+          format: float
+          description: Defensive rating for the home team
+        off_rating_A:
+          type: number
+          format: float
+          description: Offensive rating for the away team
+        def_rating_A:
+          type: number
+          format: float
+          description: Defensive rating for the away team
+        lineup_efficiency_H:
+          type: number
+          format: float
+          description: Lineup efficiency for the home team
+        lineup_efficiency_A:
+          type: number
+          format: float
+          description: Lineup efficiency for the away team
+        home_team:
+          type: string
+          description: Home team code
+        away_team:
+          type: string
+          description: Away team code
+        game_id:
+          type: string
+          description: Unique identifier for the game
+        winner:
+          type: string
+          description: Indicates which team won the game ('home' or 'away')
+        pts_H:
+          type: integer
+          description: Points scored by the home team
+        pts_A:
+          type: integer
+          description: Points scored by the away team
+        season:
+          type: string
+          description: Season year
+        date:
+          type: string
+          format: date
+          description: Date of the game
+        playoff:
+          type: boolean
+          description: Indicates if the game was a playoff game
+        referee_name:
+          type: string
+          description: Name of the referee
+        referee_id:
+          type: integer
+          description: Identifier of the referee
+      example:
+        fg_pct_H: 0.4762320104666376
+        fg3_pct_H: 0.3521515988945914
+        ft_pct_H: 0.7569339384770549
+        reb_H: 3426
+        tot_ast_H: 1996
+        tot_tov_H: 1119
+        tot_stl_H: 658
+        tot_blk_H: 418
+        ts_pct_H: 0.5769836109563027
+        w_pct_H: 0.568
+        w_pct_last_5_games_H: 0.4
+        fg_pct_A: 0.4883753306417931
+        fg3_pct_A: 0.37350565428109855
+        ft_pct_A: 0.7723283427981414
+        reb_A: 3588
+        tot_ast_A: 2160
+        tot_tov_A: 998
+        tot_stl_A: 548
+        tot_blk_A: 409
+        ts_pct_A: 0.6015969574177876
+        w_pct_A: 0.605
+        w_pct_last_5_games_A: 0.4
+        off_rating_H: 112.91448516579408
+        def_rating_H: 110.76233183856503
+        off_rating_A: 117.6130198915009
+        def_rating_A: 115.03496503496504
+        lineup_efficiency_H: 11.921331417624522
+        lineup_efficiency_A: 13.659979368814922
+        home_team: "ORL"
+        away_team: "MIL"
+        game_id: "0022301191"
+        winner: "home"
+        pts_H: 113
+        pts_A: 88
+        season: "2023-24"
+        date: "2024-04-14"
+        playoff: false
+        referee_name: "Brent Barnaky"
+        referee_id: 201638       

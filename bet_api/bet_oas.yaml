@@ -11,8 +11,6 @@ paths:
     get:
       summary: Get sports list
       description: Returns all available sports.
-      security:
-        - ApiKeyAuth: [ ]
       parameters:
         - in: query
           name: groupName
@@ -41,10 +39,6 @@ paths:
           description: There are no available sports.
         '400':
           description: Bad Request - The request parameters are invalid.
-        '401':
-          description: Unauthorized - API key is missing or invalid.
-        '403':
-          description: Forbidden - You do not have permission to access this resource.
         '500':
           description: Internal Server Error - An error occurred on the server.
 
@@ -52,8 +46,6 @@ paths:
     get:
       summary: Get sport groups
       description: Returns all available sport groups.
-      security:
-        - ApiKeyAuth: [ ]
       parameters:
         - in: query
           name: all
@@ -76,10 +68,6 @@ paths:
           description: There are no available groups.
         '400':
           description: Bad Request - The request parameters are invalid.
-        '401':
-          description: Unauthorized - API key is missing or invalid.
-        '403':
-          description: Forbidden - You do not have permission to access this resource.
         '500':
           description: Internal Server Error - An error occurred on the server.
   /sports/getEvents:
@@ -108,8 +96,6 @@ paths:
             type: string
             example: "2023-09-10T23:59:59Z"
           description: Filter to show games that commence on and before this parameter
-      security:
-        - ApiKeyAuth: [ ]
       responses:
         '200':
           description: List of all available events
@@ -123,10 +109,6 @@ paths:
           description: There are no available events.
         '400':
           description: Bad Request - The request parameters are invalid.
-        '401':
-          description: Unauthorized - API key is missing or invalid.
-        '403':
-          description: Forbidden - You do not have permission to access this resource.
         '500':
           description: Internal Server Error - An error occurred on the server.
 
@@ -154,19 +136,9 @@ paths:
           required: false
           schema:
             type: string
-            default: "eu,uk"
+            default: "eu"
             example: "eu"
-          description: Comma-separated list of regions to get odds for (e.g., "us,uk,eu")
-        - in: query
-          name: records
-          required: false
-          schema:
-            type: number
-            default: 1
-            example: 3
-          description: Number of records to retrieve
-      security:
-        - ApiKeyAuth: [ ]
+          description: Region to get odds for ("eu, uk, us, us2, au")
       responses:
         '200':
           description: List of the top 'X' head-to-head odds
@@ -180,13 +152,9 @@ paths:
           description: There are no available odds.
         '400':
           description: Bad Request - The request parameters are invalid.
-        '401':
-          description: Unauthorized - API key is missing or invalid.
-        '403':
-          description: Forbidden - You do not have permission to access this resource.
         '500':
           description: Internal Server Error - An error occurred on the server.
-  
+
   /odds/spreads:
     get:
       summary: Get head-to-head handicap odds
@@ -211,19 +179,9 @@ paths:
           required: false
           schema:
             type: string
-            default: "eu,uk"
+            default: "eu"
             example: "eu"
-          description: Comma-separated list of regions to get odds for (e.g., "us,uk,eu")
-        - in: query
-          name: records
-          required: false
-          schema:
-            type: number
-            default: 1
-            example: 3
-          description: Number of records to retrieve
-      security:
-        - ApiKeyAuth: [ ]
+          description: Region to get odds for ("eu, uk, us, us2, au")
       responses:
         '200':
           description: List of the top 'X' head-to-head handicap odds
@@ -237,10 +195,6 @@ paths:
           description: There are no available odds.
         '400':
           description: Bad Request - The request parameters are invalid.
-        '401':
-          description: Unauthorized - API key is missing or invalid.
-        '403':
-          description: Forbidden - You do not have permission to access this resource.
         '500':
           description: Internal Server Error - An error occurred on the server.
 
@@ -276,7 +230,7 @@ components:
           description: The away team. If home/away is not applicable for the sport (such as MMA and Tennis), it will be one of the participants. Null for outrights (futures) events.
           example: Kansas City Chiefs
           nullable: true
-    
+
     Sport:
       type: object
       properties:
@@ -383,12 +337,3 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Bookmaker'
-
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-API-Key
-
-security:
-  - ApiKeyAuth: [ ]
