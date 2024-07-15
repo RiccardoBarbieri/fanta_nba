@@ -10,6 +10,7 @@ import {MatchListComponent} from "../match-list/match-list.component";
 import {Match} from "../match";
 import {MatchesService} from "../matches.service";
 import {getFormattedDate} from "../../shared/utils";
+import {ScrollPanelModule} from "primeng/scrollpanel";
 
 @Component({
   selector: 'app-team-details',
@@ -18,7 +19,8 @@ import {getFormattedDate} from "../../shared/utils";
     CardModule,
     CarouselModule,
     DataViewModule,
-    MatchListComponent
+    MatchListComponent,
+    ScrollPanelModule
   ],
   templateUrl: './team-details.component.html',
   styleUrl: './team-details.component.css'
@@ -29,7 +31,7 @@ export class TeamDetailsComponent implements OnInit {
   matchesService = inject(MatchesService);
   team: Team | undefined;
   matches: Match[] = [] ;
-  today: Date = new Date("2023-10-14");
+  today: Date = new Date("2023-11-05");
   next_week: Date = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()+7);
 
   responsiveOptions: any[] | undefined;
@@ -50,17 +52,17 @@ export class TeamDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.responsiveOptions = [
       {
-        breakpoint: '1199px',
-        numVisible: 5,
-        numScroll: 1
+        breakpoint: '1500px',
+        numVisible: 4,
+        numScroll: 4
       },
       {
-        breakpoint: '991px',
+        breakpoint: '1000px',
         numVisible: 3,
-        numScroll: 1
+        numScroll: 3
       },
       {
-        breakpoint: '767px',
+        breakpoint: '500px',
         numVisible: 1,
         numScroll: 1
       }

@@ -28,26 +28,29 @@ import {MeterGroupModule, MeterItem} from "primeng/metergroup";
 export class MatchDetailsComponent {
   route: ActivatedRoute = inject(ActivatedRoute);
   matchesService = inject(MatchesService);
-  match: Match | undefined;
+
   matchStats: MatchStats | undefined;
   meterValue: MeterItem[] | undefined;
 
   constructor() {
     const match_id = this.route.snapshot.params["id"];
+    const match_date = this.route.snapshot.params["date"];
 
-    // this.matchesService.getMatchStatsById(match_id)
+    this.matchesService.getMatchStatsById(match_id, match_date).then((matches: ActualAndLastMatchStats[]) => {
+      if (matches.length > 0) {
+        this.matchStats = matches[0].actual_match_stats
 
-    this.match = mockMatch; // TODO debug
-    this.matchStats = mochMatchStats.actual_match_stats;
+        let homePts = this.matchStats.by_home_stats.pts;
+        let awayPts = this.matchStats.by_away_stats.pts;
+        let total = homePts + awayPts;
 
-    let homePts = this.matchStats.by_home_stats.pts;
-    let awayPts = this.matchStats.by_away_stats.pts;
-    let total = homePts + awayPts;
-
-    this.meterValue = [
-      { label: '', value: homePts / total * 100, color: '#52c35b' },
-      { label: '', value: awayPts / total * 100, color: '#e67229' },
-    ]
+        this.meterValue = [
+          {label: '', value: homePts / total * 100, color: '#52c35b'},
+          {label: '', value: awayPts / total * 100, color: '#e67229'},
+        ]
+      }
+    });
+    // this.matchStats = mochMatchStats.actual_match_stats;
   }
 }
 
@@ -162,77 +165,77 @@ const mochMatchStats: ActualAndLastMatchStats = {
       }
     },
   last_match_stats: {
-      global_stats: {
-          game_id: "0022301198",
-          game_date: "2024-04-14",
-          match_up: "GSW vs. UTA",
-          winner: "GSW",
-          home_point: 123,
-          away_point: 116
-        },
-      by_home_stats:
-        {
-          season_id: "22023",
-          team_id: 1610612738,
-          team_abbreviation: "BOS",
-          team_name: "Boston Celtics",
-          game_id: "0022001074",
-          game_date: "2024-01-23",
-          match_up: "BOS vs. LAL",
-          wl: "W",
-          min: 240,
-          fgm: 40,
-          fga: 85,
-          fg_pct: 47.1,
-          fg3m: 12,
-          fg3a: 32,
-          fg3_pct: 37.5,
-          ftm: 18,
-          fta: 22,
-          ft_pct: 81.8,
-          oreb: 10,
-          dreb: 35,
-          reb: 45,
-          ast: 25,
-          stl: 8,
-          blk: 5,
-          tov: 13,
-          pf: 20,
-          pts: 110,
-          plus_minus: -6,
-          video_available: 1
-        },
-      by_away_stats:
-        {
-          season_id: "22023",
-          team_id: 1610612738,
-          team_abbreviation: "BOS",
-          team_name: "Boston Celtics",
-          game_id: "0022001074",
-          game_date: "2024-01-23",
-          match_up: "BOS vs. LAL",
-          wl: "W",
-          min: 240,
-          fgm: 40,
-          fga: 85,
-          fg_pct: 47.1,
-          fg3m: 12,
-          fg3a: 32,
-          fg3_pct: 37.5,
-          ftm: 18,
-          fta: 22,
-          ft_pct: 81.8,
-          oreb: 10,
-          dreb: 35,
-          reb: 45,
-          ast: 25,
-          stl: 8,
-          blk: 5,
-          tov: 13,
-          pf: 20,
-          pts: 110,
-          plus_minus: -6,
-          video_available: 1
-        }
-    }
+    global_stats: {
+      game_id: "0022301198",
+      game_date: "2024-04-14",
+      match_up: "GSW vs. UTA",
+      winner: "GSW",
+      home_point: 123,
+      away_point: 116
+    },
+    by_home_stats:
+      {
+        season_id: "22023",
+        team_id: 1610612738,
+        team_abbreviation: "BOS",
+        team_name: "Boston Celtics",
+        game_id: "0022001074",
+        game_date: "2024-01-23",
+        match_up: "BOS vs. LAL",
+        wl: "W",
+        min: 240,
+        fgm: 40,
+        fga: 85,
+        fg_pct: 47.1,
+        fg3m: 12,
+        fg3a: 32,
+        fg3_pct: 37.5,
+        ftm: 18,
+        fta: 22,
+        ft_pct: 81.8,
+        oreb: 10,
+        dreb: 35,
+        reb: 45,
+        ast: 25,
+        stl: 8,
+        blk: 5,
+        tov: 13,
+        pf: 20,
+        pts: 110,
+        plus_minus: -6,
+        video_available: 1
+      },
+    by_away_stats:
+      {
+        season_id: "22023",
+        team_id: 1610612738,
+        team_abbreviation: "BOS",
+        team_name: "Boston Celtics",
+        game_id: "0022001074",
+        game_date: "2024-01-23",
+        match_up: "BOS vs. LAL",
+        wl: "W",
+        min: 240,
+        fgm: 40,
+        fga: 85,
+        fg_pct: 47.1,
+        fg3m: 12,
+        fg3a: 32,
+        fg3_pct: 37.5,
+        ftm: 18,
+        fta: 22,
+        ft_pct: 81.8,
+        oreb: 10,
+        dreb: 35,
+        reb: 45,
+        ast: 25,
+        stl: 8,
+        blk: 5,
+        tov: 13,
+        pf: 20,
+        pts: 110,
+        plus_minus: -6,
+        video_available: 1
+      }
+  }
 }

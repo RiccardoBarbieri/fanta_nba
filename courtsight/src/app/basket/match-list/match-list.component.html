@@ -1,7 +1,7 @@
-<p-dataView [value]="matches" layout="grid">
-  <ng-template pTemplate="grid">
+<p-dataView [value]="matches" layout="list" [rows]="6" [paginator]="true">
+  <ng-template pTemplate="list" let-matches>
     <div class="grid">
-      <div class="col-12 sm:col-12 md:col-6 xl:col-4" *ngFor="let match of matches">
+      <div class="col-12 sm:col-12 md:col-6 lg:col-4" *ngFor="let match of matches">
         <app-match [match]="match"></app-match>
       </div>
     </div>

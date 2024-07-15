@@ -34,7 +34,7 @@ import {getFormattedDate} from "../../shared/utils";
 export class HomeComponent {
   matchesService = inject(MatchesService);
 
-  today = new Date("2023-11-15");
+  today = new Date("2023-11-05");
   next_week: Date = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()+7);
   matches!: Match[];
 

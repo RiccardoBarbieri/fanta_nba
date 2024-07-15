@@ -16,7 +16,7 @@ export const routes: Routes = [
     title: "Basketball",
   },
   {
-    path: 'basket/match/:id',
+    path: 'basket/match/:id/:date',
     component: MatchDetailsComponent,
   },
   {

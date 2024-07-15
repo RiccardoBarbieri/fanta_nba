@@ -1,14 +1,14 @@
 <div class="flex flex-column m-6 gap-2">
-  <p-fieldset legend="{{match!.date | date: 'fullDate' }}">
+  <p-fieldset legend="{{matchStats?.global_stats!.game_date | date: 'fullDate' }}">
     <div class="grid">
       <div class="col">
         <div class="flex flex-column align-items-end justify-content-end align-self-center">
-          <span class="font-medium text-secondary text-lg">{{ match!.home_team.abbreviation }}</span>
+          <span class="font-medium text-secondary text-lg">{{ matchStats?.by_home_stats!.team_abbreviation }}</span>
           <a class="text-4xl font-medium text-900 text-green-500 text-right mt-1 no-underline"
-             routerLink="basket/team/{{ match!.home_team.abbreviation }}">
-            {{ match!.home_team.full_name }}
+             routerLink="basket/team/{{ matchStats?.by_home_stats!.team_abbreviation }}">
+            {{ matchStats?.by_home_stats!.team_name }}
           </a>
-          <div class="text-7xl">{{ matchStats?.by_home_stats?.pts }}</div>
+          <div class="text-7xl">{{ matchStats?.by_home_stats!.pts }}</div>
         </div>
       </div>
       <div class="col-2 align-self-center px-3">
@@ -16,12 +16,12 @@
       </div>
       <div class="col">
         <div class="flex flex-column align-items-start justify-content-start align-self-center">
-          <span class="font-medium text-secondary text-lg">{{ match!.away_team.abbreviation }}</span>
+          <span class="font-medium text-secondary text-lg">{{ matchStats?.by_away_stats!.team_abbreviation }}</span>
           <a class="text-4xl font-medium text-900 text-orange-500 text-left mt-1 no-underline"
-             routerLink="basket/team/{{ match!.away_team.abbreviation }}">
-            {{ match!.away_team.full_name }}
+             routerLink="basket/team/{{ matchStats?.by_away_stats!.team_abbreviation }}">
+            {{ matchStats?.by_away_stats!.team_name }}
           </a>
-          <div class="text-7xl">{{ matchStats?.by_away_stats?.pts }}</div>
+          <div class="text-7xl">{{ matchStats?.by_away_stats!.pts }}</div>
         </div>
       </div>
     </div>
