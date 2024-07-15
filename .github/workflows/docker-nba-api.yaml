@@ -43,7 +43,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./nba_api
-          file: ./deployment/Dockerfile
+          file: ./nba_api/deployment/Dockerfile
           tags: |
             ${{ secrets.ACR_SERVER }}/${{ steps.repository.outputs.content }}/nba_api:${{ steps.version.outputs.content }}
             ${{ secrets.ACR_SERVER }}/${{ steps.repository.outputs.content }}/nba_api:latest
