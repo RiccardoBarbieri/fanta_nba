@@ -1,4 +1,5 @@
 import datetime
+import functools
 import os.path
 import pickle
 import sys
@@ -7,6 +8,7 @@ import traceback
 from pprint import pprint
 from typing import List, Dict, AnyStr, Any
 
+import numpy
 import pandas as pd
 
 sys.path.append('..')
@@ -134,6 +136,7 @@ def get_starting_dataset(seasons: List[str]):
     return team_season_by_game
 
 
+@functools.lru_cache
 def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_team_home: bool,
                        game_id: str, playoffs: bool) -> Dict[AnyStr, Any]:
     """
@@ -232,8 +235,8 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
         'away_team': opp_team_ticker if is_team_home else team_ticker,
         'game_id': game_id,
         'winner': 'home' if home_team_game['pts'].values[0] > away_team_game['pts'].values[0] else 'away',
-        'pts_H': home_team_game['pts'].values[0],
-        'pts_A': away_team_game['pts'].values[0],
+        'pts_H': int(home_team_game['pts'].values[0]),
+        'pts_A': int(away_team_game['pts'].values[0]),
     }
 
     simple_season_stats.pop('team_id')
@@ -259,7 +262,7 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
 
     referee = get_referee(game_id)
 
-    return {
+    final = {
         **simple_season_stats,
         **simple_season_stats_opp,
         **off_def_rating,
@@ -274,7 +277,18 @@ def get_feature_vector(season: str, team_ticker: str, opp_team_ticker: str, is_t
         'referee_id': referee['id']
     }
 
+    # cast all numpy values like int64 to int and float64 to float
+    for key in final:
+        if isinstance(final[key], numpy.int64):
+            final[key] = int(final[key])
+        elif isinstance(final[key], numpy.float64):
+            final[key] = float(final[key])
 
+
+    return final
+
+
+@functools.lru_cache
 def is_team_home(team_ticker: str, game_id: str, season: str) -> bool:
     """
     Check if the team is the home team in a game.
@@ -291,6 +305,7 @@ def is_team_home(team_ticker: str, game_id: str, season: str) -> bool:
             return get_home_away_team(game['matchup'])['home_team'] == team_ticker
 
 
+@functools.lru_cache
 def get_game_id_and_season_type(team_ticker: str, season: str, date: str) -> Dict[str, Any]:
     """
     Get the game id of the game for the team.
