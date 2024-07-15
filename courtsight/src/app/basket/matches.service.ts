@@ -6,7 +6,7 @@ import {ActualAndLastMatchStats} from "./stats";
   providedIn: 'root'
 })
 export class MatchesService {
-  nba_api_url = "/api/";
+  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io/";
 
   constructor() {
   }
@@ -46,7 +46,7 @@ export class MatchesService {
     }
     const data = await fetch(this.nba_api_url + 'matches?' + params.toString(), {
       headers: {
-        "Content-Type": "application/json",
+        "Accept": "application/json",
       }
     });
     return await data.json() ?? [];
@@ -57,7 +57,7 @@ export class MatchesService {
       match_date: match_date,
     }), {
       headers: {
-        "Content-Type": "application/json",
+        "Accept": "application/json",
       }
     });
     return await data.json() ?? {};

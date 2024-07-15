@@ -27,13 +27,16 @@ import {MeterGroupModule, MeterItem} from "primeng/metergroup";
 })
 export class MatchDetailsComponent {
   route: ActivatedRoute = inject(ActivatedRoute);
-  teamsService = inject(MatchesService);
+  matchesService = inject(MatchesService);
   match: Match | undefined;
   matchStats: MatchStats | undefined;
   meterValue: MeterItem[] | undefined;
 
   constructor() {
     const match_id = this.route.snapshot.params["id"];
+
+    // this.matchesService.getMatchStatsById(match_id)
+
     this.match = mockMatch; // TODO debug
     this.matchStats = mochMatchStats.actual_match_stats;
 

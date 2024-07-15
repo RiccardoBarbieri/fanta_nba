@@ -5,7 +5,7 @@ import {PlayerStats} from "./stats";
   providedIn: 'root'
 })
 export class PlayersService {
-  nba_api_url = "/api/players";
+  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io/players";
 
   constructor() { }
 
@@ -26,7 +26,7 @@ export class PlayersService {
 
     const data = await fetch(`${this.nba_api_url}/${player_id}/stats` + params.toString(), {
       headers: {
-        "Content-Type": "application/json",
+        "Accept": "application/json",
       }
     });
     return await data.json() ?? {};

@@ -6,7 +6,7 @@ import {TeamStats} from "./stats";
   providedIn: 'root'
 })
 export class TeamsService {
-  nba_api_url = "/api/teams";
+  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io/teams";
 
   constructor() {
   }

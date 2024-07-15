@@ -20,7 +20,7 @@
       <div class="flex flex-1 flex-column align-items-end justify-content-end align-self-center">
         <span class="font-medium text-secondary text-sm">{{ match.home_team.abbreviation }}</span>
         <a class="text-lg font-medium text-900 text-green-500 text-right mt-1 no-underline"
-           routerLink="./team/{{ match.home_team.abbreviation }}">
+           routerLink="basket/team/{{ match.home_team.abbreviation }}">
           {{ match.home_team.full_name }}
         </a>
       </div>
@@ -30,7 +30,7 @@
       <div class="flex flex-1 flex-column align-items-start justify-content-start align-self-center">
         <span class="font-medium text-secondary text-sm">{{ match.away_team.abbreviation }}</span>
         <a class="text-lg font-medium text-900 text-orange-500 text-left mt-1 no-underline"
-           routerLink="./team/{{ match.home_team.abbreviation }}">
+           routerLink="basket/team/{{ match.home_team.abbreviation }}">
           {{ match.away_team.full_name }}
         </a>
       </div>
@@ -38,7 +38,7 @@
     <div class="flex align-self-end mt-3">
       <p-button icon="pi pi-arrow-right" iconPos="right" [text]="true" [raised]="true"
                 class="flex-auto md:flex-initial white-space-nowrap" label="See details"
-                routerLink="./match/{{match.game_id}}"/>
+                routerLink="basket/match/{{match.game_id}}"/>
     </div>
   </div>
 </div>

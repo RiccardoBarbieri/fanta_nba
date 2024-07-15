@@ -8,6 +8,8 @@ import {CarouselModule} from "primeng/carousel";
 import {DataViewModule} from "primeng/dataview";
 import {MatchListComponent} from "../match-list/match-list.component";
 import {Match} from "../match";
+import {MatchesService} from "../matches.service";
+import {getFormattedDate} from "../../shared/utils";
 
 @Component({
   selector: 'app-team-details',
@@ -24,115 +26,10 @@ import {Match} from "../match";
 export class TeamDetailsComponent implements OnInit {
   route: ActivatedRoute = inject(ActivatedRoute);
   teamsService = inject(TeamsService);
+  matchesService = inject(MatchesService);
   team: Team | undefined;
-  matches: Match[] = [
-    {
-      "game_id": 12345,
-      "match_up": "BKN - WAS",
-      "date": "JUL 12, 2024",
-      "home_team": {
-        "id": 1610612767,
-        "full_name": "Washington Wizards",
-        "abbreviation": "WAS",
-        "nickname": "Wizards",
-        "city": "Washington",
-        "state": "DC",
-        "year_founded": 1939,
-        "arena": "Nome a caso Arena"
-      },
-      "away_team": {
-        "id": 1610612738,
-        "full_name": "Boston Celtics",
-        "abbreviation": "BOS",
-        "nickname": "Celtics",
-        "city": "Boston",
-        "state": "MA",
-        "year_founded": 1946,
-        "arena": "Nome a caso Arena"
-      },
-      "referee": {
-        "name": "Sean Corbin",
-        "id": 1151
-      },
-      "arena": {
-        "name": "Capital One Arena",
-        "city": "Washington",
-        "state": "DC",
-        "country": "US"
-      }
-    },
-    {
-      "game_id": 12345,
-      "match_up": "BKN - WAS",
-      "date": "JUL 13, 2024",
-      "home_team": {
-        "id": 1610612767,
-        "full_name": "Washington Wizards",
-        "abbreviation": "WAS",
-        "nickname": "Wizards",
-        "city": "Washington",
-        "state": "DC",
-        "year_founded": 1939,
-        "arena": "Nome a caso Arena"
-      },
-      "away_team": {
-        "id": 1610612738,
-        "full_name": "Boston Celtics",
-        "abbreviation": "BOS",
-        "nickname": "Celtics",
-        "city": "Boston",
-        "state": "MA",
-        "year_founded": 1946,
-        "arena": "Nome a caso Arena"
-      },
-      "referee": {
-        "name": "Sean Corbin",
-        "id": 1151
-      },
-      "arena": {
-        "name": "Capital One Arena",
-        "city": "Washington",
-        "state": "DC",
-        "country": "US"
-      }
-    },
-    {
-      "game_id": 12345,
-      "match_up": "BKN - WAS",
-      "date": "JUL 14, 2024",
-      "home_team": {
-        "id": 1610612767,
-        "full_name": "Washington Wizards",
-        "abbreviation": "WAS",
-        "nickname": "Wizards",
-        "city": "Washington",
-        "state": "DC",
-        "year_founded": 1939,
-        "arena": "Nome a caso Arena"
-      },
-      "away_team": {
-        "id": 1610612738,
-        "full_name": "Boston Celtics",
-        "abbreviation": "BOS",
-        "nickname": "Celtics",
-        "city": "Boston",
-        "state": "MA",
-        "year_founded": 1946,
-        "arena": "Nome a caso Arena"
-      },
-      "referee": {
-        "name": "Sean Corbin",
-        "id": 1151
-      },
-      "arena": {
-        "name": "Capital One Arena",
-        "city": "Washington",
-        "state": "DC",
-        "country": "US"
-      }
-    }
-  ];
-  today = new Date();
+  matches: Match[] = [] ;
+  today: Date = new Date("2023-10-14");
   next_week: Date = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()+7);
 
   responsiveOptions: any[] | undefined;
@@ -141,8 +38,12 @@ export class TeamDetailsComponent implements OnInit {
     this.titleService.setTitle('Team Details');
     const ticker = this.route.snapshot.params["ticker"];
     // this.team = mockTeam; // TODO debug
+    // this.matches = mockMatches;
     this.teamsService.getTeamFromTicker(ticker, "2023-24").then((team: Team) => {
       this.team = team;
+      this.matchesService.getMatchesByDate(getFormattedDate(this.today),getFormattedDate(this.next_week)).then((matches: Match[]) => {
+        this.matches = matches.filter((match: Match) => {return match.home_team.id === team.team_info.id || match.away_team.id === team.team_info.id});
+      })
     });
   }
 
@@ -244,3 +145,111 @@ const mockTeam: Team = {
 
   ]
 }
+
+const mockMatches: Match[] = [
+  {
+    "game_id": 12345,
+    "match_up": "BKN - WAS",
+    "date": "JUL 12, 2024",
+    "home_team": {
+      "id": 1610612767,
+      "full_name": "Washington Wizards",
+      "abbreviation": "WAS",
+      "nickname": "Wizards",
+      "city": "Washington",
+      "state": "DC",
+      "year_founded": 1939,
+      "arena": "Nome a caso Arena"
+    },
+    "away_team": {
+      "id": 1610612738,
+      "full_name": "Boston Celtics",
+      "abbreviation": "BOS",
+      "nickname": "Celtics",
+      "city": "Boston",
+      "state": "MA",
+      "year_founded": 1946,
+      "arena": "Nome a caso Arena"
+    },
+    "referee": {
+      "name": "Sean Corbin",
+      "id": 1151
+    },
+    "arena": {
+      "name": "Capital One Arena",
+      "city": "Washington",
+      "state": "DC",
+      "country": "US"
+    }
+  },
+  {
+    "game_id": 12345,
+    "match_up": "BKN - WAS",
+    "date": "JUL 13, 2024",
+    "home_team": {
+      "id": 1610612767,
+      "full_name": "Washington Wizards",
+      "abbreviation": "WAS",
+      "nickname": "Wizards",
+      "city": "Washington",
+      "state": "DC",
+      "year_founded": 1939,
+      "arena": "Nome a caso Arena"
+    },
+    "away_team": {
+      "id": 1610612738,
+      "full_name": "Boston Celtics",
+      "abbreviation": "BOS",
+      "nickname": "Celtics",
+      "city": "Boston",
+      "state": "MA",
+      "year_founded": 1946,
+      "arena": "Nome a caso Arena"
+    },
+    "referee": {
+      "name": "Sean Corbin",
+      "id": 1151
+    },
+    "arena": {
+      "name": "Capital One Arena",
+      "city": "Washington",
+      "state": "DC",
+      "country": "US"
+    }
+  },
+  {
+    "game_id": 12345,
+    "match_up": "BKN - WAS",
+    "date": "JUL 14, 2024",
+    "home_team": {
+      "id": 1610612767,
+      "full_name": "Washington Wizards",
+      "abbreviation": "WAS",
+      "nickname": "Wizards",
+      "city": "Washington",
+      "state": "DC",
+      "year_founded": 1939,
+      "arena": "Nome a caso Arena"
+    },
+    "away_team": {
+      "id": 1610612738,
+      "full_name": "Boston Celtics",
+      "abbreviation": "BOS",
+      "nickname": "Celtics",
+      "city": "Boston",
+      "state": "MA",
+      "year_founded": 1946,
+      "arena": "Nome a caso Arena"
+    },
+    "referee": {
+      "name": "Sean Corbin",
+      "id": 1151
+    },
+    "arena": {
+      "name": "Capital One Arena",
+      "city": "Washington",
+      "state": "DC",
+      "country": "US"
+    }
+  }
+];

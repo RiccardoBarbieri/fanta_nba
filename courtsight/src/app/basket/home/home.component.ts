@@ -10,6 +10,7 @@ import {RouterLink} from "@angular/router";
 import {Button} from "primeng/button";
 import {MatchListComponent} from "../match-list/match-list.component";
 import {MatchesService} from "../matches.service";
+import {getFormattedDate} from "../../shared/utils";
 
 
 @Component({
@@ -33,13 +34,13 @@ import {MatchesService} from "../matches.service";
 export class HomeComponent {
   matchesService = inject(MatchesService);
 
-  today = new Date();
+  today = new Date("2023-11-15");
   next_week: Date = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()+7);
   matches!: Match[];
 
   constructor() {
-    this.matchesService.getMatchesByDate(this.today.toISOString().split('T')[0],
-      this.today.toISOString().split('T')[0]).then((matches: Match[]) => {
+    this.matchesService.getMatchesByDate(getFormattedDate(this.today),
+      getFormattedDate(this.next_week)).then((matches: Match[]) => {
         this.matches = matches;
     })
   }
