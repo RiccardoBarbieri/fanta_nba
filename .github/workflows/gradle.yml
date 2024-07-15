@@ -44,10 +44,10 @@ jobs:
 
     - name: Generate new distribution
       run: ./gradlew bootDistTar
-      with:
-        working-directory: bet_api
+#      with:
+#        working-directory: bet_api
 
     - name: Push image with gradle wrapper
       run: ./gradlew pushImage
-      with:
-        working-directory: bet_api
+#      with:
+#        working-directory: bet_api
