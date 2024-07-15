@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import joblib  # Libreria per salvare e caricare il modello
 import matplotlib.pyplot as plt
@@ -36,6 +37,10 @@ preprocessor = ColumnTransformer(
 # Applicazione del preprocessing ai dati
 features_preprocessed = preprocessor.fit_transform(features)
 
+X_train_not_preprocessed, X_test_not_preprocessed, y_train, y_test = train_test_split(
+    features, target, test_size=0.2, random_state=42
+)
+
 # Divisione del dataset in training set (80%) e test set (20%)
 X_train, X_test, y_train, y_test, train_game_ids, test_game_ids = train_test_split(
     features_preprocessed, target, game_ids, test_size=0.2, random_state=42
@@ -51,9 +56,22 @@ linear_regressor.fit(X_train, y_train)
 joblib.dump(linear_regressor, 'linear_regression_model.joblib')
 joblib.dump(preprocessor, 'preprocessor_linear.joblib')
 
+model_with_preprocessor = make_pipeline(preprocessor, linear_regressor)
+joblib.dump(model_with_preprocessor, 'model_with_preprocessor.joblib')
+
 # Predizione sui dati di test
 y_pred = linear_regressor.predict(X_test)
 
+y_pred_comb = model_with_preprocessor.predict(X_test_not_preprocessed)
+
+with pd.option_context('display.max_rows', 10, 'display.max_columns', None, 'display.width', None):
+    df_pred = pd.DataFrame({'game_id': test_game_ids, 'predicted_point_diff': y_pred, 'actual_point_diff': y_test})
+    print(df_pred)
+    df_pred_comb = pd.DataFrame({'game_id': test_game_ids, 'predicted_point_diff': y_pred_comb, 'actual_point_diff': y_test})
+    print(df_pred_comb)
+
+
+exit()
 # Valutazione del modello
 mae = mean_absolute_error(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
