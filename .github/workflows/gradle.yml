@@ -43,11 +43,11 @@ jobs:
       uses: gradle/actions/setup-gradle@v3.4.2
 
     - name: Generate new distribution
-      run: ./gradlew bootDistTar
+      run: ./bet_api/gradlew bootDistTar
 #      with:
 #        working-directory: bet_api
 
     - name: Push image with gradle wrapper
-      run: ./gradlew pushImage
+      run: ./bet_api/gradlew pushImage
 #      with:
 #        working-directory: bet_api
