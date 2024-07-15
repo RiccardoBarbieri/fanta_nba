@@ -14,5 +14,5 @@ sed -e "s|<port>|$PORT|g" deployment/Dockerfile.template > deployment/Dockerfile
 
 echo "Dockerfile updated"
 
-docker build -t "$REGISTRY"/nba_api:"$VERSION" -f deployment/Dockerfile .
-docker tag "$REGISTRY"/nba_api:"$VERSION" "$REGISTRY"/nba_api:latest
+#docker build -t "$REGISTRY"/nba_api:"$VERSION" -f deployment/Dockerfile .
+#docker tag "$REGISTRY"/nba_api:"$VERSION" "$REGISTRY"/nba_api:latest
