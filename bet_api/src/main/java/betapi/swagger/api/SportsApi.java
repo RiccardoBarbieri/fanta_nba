@@ -15,23 +15,22 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
+
 
 @jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-06-28T13:02:24.955337310Z[GMT]")
 @Validated
 public interface SportsApi {
 
-    @Operation(summary = "Get events list", description = "Returns all available events.", security = {
-            @SecurityRequirement(name = "ApiKeyAuth")})
+    @Operation(summary = "Get events list", description = "Returns all available events.", tags = {})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available events", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Event.class)))),
 
@@ -43,14 +42,13 @@ public interface SportsApi {
     @RequestMapping(value = "/sports/getEvents",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<List<Event>> sportsGetEventsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the events", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey") String sportKey
+    ResponseEntity<List<Event>> sportsGetEventsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the events", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
             , @Parameter(in = ParameterIn.QUERY, description = "Filter to show games that commence on and after this parameter", schema = @Schema()) @Valid @RequestParam(value = "commenceTimeFrom", required = false) String commenceTimeFrom
             , @Parameter(in = ParameterIn.QUERY, description = "Filter to show games that commence on and before this parameter", schema = @Schema()) @Valid @RequestParam(value = "commenceTimeTo", required = false) String commenceTimeTo
     );
 
 
-    @Operation(summary = "Get sport groups", description = "Returns all available sport groups.", security = {
-            @SecurityRequirement(name = "ApiKeyAuth")})
+    @Operation(summary = "Get sport groups", description = "Returns all available sport groups.", tags = {})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available sport groups", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))),
 
@@ -66,8 +64,7 @@ public interface SportsApi {
     );
 
 
-    @Operation(summary = "Get sports list", description = "Returns all available sports.", security = {
-            @SecurityRequirement(name = "ApiKeyAuth")})
+    @Operation(summary = "Get sports list", description = "Returns all available sports.", tags = {})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of all available sports", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Sport.class)))),
 

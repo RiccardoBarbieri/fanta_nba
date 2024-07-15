@@ -73,12 +73,11 @@ public class OddsApiController implements OddsApi {
         return false;
     }
 
-    public ResponseEntity<List<Odds>> oddsHead2headGet(
-            @NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId,
-            @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey,
-            @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
+    public ResponseEntity<List<Odds>> oddsHead2headGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+            , @Parameter(in = ParameterIn.QUERY, description = "Region to get odds for (\"eu, uk, us, us2, au\")", schema = @Schema(defaultValue = "eu")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu") String regions
     ) {
-        log.info("Received oddsHead2headGet request with eventId: {}, sportKey: {}, regions: {}", eventId, sportKey, regions);
+        log.info("Received oddsHead2headGet request with eventId: {}, sportKey: {}, region: {}", eventId, sportKey, regions);
 
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -108,12 +107,11 @@ public class OddsApiController implements OddsApi {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<List<Odds>> oddsSpreadsGet(
-            @NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId,
-            @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey,
-            @Parameter(in = ParameterIn.QUERY, description = "Comma-separated list of regions to get odds for (e.g., \"us,uk,eu\")", schema = @Schema(defaultValue = "eu,uk")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu,uk") String regions
+    public ResponseEntity<List<Odds>> oddsSpreadsGet(@NotNull @Parameter(in = ParameterIn.QUERY, description = "ID of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "eventId", required = true) String eventId
+            , @NotNull @Parameter(in = ParameterIn.QUERY, description = "The sport key of the event", required = true, schema = @Schema()) @Valid @RequestParam(value = "sportKey", required = true) String sportKey
+            , @Parameter(in = ParameterIn.QUERY, description = "Region to get odds for (\"eu, uk, us, us2, au\")", schema = @Schema(defaultValue = "eu")) @Valid @RequestParam(value = "regions", required = false, defaultValue = "eu") String regions
     ) {
-        log.info("Received oddsSpreadsGet request with eventId: {}, sportKey: {}, regions: {}", eventId, sportKey, regions);
+        log.info("Received oddsSpreadsGet request with eventId: {}, sportKey: {}, region: {}", eventId, sportKey, regions);
 
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
