@@ -8,3 +8,4 @@ source ./nba_venv/bin/activate
 # installa requirements
 python3 -m pip install -r venv_req.txt
 ```
+test
