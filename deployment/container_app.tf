@@ -213,3 +213,60 @@ resource "azurerm_container_app" "bet_api" {
     }
   }
 }
+
+
+variable "nba-api-target-port" {
+    description = "Port for the nba-api service"
+    type        = number
+}
+
+resource "azurerm_container_app" "nba_api" {
+  name                         = "nba-api"
+  container_app_environment_id = data.azurerm_container_app_environment.app_env.id
+  resource_group_name          = data.azurerm_resource_group.main_group.name
+  revision_mode                = "Single"
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  secret {
+    name  = "registry-password"
+    value = data.azurerm_container_registry.main_registry.admin_password
+  }
+
+  registry {
+    server               = data.azurerm_container_registry.main_registry.login_server
+    username             = data.azurerm_container_registry.main_registry.admin_username
+    password_secret_name = "registry-password"
+  }
+
+  template {
+    min_replicas = 1
+    max_replicas = 5
+
+    # Total CPU and memory for all containers defined in a Container App must add up to one of the following CPU - Memory combinations: [cpu: 0.25, memory: 0.5Gi]; [cpu: 0.5, memory: 1.0Gi]; [cpu: 0.75, memory: 1.5Gi]; [cpu: 1.0, memory: 2.0Gi]; [cpu: 1.25, memory: 2.5Gi]; [cpu: 1.5, memory: 3.0Gi]; [cpu: 1.75, memory: 3.5Gi]; [cpu: 2.0, memory: 4.0Gi]
+    container {
+
+      image  = "${data.azurerm_container_registry.main_registry.login_server}/fantanba/nba_api:latest"
+      memory = "4Gi"
+      cpu    = 2
+      name   = "nba-api-image"
+    }
+
+    http_scale_rule {
+      concurrent_requests = 20
+      name                = "http-scale-rule"
+    }
+  }
+
+  ingress {
+    external_enabled = true
+    target_port      = var.nba-api-target-port
+    transport        = "http"
+    traffic_weight {
+      percentage      = 100
+      latest_revision = true
+    }
+  }
+}
