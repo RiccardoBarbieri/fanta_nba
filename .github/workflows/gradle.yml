@@ -1,0 +1,67 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Gradle pushImage task
+
+on:
+  push:
+    paths:
+      - 'bet_api/**'
+    branches: [ "bet-api-actions", "master" ]
+#  pull_request:
+#    paths:
+#      - 'bet_api/**'
+#    branches: [ "bet-api-actions", "master" ]
+
+
+jobs:
+  pushImage:
+    env:
+      ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+      ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+      ACR_SERVER: ${{ secrets.ACR_SERVER }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'corretto'
+
+    # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
+    # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3.4.2
+
+#    - name: Generate new distribution
+#      run: ./gradlew bootDistTar
+#      working-directory: bet_api
+
+    - name: Push image with gradle wrapper
+      run: ./gradlew pushImage
+      working-directory: bet_api
+
+#  newRevision:
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Log in to Azure
+#        uses: azure/login@v1
+#        with:
+#          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
