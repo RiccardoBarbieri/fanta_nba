@@ -3,10 +3,11 @@ package betapi.swagger.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
-import org.threeten.bp.OffsetDateTime;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 /**
