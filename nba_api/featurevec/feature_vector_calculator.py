@@ -316,19 +316,19 @@ def get_game_id_and_season_type(team_ticker: str, season: str, date: str) -> Dic
 
 import logging
 
-log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s] [%(name)s] %(message)s")
-root_logger = logging.getLogger()
-
-fileHandler = logging.FileHandler(f"{LOG_FILE}")
-fileHandler.setFormatter(log_formatter)
-root_logger.addHandler(fileHandler)
-
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(log_formatter)
-root_logger.addHandler(consoleHandler)
-
-logger = logging.getLogger(os.path.basename(__file__))
-logger.setLevel(logging.DEBUG)
+# log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s] [%(name)s] %(message)s")
+# root_logger = logging.getLogger()
+#
+# fileHandler = logging.FileHandler(f"{LOG_FILE}")
+# fileHandler.setFormatter(log_formatter)
+# root_logger.addHandler(fileHandler)
+#
+# consoleHandler = logging.StreamHandler()
+# consoleHandler.setFormatter(log_formatter)
+# root_logger.addHandler(consoleHandler)
+#
+# logger = logging.getLogger(os.path.basename(__file__))
+# logger.setLevel(logging.DEBUG)
 
 if __name__ == '__main__':
     seasons = ['2022-23', '2023-24']
