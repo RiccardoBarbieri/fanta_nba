@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - 'bet_api/**'
-    branches: [ "bet-api-actions", "master" ]
+    branches: [ "master" ]
 #  pull_request:
 #    paths:
 #      - 'bet_api/**'
