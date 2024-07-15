@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "betapi.swagger"
-version = "1.0.1"
+version = "1.1.0"
 description = "bet_api"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
