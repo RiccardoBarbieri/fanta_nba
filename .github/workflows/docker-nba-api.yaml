@@ -29,18 +29,23 @@ jobs:
         with:
           path: nba_api/deployment/version
 
-      - name: Read port
-        id: port
+      - name: Read version
+        id: repository
         uses: juliangruber/read-file-action@v1
         with:
-          path: nba_api/deployment/port
+          path: nba_api/deployment/repository
 
       - name: Update dockerfile
         run: ./deployment/update-dockerfile.sh
         working-directory: nba_api
 
-      - name: Echoing
-        run: echo ${{ steps.version.outputs.content }} ${{ steps.port.outputs.content }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./nba_api
+          file: ./deployment/Dockerfile
+          tags: |
+            ${{ secrets.ACR_SERVER }}/${{ steps.repository.outputs.content }}/nba_api:${{ steps.version.outputs.content }}
+            ${{ secrets.ACR_SERVER }}/${{ steps.repository.outputs.content }}/nba_api:latest
 
-#      - name: Build and push
-#        uses: docker/build-push-action@v6
+
