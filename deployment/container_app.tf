@@ -30,109 +30,6 @@ variable "bet-api-target-port" {
 
 # Template https://learn.microsoft.com/en-us/azure/templates/microsoft.app/containerapps?pivots=deployment-language-terraform#ingress-2
 
-# resource "azapi_resource" "bet_api" {
-#   type      = "Microsoft.App/containerApps@2023-11-02-preview"
-#   name      = "bet-api"
-#   location  = data.azurerm_resource_group.main_group.location
-#   parent_id = data.azurerm_resource_group.main_group.id
-#
-#   identity {
-#     type = "SystemAssigned"
-#   }
-#
-#   body = jsonencode({
-#     properties = {
-#       configuration = {
-#         activeRevisionsMode = "Single"
-#         ingress = {
-#           allowInsecure        = true
-#           clientCertificateMode = "ignore"
-#           #           exposedPort            = 80 TODO maybe specify (or is it default?)
-#           external             = true
-#           targetPort           = var.bet-api-target-port
-#           targetPortHttpScheme = "http"
-#           traffic              = [
-#             {
-#               latestRevision = true
-#               weight         = 100
-#             }
-#           ]
-#           transport = "http"
-#         }
-#         maxInactiveRevisions = 2
-#         registries           = [
-#           {
-#             #             identity          = "string"
-#             passwordSecretRef = "registry-password"
-#             server            = data.azurerm_container_registry.main_registry.login_server
-#             username          = data.azurerm_container_registry.main_registry.admin_username
-#           }
-#         ]
-#         secrets = [
-#           {
-#             name  = lower(data.azurerm_key_vault_secret.odds_api_key.name)
-#             value = data.azurerm_key_vault_secret.odds_api_key.value
-#           },
-#           {
-#             name  = lower(data.azurerm_key_vault_secret.cosmos_db_connection_string.name)
-#             value = data.azurerm_key_vault_secret.cosmos_db_connection_string.value
-#           },
-#           {
-#             name  = lower(data.azurerm_key_vault_secret.cosmos_db_database.name)
-#             value = data.azurerm_key_vault_secret.cosmos_db_database.value
-#           },
-#           {
-#             name  = "registry-password"
-#             value = data.azurerm_container_registry.main_registry.admin_password
-#           }
-#         ]
-#       }
-#       environmentId = data.azurerm_container_app_environment.app_env.id
-#       template = {
-#         containers = [
-#           {
-#             env = [
-#               {
-#                 name      = "ODDS_API_KEY"
-#                 secretRef = lower(data.azurerm_key_vault_secret.odds_api_key.name)
-#               },
-#               {
-#                 name      = "COSMOSDB_CONNECTION_STRING"
-#                 secretRef = lower(data.azurerm_key_vault_secret.cosmos_db_connection_string.name)
-#               },
-#               {
-#                 name      = "COSMOSDB_DATABASE"
-#                 secretRef = lower(data.azurerm_key_vault_secret.cosmos_db_database.name)
-#               }
-#             ]
-#             image = "${data.azurerm_container_registry.main_registry.login_server}/fantanba/bet_api:latest"
-#             name  = "bet-api-image"
-#             resources = {
-#               cpu    = 1
-#               memory = "2Gi"
-#             }
-#           }
-#         ]
-#         scale = {
-#           maxReplicas = 10
-#           minReplicas = 1
-#           rules       = [
-#             {
-#               name = "http-scale-rule"
-#               http = {
-#                 metadata = {
-#                   concurrentRequests = "20"
-#                 }
-#               }
-#             }
-#           ]
-#         }
-#       }
-#     }
-#   })
-# }
-
-
 resource "azurerm_container_app" "bet_api" {
   name                         = "bet-api"
   container_app_environment_id = data.azurerm_container_app_environment.app_env.id
@@ -235,6 +132,11 @@ resource "azurerm_container_app" "nba_api" {
     value = data.azurerm_container_registry.main_registry.admin_password
   }
 
+  secret {
+    name = "ml-api-key"
+    value = data.azurerm_key_vault_secret.ml_api_key.value
+  }
+
   registry {
     server               = data.azurerm_container_registry.main_registry.login_server
     username             = data.azurerm_container_registry.main_registry.admin_username
@@ -247,6 +149,11 @@ resource "azurerm_container_app" "nba_api" {
 
     # Total CPU and memory for all containers defined in a Container App must add up to one of the following CPU - Memory combinations: [cpu: 0.25, memory: 0.5Gi]; [cpu: 0.5, memory: 1.0Gi]; [cpu: 0.75, memory: 1.5Gi]; [cpu: 1.0, memory: 2.0Gi]; [cpu: 1.25, memory: 2.5Gi]; [cpu: 1.5, memory: 3.0Gi]; [cpu: 1.75, memory: 3.5Gi]; [cpu: 2.0, memory: 4.0Gi]
     container {
+
+      env {
+        name = "ML_API_KEY"
+        secret_name = "ml-api-key"
+      }
 
       image  = "${data.azurerm_container_registry.main_registry.login_server}/fantanba/nba_api:latest"
       memory = "4Gi"
