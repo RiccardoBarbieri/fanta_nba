@@ -299,7 +299,9 @@ def is_team_home(team_ticker: str, game_id: str, season: str) -> bool:
     :return: A boolean representing if the team is the home team.
     """
     team_game_log = get_season_games_for_team(team_ticker, season, False)
-    team_game_log.extend(get_season_games_for_team(team_ticker, season, True))
+    if playoffs := get_season_games_for_team(team_ticker, season, True):
+        team_game_log.extend(playoffs)
+
     for game in team_game_log:
         if game['game_id'] == game_id:
             return get_home_away_team(game['matchup'])['home_team'] == team_ticker
