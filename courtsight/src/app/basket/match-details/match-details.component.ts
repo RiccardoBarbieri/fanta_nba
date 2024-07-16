@@ -11,6 +11,13 @@ import {StatsTableComponent} from "./stats-table/stats-table.component";
 import {MeterGroupModule, MeterItem} from "primeng/metergroup";
 import {PanelModule} from "primeng/panel";
 import {CardModule} from "primeng/card";
+import {OddsService} from "../odds.service";
+import {Vector} from "../vector";
+import {PredictionsService} from "../predictions.service";
+import {Button} from "primeng/button";
+import {SkeletonModule} from "primeng/skeleton";
+import {Odds} from "../odds";
+import {TableModule} from "primeng/table";
 
 @Component({
   selector: 'app-match-details',
@@ -25,21 +32,45 @@ import {CardModule} from "primeng/card";
     MeterGroupModule,
     CommonModule,
     PanelModule,
-    CardModule
+    CardModule,
+    Button,
+    SkeletonModule,
+    TableModule
   ],
   templateUrl: './match-details.component.html',
   styleUrl: './match-details.component.css'
 })
 export class MatchDetailsComponent {
   route: ActivatedRoute = inject(ActivatedRoute);
-  matchesService = inject(MatchesService);
 
+  matchesService = inject(MatchesService);
+  oddsService = inject(OddsService);
+  predictionsService = inject(PredictionsService);
+
+  match: Match | undefined;
   matchStats: MatchStats | undefined;
   meterValue: MeterItem[] = [];
+  odds: Odds | undefined;
+
+  computed: boolean = false
+  loading: boolean = false;
+  prediction_message = "";
+  prediction_result = "";
+
+  bookmakers_list: any[] = [];
+
+  load() {
+    this.loading = true;
+
+    setTimeout(() => {
+      this.loading = false
+    }, 4000);
+  }
 
   constructor() {
     const match_id = this.route.snapshot.params["id"];
     const match_date = this.route.snapshot.params["date"];
+
 
     this.matchesService.getMatchStatsById(match_id, match_date).then((matches: ActualAndLastMatchStats) => {
       this.matchStats = matches.actual_match_stats
@@ -47,14 +78,95 @@ export class MatchDetailsComponent {
       let homePts = this.matchStats.by_home_stats.pts;
       let awayPts = this.matchStats.by_away_stats.pts;
       let total = homePts + awayPts;
+      console.log(homePts, awayPts)
 
       this.meterValue = [
         {label: '', value: homePts / total * 100, color: homePts >= awayPts ? colors.winningLeft : colors.losingLeft},
-        {label: '', value: awayPts / total * 100, color: homePts < awayPts ? colors.winningRight : colors.losingRight},
+        {label: '', value: awayPts / total * 100, color: homePts >= awayPts ? colors.losingRight : colors.winningRight},
       ]
 
+      this.matchesService.getMatchesByDate(this.matchStats.global_stats.game_date, this.matchStats.global_stats.game_date).then(matches => {
+        this.match = matches.find(m => m.game_id === match_id);
+      })
+
+      const event_id: string = `${this.matchStats?.by_home_stats.team_abbreviation}FAKE${this.matchStats?.by_away_stats.team_abbreviation}`;
+      this.oddsService.getOddsForMatch(event_id).then((odds: Odds[]) => {
+        this.odds = odds[0];
+
+        let max = 0;
+        let min = 100000
+        for (let bookmaker of this.odds.bookmakers) {
+          const home_quota = bookmaker.markets[0].outcomes.find((o) => o.name === this.matchStats!.by_home_stats.team_abbreviation)?.price!;
+          const away_quota = bookmaker.markets[0].outcomes.find((o) => o.name === this.matchStats!.by_away_stats.team_abbreviation)?.price!;
+          if (home_quota < min) {
+            min = home_quota;
+          }
+          if (away_quota < min) {
+            min = away_quota;
+          }
+          if (home_quota > max) {
+            max = home_quota;
+          }
+          if (away_quota > max) {
+            max = away_quota;
+          }
+          this.bookmakers_list.push({
+            name: bookmaker.title,
+            url: bookmaker.url,
+            home_team_quota: {
+              value: home_quota, color: "text-900"
+            },
+            away_team_quota: {
+              value: away_quota, color: "text-900"
+            },
+          })
+        }
+
+        for (let item of this.bookmakers_list) {
+          if (item.home_team_quota.value === max) {
+            item.home_team_quota.color = "text-green-600"
+          }
+          if (item.home_team_quota.value === min) {
+            item.home_team_quota.color = "text-red-500"
+          }
+          if (item.away_team_quota.value === max) {
+            item.away_team_quota.color = "text-green-600"
+          }
+          if (item.away_team_quota.value === min) {
+            item.away_team_quota.color = "text-red-500"
+          }
+        }
+      })
     });
-    // this.matchStats = mochMatchStats.actual_match_stats;
+  }
+
+  getPrediction() {
+    this.loading = true;
+
+    if (this.matchStats) {
+      this.matchesService.getFeatureVectorForMatch(this.matchStats.by_home_stats.team_abbreviation, this.matchStats.by_away_stats.team_abbreviation, "2023-24", this.matchStats.global_stats.game_date)
+        .then((vector: Vector) => {
+          if (vector.game_id === null) {
+            this.prediction_message = "There was an error retrieving the feature vector"
+            this.loading = false;
+            this.computed = true;
+          } else {
+            this.predictionsService.getPredictionForMatch(vector).then((prediction) => {
+              this.loading = false;
+              this.computed = true;
+              if (prediction > 0) {
+                this.prediction_message = `${this.matchStats?.by_home_stats.team_name} are forecast to win!`
+                this.prediction_result = String(Math.abs(prediction));
+              } else if (prediction < 0) {
+                this.prediction_message = `${this.matchStats?.by_away_stats.team_name} are forecast to win!`
+                this.prediction_result = String(Math.abs(prediction));
+              } else {
+                this.prediction_message = "The result of the match could not be predicted"
+              }
+            })
+          }
+        });
+    }
   }
 }
 
@@ -63,190 +175,4 @@ export const colors = {
   losingLeft: "rgba(73,225,11,0.25)",
   winningRight: "#eb9c08",
   losingRight: "rgba(235,156,8,0.25)",
-}
-
-const mockMatch: Match =
-  {
-    "game_id": 12345,
-    "match_up": "BKN - WAS",
-    "date": "JUL 12, 2024",
-    "home_team": {
-      "id": 1610612767,
-      "full_name": "Washington Wizards",
-      "abbreviation": "WAS",
-      "nickname": "Wizards",
-      "city": "Washington",
-      "state": "DC",
-      "year_founded": 1939,
-      "arena": "Nome a caso Arena"
-    },
-    "away_team": {
-      "id": 1610612738,
-      "full_name": "Boston Celtics",
-      "abbreviation": "BOS",
-      "nickname": "Celtics",
-      "city": "Boston",
-      "state": "MA",
-      "year_founded": 1946,
-      "arena": "Nome a caso Arena"
-    },
-    "referee": {
-      "name": "Sean Corbin",
-      "id": 1151
-    },
-    "arena": {
-      "name": "Capital One Arena",
-      "city": "Washington",
-      "state": "DC",
-      "country": "US"
-    }
-  }
-const mochMatchStats: ActualAndLastMatchStats = {
-  actual_match_stats:
-    {
-      global_stats: {
-        game_id: "0022301198",
-        game_date: "2024-04-14",
-        match_up: "GSW vs. UTA",
-        winner: "GSW",
-        home_point: 123,
-        away_point: 116
-      },
-      by_home_stats: {
-        season_id: "22023",
-        team_id: 1610612738,
-        team_abbreviation: "BOS",
-        team_name: "Boston Celtics",
-        game_id: "0022001074",
-        game_date: "2024-01-23",
-        match_up: "BOS vs. LAL",
-        wl: "W",
-        min: 240,
-        fgm: 40,
-        fga: 85,
-        fg_pct: 47.1,
-        fg3m: 12,
-        fg3a: 32,
-        fg3_pct: 37.5,
-        ftm: 18,
-        fta: 22,
-        ft_pct: 81.8,
-        oreb: 10,
-        dreb: 35,
-        reb: 45,
-        ast: 25,
-        stl: 8,
-        blk: 5,
-        tov: 13,
-        pf: 20,
-        pts: 110,
-        plus_minus: -6,
-        video_available: 1
-      },
-      by_away_stats: {
-        season_id: "22023",
-        team_id: 1610612738,
-        team_abbreviation: "BOS",
-        team_name: "Boston Celtics",
-        game_id: "0022001074",
-        game_date: "2024-01-23",
-        match_up: "BOS vs. LAL",
-        wl: "W",
-        min: 240,
-        fgm: 40,
-        fga: 85,
-        fg_pct: 47.1,
-        fg3m: 12,
-        fg3a: 32,
-        fg3_pct: 37.5,
-        ftm: 18,
-        fta: 22,
-        ft_pct: 81.8,
-        oreb: 10,
-        dreb: 35,
-        reb: 45,
-        ast: 25,
-        stl: 8,
-        blk: 5,
-        tov: 13,
-        pf: 20,
-        pts: 131,
-        plus_minus: -6,
-        video_available: 1
-      }
-    },
-  last_match_stats: {
-    global_stats: {
-      game_id: "0022301198",
-      game_date: "2024-04-14",
-      match_up: "GSW vs. UTA",
-      winner: "GSW",
-      home_point: 123,
-      away_point: 116
-    },
-    by_home_stats:
-      {
-        season_id: "22023",
-        team_id: 1610612738,
-        team_abbreviation: "BOS",
-        team_name: "Boston Celtics",
-        game_id: "0022001074",
-        game_date: "2024-01-23",
-        match_up: "BOS vs. LAL",
-        wl: "W",
-        min: 240,
-        fgm: 40,
-        fga: 85,
-        fg_pct: 47.1,
-        fg3m: 12,
-        fg3a: 32,
-        fg3_pct: 37.5,
-        ftm: 18,
-        fta: 22,
-        ft_pct: 81.8,
-        oreb: 10,
-        dreb: 35,
-        reb: 45,
-        ast: 25,
-        stl: 8,
-        blk: 5,
-        tov: 13,
-        pf: 20,
-        pts: 110,
-        plus_minus: -6,
-        video_available: 1
-      },
-    by_away_stats:
-      {
-        season_id: "22023",
-        team_id: 1610612738,
-        team_abbreviation: "BOS",
-        team_name: "Boston Celtics",
-        game_id: "0022001074",
-        game_date: "2024-01-23",
-        match_up: "BOS vs. LAL",
-        wl: "W",
-        min: 240,
-        fgm: 40,
-        fga: 85,
-        fg_pct: 47.1,
-        fg3m: 12,
-        fg3a: 32,
-        fg3_pct: 37.5,
-        ftm: 18,
-        fta: 22,
-        ft_pct: 81.8,
-        oreb: 10,
-        dreb: 35,
-        reb: 45,
-        ast: 25,
-        stl: 8,
-        blk: 5,
-        tov: 13,
-        pf: 20,
-        pts: 110,
-        plus_minus: -6,
-        video_available: 1
-      }
-  }
 }

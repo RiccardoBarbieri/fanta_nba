@@ -1,10 +1,15 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {CardModule} from "primeng/card";
 import {Button, ButtonDirective} from "primeng/button";
 import {DatePipe} from "@angular/common";
 import {RouterLink} from "@angular/router";
 import {StandingsListComponent} from "./standings-list/standings-list.component";
+import {BadgeModule} from "primeng/badge";
+import {AvatarModule} from "primeng/avatar";
+import {StandingsService} from "../standings.service";
+import {getFormattedDate} from "../../shared/utils";
+import {Standings} from "../standings";
 
 @Component({
   selector: 'app-standings',
@@ -17,131 +22,27 @@ import {StandingsListComponent} from "./standings-list/standings-list.component"
     RouterLink,
     ButtonDirective,
     StandingsListComponent,
+    BadgeModule,
+    AvatarModule,
   ],
   templateUrl: './standings.component.html',
   styleUrl: './standings.component.css'
 })
 export class StandingsComponent {
+  standingsService = inject(StandingsService);
   last_update!: Date;
 
+  standings : Standings | undefined;
+
   constructor() {
-    this.last_update = new Date();
+    this.refreshStandings()
   }
 
   refreshStandings() {
     this.last_update = new Date();
+    this.standingsService.getStandingsForDate(getFormattedDate(this.last_update)).then((standings: Standings) => {
+      this.standings = standings;
+    })
   }
-
-  openTeamDetails() {
-  }
-
-  teams : Row[] = [
-    {
-      team_id: 1,
-      ticker: "BOS",
-      name: "Boston Celtics",
-      w: 64,
-      l: 18,
-    },
-    {
-      team_id: 2,
-      ticker: "CFR",
-      name: "New York Knicks",
-      w: 50,
-      l: 32,
-    },
-    {
-      team_id: 3,
-      ticker: "MBS",
-      name: "Milwaukee Bucks",
-      w: 49,
-      l: 33,
-    },
-    {
-      team_id: 4,
-      ticker: "LOL",
-      name: "Cleveland Cavaliers",
-      w: 48,
-      l: 34,
-    },
-    {
-      team_id: 5,
-      ticker: "OMA",
-      name: "Orlando Magic",
-      w: 47,
-      l: 35,
-    },
-    {
-      team_id: 5,
-      ticker: "OMA",
-      name: "Orlando Magic",
-      w: 47,
-      l: 35,
-    },
-    {
-      team_id: 5,
-      ticker: "OMA",
-      name: "Orlando Magic",
-      w: 47,
-      l: 35,
-    },
-    {
-      team_id: 5,
-      ticker: "OMA",
-      name: "Orlando Magic",
-      w: 47,
-      l: 35,
-    },
-    {
-      team_id: 5,
-      ticker: "OMA",
-      name: "Orlando Magic",
-      w: 47,
-      l: 35,
-    },
-    {
-      team_id: 2,
-      ticker: "CFR",
-      name: "New York Knicks",
-      w: 50,
-      l: 32,
-    },
-    {
-      team_id: 2,
-      ticker: "CFR",
-      name: "New York Knicks",
-      w: 50,
-      l: 32,
-    },{
-      team_id: 2,
-      ticker: "CFR",
-      name: "New York Knicks",
-      w: 50,
-      l: 32,
-    },
-    {
-      team_id: 2,
-      ticker: "CFR",
-      name: "New York Knicks",
-      w: 50,
-      l: 32,
-    },
-    {
-      team_id: 2,
-      ticker: "CFR",
-      name: "New York Knicks",
-      w: 50,
-      l: 32,
-    },
-
-
-  ]
 }
 
-export interface Row { // TODO change
-  team_id: number,
-  ticker: string,
-  name: string,
-  w: number,
-  l: number,
-}

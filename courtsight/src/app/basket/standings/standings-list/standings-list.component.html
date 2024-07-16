@@ -1,20 +1,29 @@
 <p-fieldset legend="{{title}}">
   <p-table
     [value]="teams"
-    [scrollable]="true"
     styleClass="p-datatable-sm p-datatable-striped">
     <ng-template pTemplate="header">
       <tr>
-        <th pFrozenColumn>Team</th>
-        <th>W</th>
-        <th>L</th>
+        <th class="text-center" pFrozenColumn style="width:3rem">#</th>
+        <th class="text-left" pFrozenColumn>Team</th>
+        <th class="text-center">Games</th>
+        <th class="text-center">W</th>
+        <th class="text-center">L</th>
+        <th class="text-center">W %</th>
+        <th class="text-center">Home record</th>
+        <th class="text-center">Road record</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-team let-i="rowIndex">
-      <tr [ngClass]="{'playoff': i <= 6, 'playon': i >= 7 && i <= 10}">
-        <td pFrozenColumn ><a class="font-medium no-underline text-900" routerLink="./team/{{team.ticker}}">{{ team.name }}</a></td>
-        <td>{{ team.w }}</td>
-        <td>{{ team.l }}</td>
+      <tr>
+        <td class="text-center font-bold" pFrozenColumn [class]="{'playoff': i <= 6, 'playon': i >= 7 && i <= 10}">{{i+1}}</td>
+        <td class="text-left" pFrozenColumn ><a class="font-medium no-underline text-900" routerLink="./team/{{team.team_ticker}}">{{ team.team }}</a></td>
+        <td class="text-center">{{ team.g }}</td>
+        <td class="text-center">{{ team.w }}</td>
+        <td class="text-center">{{ team.l }}</td>
+        <td class="text-center">{{ team.w_pct }}</td>
+        <td class="text-center">{{ team.home_record }}</td>
+        <td class="text-center">{{ team.road_record }}</td>
       </tr>
     </ng-template>
   </p-table>

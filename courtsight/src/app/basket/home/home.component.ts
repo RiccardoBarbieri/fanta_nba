@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {StandingsComponent} from "../standings/standings.component";
 import {CardModule} from "primeng/card";
 import {CommonModule, DatePipe} from "@angular/common";
@@ -10,7 +10,11 @@ import {RouterLink} from "@angular/router";
 import {Button} from "primeng/button";
 import {MatchListComponent} from "../match-list/match-list.component";
 import {MatchesService} from "../matches.service";
-import {getFormattedDate} from "../../shared/utils";
+import {counterArray, getFormattedDate} from "../../shared/utils";
+import {CalendarModule} from "primeng/calendar";
+import {FormsModule} from "@angular/forms";
+import {InputGroupModule} from "primeng/inputgroup";
+import {SkeletonModule} from "primeng/skeleton";
 
 
 @Component({
@@ -26,136 +30,40 @@ import {getFormattedDate} from "../../shared/utils";
     CommonModule,
     RouterLink,
     Button,
-    MatchListComponent
+    MatchListComponent,
+    CalendarModule,
+    FormsModule,
+    InputGroupModule,
+    SkeletonModule,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
   matchesService = inject(MatchesService);
-
-  today = new Date("2023-11-05");
-  next_week: Date = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()+7);
-  matches!: Match[];
+  date: Date = new Date("2023-11-05");
+  current_date: Date;
+  next_week = () => {
+    return new Date(this.current_date.getFullYear(), this.current_date.getMonth(), this.current_date.getDate() + 7)
+  };
+  matches: Match[] = [];
+  loading = false;
 
   constructor() {
-    this.matchesService.getMatchesByDate(getFormattedDate(this.today),
-      getFormattedDate(this.next_week)).then((matches: Match[]) => {
-        this.matches = matches;
+    this.current_date = this.date;
+    this.refreshMatches();
+  }
+
+  refreshMatches() {
+    this.current_date = this.date;
+    this.matches = [];
+    this.loading = true;
+    this.matchesService.getMatchesByDate(getFormattedDate(this.current_date),
+      getFormattedDate(this.next_week())).then((matches: Match[]) => {
+      this.matches = matches;
+      this.loading =false;
     })
   }
 
-  navigateToMatch(match_id: number) {
-
-  }
-
-  // ngOnInit() {
-  //   this.matches = [
-  //     {
-  //       "game_id": 12345,
-  //       "match_up": "BKN - WAS",
-  //       "date": "JUL 12, 2024",
-  //       "home_team": {
-  //         "id": 1610612767,
-  //         "full_name": "Washington Wizards",
-  //         "abbreviation": "WAS",
-  //         "nickname": "Wizards",
-  //         "city": "Washington",
-  //         "state": "DC",
-  //         "year_founded": 1939,
-  //         "arena": "Nome a caso Arena"
-  //       },
-  //       "away_team": {
-  //         "id": 1610612738,
-  //         "full_name": "Boston Celtics",
-  //         "abbreviation": "BOS",
-  //         "nickname": "Celtics",
-  //         "city": "Boston",
-  //         "state": "MA",
-  //         "year_founded": 1946,
-  //         "arena": "Nome a caso Arena"
-  //       },
-  //       "referee": {
-  //         "name": "Sean Corbin",
-  //         "id": 1151
-  //       },
-  //       "arena": {
-  //         "name": "Capital One Arena",
-  //         "city": "Washington",
-  //         "state": "DC",
-  //         "country": "US"
-  //       }
-  //     },
-  //     {
-  //       "game_id": 12345,
-  //       "match_up": "BKN - WAS",
-  //       "date": "JUL 13, 2024",
-  //       "home_team": {
-  //         "id": 1610612767,
-  //         "full_name": "Washington Wizards",
-  //         "abbreviation": "WAS",
-  //         "nickname": "Wizards",
-  //         "city": "Washington",
-  //         "state": "DC",
-  //         "year_founded": 1939,
-  //         "arena": "Nome a caso Arena"
-  //       },
-  //       "away_team": {
-  //         "id": 1610612738,
-  //         "full_name": "Boston Celtics",
-  //         "abbreviation": "BOS",
-  //         "nickname": "Celtics",
-  //         "city": "Boston",
-  //         "state": "MA",
-  //         "year_founded": 1946,
-  //         "arena": "Nome a caso Arena"
-  //       },
-  //       "referee": {
-  //         "name": "Sean Corbin",
-  //         "id": 1151
-  //       },
-  //       "arena": {
-  //         "name": "Capital One Arena",
-  //         "city": "Washington",
-  //         "state": "DC",
-  //         "country": "US"
-  //       }
-  //     },
-  //     {
-  //       "game_id": 12345,
-  //       "match_up": "BKN - WAS",
-  //       "date": "JUL 14, 2024",
-  //       "home_team": {
-  //         "id": 1610612767,
-  //         "full_name": "Washington Wizards",
-  //         "abbreviation": "WAS",
-  //         "nickname": "Wizards",
-  //         "city": "Washington",
-  //         "state": "DC",
-  //         "year_founded": 1939,
-  //         "arena": "Nome a caso Arena"
-  //       },
-  //       "away_team": {
-  //         "id": 1610612738,
-  //         "full_name": "Boston Celtics",
-  //         "abbreviation": "BOS",
-  //         "nickname": "Celtics",
-  //         "city": "Boston",
-  //         "state": "MA",
-  //         "year_founded": 1946,
-  //         "arena": "Nome a caso Arena"
-  //       },
-  //       "referee": {
-  //         "name": "Sean Corbin",
-  //         "id": 1151
-  //       },
-  //       "arena": {
-  //         "name": "Capital One Arena",
-  //         "city": "Washington",
-  //         "state": "DC",
-  //         "country": "US"
-  //       }
-  //     }
-  //   ]
-  // }
+  protected readonly counterArray = counterArray;
 }

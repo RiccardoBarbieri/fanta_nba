@@ -1,18 +1,34 @@
 <p-card header="Standings" [styleClass]="'surface-ground'">
+
+  <div class="flex flex-row flex-wrap">
+    <div class="flex flex-grow-1 flex-column mb-2">
+      <app-standings-list [title]="'East Coast'" [teams]="standings?.east!"/>
+    </div>
+    <div class="flex flex-grow-1 flex-column mb-2">
+      <app-standings-list [title]="'West Coast'" [teams]="standings?.west!"/>
+    </div>
+  </div>
+
+  <div class="flex flex-column mt-2">
+    <div class="flex flex-row align-items-center">
+      <p-avatar
+        styleClass="mr-2 playoff"
+        size="normal"/>
+      <div>Playoff</div>
+      <p-avatar
+        styleClass="ml-4 mr-2 playon"
+        size="normal"/>
+      <div>Playon</div>
+    </div>
+  </div>
+
   <ng-template pTemplate="footer">
-    <div class="flex align-items-center justify-content-between">
-      <div class="flex flex-row flex-wrap">
-        <div class="mr-2">Last update:</div> <div>{{ last_update | date: 'M/d/yy, H:mm' }}</div>
+    <div class="flex flex-row align-items-center justify-content-between flex-wrap">
+      <div class="flex">
+        <div class="mr-2">Last update:</div>
+        <div>{{ last_update | date: 'M/d/yy, H:mm' }}</div>
       </div>
       <p-button icon="pi pi-refresh" [rounded]="true" [text]="true" (click)="refreshStandings()"/>
     </div>
   </ng-template>
-<div class="flex">
-  <div class="col-6">
-    <app-standings-list [title]="'East Coast'" [teams]="teams"/>
-  </div>
-  <div class="col-6">
-    <app-standings-list [title]="'West Coast'" [teams]="teams"/>
-  </div>
-</div>
 </p-card>

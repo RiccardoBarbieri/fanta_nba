@@ -6,6 +6,7 @@ import {RouterLink} from "@angular/router";
 import {Match} from "../match";
 import {CommonModule} from "@angular/common";
 import {MatchComponent} from "./match/match.component";
+import {SkeletonModule} from "primeng/skeleton";
 
 @Component({
   selector: 'app-match-list',
@@ -16,7 +17,8 @@ import {MatchComponent} from "./match/match.component";
     DividerModule,
     RouterLink,
     CommonModule,
-    MatchComponent
+    MatchComponent,
+    SkeletonModule
   ],
   templateUrl: './match-list.component.html',
   styleUrl: './match-list.component.css'

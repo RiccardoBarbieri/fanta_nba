@@ -15,7 +15,11 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-row align-items-baseline gap-1 mt-2">
+
+    <div class="flex flex-row justify-content-between align-items-baseline gap-1 mt-2">
+<!--      <div *ngIf="true" class="flex-1 text-center font-light text-4xl ml-3">-->
+<!--        110-->
+<!--      </div>-->
       <div class="flex flex-1 flex-column align-items-end justify-content-end align-self-center">
         <span class="font-medium text-green-500 text-sm">{{ match.home_team.abbreviation }}</span>
         <a class="text-lg font-bold text-900 text-right mt-1 no-underline"
@@ -33,7 +37,11 @@
           {{ match.away_team.full_name }}
         </a>
       </div>
+<!--      <div *ngIf="true" class="flex-1 text-center font-light text-4xl ml-3">-->
+<!--        110-->
+<!--      </div>-->
     </div>
+
     <div class="flex align-self-end mt-2">
       <p-button icon="pi pi-arrow-right" iconPos="right" [text]="true" [raised]="true"
                 class="flex-auto md:flex-initial white-space-nowrap" label="See details"

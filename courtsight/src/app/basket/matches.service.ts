@@ -1,40 +1,27 @@
 import {Injectable} from '@angular/core';
 import {Match} from "./match";
 import {ActualAndLastMatchStats} from "./stats";
+import {Vector} from "./vector";
 
 @Injectable({
   providedIn: 'root'
 })
 export class MatchesService {
-  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io/";
+  nba_api_url = "https://nba-api.orangewave-05a306f8.westeurope.azurecontainerapps.io";
 
-  constructor() {
+  async getFeatureVectorForMatch(team_ticker: string, opp_ticker: string, season: string, date: string): Promise<Vector> {
+    const data = await fetch(this.nba_api_url + '/feature_vector?' + new URLSearchParams({
+      team_ticker: team_ticker,
+      opp_team_ticker: opp_ticker,
+      season: season,
+      date: date
+    }), {
+      headers: {
+        "Accept": "application/json",
+      }
+    });
+    return await data.json() ?? {};
   }
-
-  // async getMatches(match_up: string, season: string, matchday: string): Promise<Match[]> {
-  //   const data = await fetch(this.nba_api_url + 'matches' +
-  //     new URLSearchParams({
-  //       match_up: match_up,
-  //       season: season,
-  //       matchday: matchday,
-  //     }).toString()
-  //   );
-  //   return await data.json() ?? [];
-  // }
-
-  // async getMatchById(game_id: number): Promise<Match> {
-  //   const data = await fetch(this.nba_api_url + 'match/' + game_id);
-  //   return await data.json() ?? {};
-  // }
-  //
-  // async getMatch(match_up: string, season: string, matchday: string): Promise<Match> {
-  //   const data = await fetch(this.nba_api_url + 'match/' + new URLSearchParams({
-  //     match_up: match_up,
-  //     season: season,
-  //     matchday: matchday,
-  //   }).toString());
-  //   return await data.json() ?? {};
-  // }
 
   async getMatchesByDate(date_from: string, date_to: string | undefined): Promise<Match[]> {
     const params = new URLSearchParams(
@@ -44,7 +31,7 @@ export class MatchesService {
     if (date_to) {
       params.append('date_to', date_to);
     }
-    const data = await fetch(this.nba_api_url + 'matches?' + params.toString(), {
+    const data = await fetch(this.nba_api_url + '/matches?' + params.toString(), {
       headers: {
         "Accept": "application/json",
       }
@@ -53,7 +40,7 @@ export class MatchesService {
   }
 
   async getMatchStatsById(match_id: number, match_date: string): Promise<ActualAndLastMatchStats> {
-    const data = await fetch(this.nba_api_url + 'match/' + match_id + '/stats?' + new URLSearchParams({
+    const data = await fetch(`${this.nba_api_url}/match/${match_id}/stats?` + new URLSearchParams({
       match_date: match_date,
     }), {
       headers: {

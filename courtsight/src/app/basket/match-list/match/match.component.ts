@@ -3,6 +3,7 @@ import {Match} from "../../match";
 import {DividerModule} from "primeng/divider";
 import {Button} from "primeng/button";
 import {RouterLink} from "@angular/router";
+import {CommonModule} from "@angular/common";
 
 @Component({
   selector: 'app-match',
@@ -10,7 +11,8 @@ import {RouterLink} from "@angular/router";
   imports: [
     DividerModule,
     Button,
-    RouterLink
+    RouterLink,
+    CommonModule
   ],
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'

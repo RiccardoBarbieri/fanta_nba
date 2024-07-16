@@ -11,6 +11,9 @@ import {Match} from "../match";
 import {MatchesService} from "../matches.service";
 import {getFormattedDate} from "../../shared/utils";
 import {ScrollPanelModule} from "primeng/scrollpanel";
+import {DividerModule} from "primeng/divider";
+import {CalendarModule} from "primeng/calendar";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-team-details',
@@ -20,7 +23,10 @@ import {ScrollPanelModule} from "primeng/scrollpanel";
     CarouselModule,
     DataViewModule,
     MatchListComponent,
-    ScrollPanelModule
+    ScrollPanelModule,
+    DividerModule,
+    CalendarModule,
+    FormsModule
   ],
   templateUrl: './team-details.component.html',
   styleUrl: './team-details.component.css'
@@ -31,22 +37,41 @@ export class TeamDetailsComponent implements OnInit {
   matchesService = inject(MatchesService);
   team: Team | undefined;
   matches: Match[] = [] ;
-  today: Date = new Date("2023-11-05");
-  next_week: Date = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()+7);
+
+  date: Date = new Date("2023-11-05");
+  current_date: Date;
+  next_week = () => {
+    return new Date(this.current_date.getFullYear(), this.current_date.getMonth(), this.current_date.getDate() + 7)
+  };
+
+  // today: Date = new Date("2023-11-05");
+  // next_week: Date = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()+7);
 
   responsiveOptions: any[] | undefined;
 
   constructor(private titleService: Title) {
+    this.current_date = this.date;
     this.titleService.setTitle('Team Details');
     const ticker = this.route.snapshot.params["ticker"];
     // this.team = mockTeam; // TODO debug
     // this.matches = mockMatches;
     this.teamsService.getTeamFromTicker(ticker, "2023-24").then((team: Team) => {
       this.team = team;
-      this.matchesService.getMatchesByDate(getFormattedDate(this.today),getFormattedDate(this.next_week)).then((matches: Match[]) => {
+      this.matchesService.getMatchesByDate(getFormattedDate(this.current_date),getFormattedDate(this.next_week())).then((matches: Match[]) => {
         this.matches = matches.filter((match: Match) => {return match.home_team.id === team.team_info.id || match.away_team.id === team.team_info.id});
       })
     });
+  }
+
+  refreshMatches() {
+    this.current_date = this.date;
+    this.matches = [];
+    // this.loading = true;
+    this.matchesService.getMatchesByDate(getFormattedDate(this.current_date),
+      getFormattedDate(this.next_week())).then((matches: Match[]) => {
+      this.matches = matches;
+      // this.loading =false;
+    })
   }
 
   ngOnInit(): void {
@@ -69,189 +94,3 @@ export class TeamDetailsComponent implements OnInit {
     ];
   }
 }
-
-
-const mockTeam: Team = {
-  team_ticker: "BOS",
-  team_info: {
-    id: 1610612738,
-    full_name: "Boston Celtics",
-    abbreviation: "BOS",
-    nickname: "Celtics",
-    city: "Boston",
-    state: "MA",
-    year_founded: 1946,
-    arena: "TD Garden"
-  },
-  team_players: [
-    {
-      player_id: 1630552,
-      player: "Marcus Smart",
-      num: "26",
-      position: "G",
-      height: "6-3",
-      weight: 220,
-      age: 29,
-      exp: "6"
-    },
-    {
-      player_id: 123456,
-      player: "Leo Baraldi",
-      num: "37",
-      position: "L",
-      height: "6-11",
-      weight: 210,
-      age: 23,
-      exp: "9"
-    },
-    {
-      player_id: 1630552,
-      player: "Marcus Smart",
-      num: "26",
-      position: "G",
-      height: "6-3",
-      weight: 220,
-      age: 29,
-      exp: "6"
-    },
-    {
-      player_id: 123456,
-      player: "Leo Baraldi",
-      num: "37",
-      position: "L",
-      height: "6-11",
-      weight: 210,
-      age: 23,
-      exp: "9"
-    },
-    {
-      player_id: 1630552,
-      player: "Marcus Smart",
-      num: "26",
-      position: "G",
-      height: "6-3",
-      weight: 220,
-      age: 29,
-      exp: "6"
-    },
-    {
-      player_id: 123456,
-      player: "Leo Baraldi",
-      num: "37",
-      position: "L",
-      height: "6-11",
-      weight: 210,
-      age: 23,
-      exp: "9"
-    },
-
-  ]
-}
-
-const mockMatches: Match[] = [
-  {
-    "game_id": 12345,
-    "match_up": "BKN - WAS",
-    "date": "JUL 12, 2024",
-    "home_team": {
-      "id": 1610612767,
-      "full_name": "Washington Wizards",
-      "abbreviation": "WAS",
-      "nickname": "Wizards",
-      "city": "Washington",
-      "state": "DC",
-      "year_founded": 1939,
-      "arena": "Nome a caso Arena"
-    },
-    "away_team": {
-      "id": 1610612738,
-      "full_name": "Boston Celtics",
-      "abbreviation": "BOS",
-      "nickname": "Celtics",
-      "city": "Boston",
-      "state": "MA",
-      "year_founded": 1946,
-      "arena": "Nome a caso Arena"
-    },
-    "referee": {
-      "name": "Sean Corbin",
-      "id": 1151
-    },
-    "arena": {
-      "name": "Capital One Arena",
-      "city": "Washington",
-      "state": "DC",
-      "country": "US"
-    }
-  },
-  {
-    "game_id": 12345,
-    "match_up": "BKN - WAS",
-    "date": "JUL 13, 2024",
-    "home_team": {
-      "id": 1610612767,
-      "full_name": "Washington Wizards",
-      "abbreviation": "WAS",
-      "nickname": "Wizards",
-      "city": "Washington",
-      "state": "DC",
-      "year_founded": 1939,
-      "arena": "Nome a caso Arena"
-    },
-    "away_team": {
-      "id": 1610612738,
-      "full_name": "Boston Celtics",
-      "abbreviation": "BOS",
-      "nickname": "Celtics",
-      "city": "Boston",
-      "state": "MA",
-      "year_founded": 1946,
-      "arena": "Nome a caso Arena"
-    },
-    "referee": {
-      "name": "Sean Corbin",
-      "id": 1151
-    },
-    "arena": {
-      "name": "Capital One Arena",
-      "city": "Washington",
-      "state": "DC",
-      "country": "US"
-    }
-  },
-  {
-    "game_id": 12345,
-    "match_up": "BKN - WAS",
-    "date": "JUL 14, 2024",
-    "home_team": {
-      "id": 1610612767,
-      "full_name": "Washington Wizards",
-      "abbreviation": "WAS",
-      "nickname": "Wizards",
-      "city": "Washington",
-      "state": "DC",
-      "year_founded": 1939,
-      "arena": "Nome a caso Arena"
-    },
-    "away_team": {
-      "id": 1610612738,
-      "full_name": "Boston Celtics",
-      "abbreviation": "BOS",
-      "nickname": "Celtics",
-      "city": "Boston",
-      "state": "MA",
-      "year_founded": 1946,
-      "arena": "Nome a caso Arena"
-    },
-    "referee": {
-      "name": "Sean Corbin",
-      "id": 1151
-    },
-    "arena": {
-      "name": "Capital One Arena",
-      "city": "Washington",
-      "state": "DC",
-      "country": "US"
-    }
-  }
-];
