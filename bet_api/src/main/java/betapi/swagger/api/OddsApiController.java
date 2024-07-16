@@ -37,22 +37,16 @@ public class OddsApiController implements OddsApi {
 
     private List<Odds> getEventOdds(String sportKey, String eventId, String regions, String market) {
         log.debug("Fetching odds for sportKey: {}, eventId: {}, regions: {}, market: {}", sportKey, eventId, regions, market);
-        Odds odds = null;
-        try {
-            odds = oddsApiService.getEventOdds(sportKey, eventId, regions, market, null, null, null, null, null, null);
-        } catch (Exception e) {
-            if (e.getMessage().contains("Invalid event_id parameter")) {
-                log.warn("Using fake data for odds");
-            }
-            else {
-                log.error("Failed to retrieve odds: {}", e.getMessage());
-                throw new RuntimeException(e);
-            }
-        }
 
-        if (odds == null) {
+        Odds odds;
+        if (eventId != null && eventId.contains("FAKE")) {
+            log.warn("Using fake data for odds");
             odds = FakeOddsGenerator.getFakeOdds(market, sportKey, eventId.split("FAKE")[0], eventId.split("FAKE")[1]);
         }
+        else {
+            odds = oddsApiService.getEventOdds(sportKey, eventId, regions, market, null, null, null, null, null, null);
+        }
+
         try {
             OddsUtils.addBookmakersUrl(odds, regions);
         } catch (IOException e) {
