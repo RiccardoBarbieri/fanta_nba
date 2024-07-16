@@ -1,31 +1,41 @@
 openapi: 3.0.1
 info:
   title: NBA API
-  description: API for retrieving NBA teams, matches, players, and their statistics
+  description: "API for retrieving NBA teams, matches, players, and their statistics"
   version: 1.0.0
+servers:
+  - url: /
 paths:
   /teams:
     get:
       summary: Retrieve all teams by ticker and season
+      operationId: teams_get
       parameters:
-        - in: query
-          name: team_tickers
+        - name: team_tickers
+          in: query
+          description: List of team tickers
+          required: true
+          style: form
+          explode: true
           schema:
             type: array
             items:
               type: string
+          example:
+            - BOS
+            - LAL
+            - MIA
+        - name: season
+          in: query
+          description: "NBA season (e.g., 2023-24)"
           required: true
-          description: List of team tickers
-          example: ["BOS", "LAL", "MIA"]
-        - in: query
-          name: season
+          style: form
+          explode: true
           schema:
             type: string
-          required: true
-          description: NBA season (e.g., 2023-24)
-          example: "2023-24"
+          example: 2023-24
       responses:
-        '200':
+        "200":
           description: A list of teams with their information and players
           content:
             application/json:
@@ -33,101 +43,124 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Team'
-
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.team_controller
   /teams/{team_ticker}:
     get:
       summary: Retrieve team information and players by ticker and season
+      operationId: teams_team_ticker_get
       parameters:
-        - in: path
-          name: team_ticker
-          schema:
-            type: string
-          required: true
+        - name: team_ticker
+          in: path
           description: Team ticker
-          example: "BOS"
-        - in: query
-          name: season
+          required: true
+          style: simple
+          explode: false
           schema:
             type: string
+          example: BOS
+        - name: season
+          in: query
+          description: "NBA season (e.g., 2023-24)"
           required: true
-          description: NBA season (e.g., 2023-24)
-          example: "2023-24"
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 2023-24
       responses:
-        '200':
+        "200":
           description: Team information and list of players
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Team'
-
+      x-openapi-router-controller: swagger_server.controllers.team_controller
   /teams/{team_id}/stats:
     get:
-      summary: Retrieve team stats by team ID, season, date, number of games, and location
+      summary: "Retrieve team stats by team ID, season, date, number of games, and\
+        \ location"
+      operationId: teams_team_id_stats_get
       parameters:
-        - in: path
-          name: team_id
+        - name: team_id
+          in: path
+          description: Team ID
+          required: true
+          style: simple
+          explode: false
           schema:
             type: integer
-          required: true
-          description: Team ID
           example: 1610612738
-        - in: query
-          name: season
+        - name: season
+          in: query
+          description: "NBA season (e.g., 2023-24)"
+          required: true
+          style: form
+          explode: true
           schema:
             type: string
+          example: 2023-24
+        - name: date_to
+          in: query
+          description: Match date up to consider for the stats (format:'YYYY-MM-DD')
           required: true
-          description: NBA season (e.g., 2023-24)
-          example: "2023-24"
-        - in: query
-          name: date_to
+          style: form
+          explode: true
           schema:
             type: string
             format: date
-          required: true
-          description: Match date up to consider for the stats (format:'YYYY-MM-DD')
-          example: "2024-08-08"
-        - in: query
-          name: last_x
+          example: 2024-08-08
+        - name: last_x
+          in: query
+          description: Number of last games to consider
+          required: false
+          style: form
+          explode: true
           schema:
             type: integer
-          required: false
-          description: Number of last games to consider
           example: 5
-        - in: query
-          name: home_away_filter
+        - name: home_away_filter
+          in: query
+          description: Location of the games (HOME or AWAY)
+          required: false
+          style: form
+          explode: true
           schema:
             type: string
-          required: false
-          description: Location of the games (HOME or AWAY)
-          example: "HOME"
+          example: HOME
       responses:
-        '200':
+        "200":
           description: A list of team stats
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TeamStats'
-
+      x-openapi-router-controller: swagger_server.controllers.team_controller
   /matches:
     get:
       summary: Retrieve all matches beetween two dates
+      operationId: matches_get
       parameters:
-        - in: query
-          name: date_from
-          schema:
-            type: string
-          required: true
+        - name: date_from
+          in: query
           description: The cutoff date from which games are considered (format:'YYYY-MM-DD')
-          example: "2024-04-14"
-        - in: query
-          name: date_to
+          required: true
+          style: form
+          explode: true
           schema:
             type: string
-          required: false
+          example: 2024-04-14
+        - name: date_to
+          in: query
           description: The cutoff date until which games are considered (format:'YYYY-MM-DD')
-          example: "2024-04-14"
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 2024-04-14
       responses:
-        '200':
+        "200":
           description: A list of matches
           content:
             application/json:
@@ -135,83 +168,124 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Match'
-
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.match_controller
   /match/{match_id}/stats:
     get:
       summary: Retrieve match stats by match ID
+      operationId: match_match_id_stats_get
       parameters:
-        - in: path
-          name: match_id
-          schema:
-            type: string
-          required: true
+        - name: match_id
+          in: path
           description: Match ID
-          example: "0022301187"
-        - in: query
-          name: match_date
+          required: true
+          style: simple
+          explode: false
           schema:
             type: string
-          required: true
+          example: "0022301187"
+        - name: match_date
+          in: query
           description: The date of the match (format:'YYYY-MM-DD')
-          example: "2024-04-14"
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 2024-04-14
       responses:
-        '200':
+        "200":
           description: Match stats
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatchStats'
-
+      x-openapi-router-controller: swagger_server.controllers.match_controller
   /players/{player_id}/stats:
     get:
-      summary: Retrieve player stats by player ID, season, date, location and number of games
+      summary: "Retrieve player stats by player ID, season, date, location and number\
+        \ of games"
+      operationId: players_player_id_stats_get
       parameters:
-        - in: path
-          name: player_id
-          schema:
-            type: string
-          required: true
+        - name: player_id
+          in: path
           description: Player ID
-          example: "1629027"
-        - in: query
-          name: season
+          required: true
+          style: simple
+          explode: false
           schema:
             type: string
+          example: "1629027"
+        - name: season
+          in: query
+          description: "NBA season (e.g., 2023-24)"
           required: true
-          description: NBA season (e.g., 2023-24)
-          example: "2023-24"
-        - in: query
-          name: date_to
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 2023-24
+        - name: date_to
+          in: query
+          description: Match date up to consider for the stats (format:'YYYY-MM-DD')
+          required: true
+          style: form
+          explode: true
           schema:
             type: string
             format: date
-          required: true
-          description: Match date up to consider for the stats (format:'YYYY-MM-DD')
-          example: "2024-08-08"
-        - in: query
-          name: last_x
+          example: 2024-08-08
+        - name: last_x
+          in: query
+          description: Number of last games to consider
+          required: false
+          style: form
+          explode: true
           schema:
             type: integer
-          required: false
-          description: Number of last games to consider
           example: 5
-        - in: query
-          name: home_away_filter
+        - name: home_away_filter
+          in: query
+          description: Location of the games (HOME or AWAY)
+          required: false
+          style: form
+          explode: true
           schema:
             type: string
-          required: false
-          description: Location of the games (HOME or AWAY)
-          example: "HOME"
+          example: HOME
       responses:
-        '200':
+        "200":
           description: Player stats
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlayerStats'
+      x-openapi-router-controller: swagger_server.controllers.player_controller
+  /standings:
+    get:
+      summary: Retrieve east and west conference standings
+      operationId: standings_get
+      parameters:
+        - name: date
+          in: query
+          description: Date to be considered to evaluate the standing (format:'YYYY-MM-DD')
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 2024-04-14
+      responses:
+        "200":
+          description: East and West conference standings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Standings'
+      x-openapi-router-controller: swagger_server.controllers.league_standing_controller
   /feature_vector:
     get:
-      summary: Retrieve feature vector 
+      summary: Retrieve feature vector
       operationId: feature_vector_get
       parameters:
         - name: team_ticker
@@ -260,19 +334,146 @@ paths:
       x-openapi-router-controller: swagger_server.controllers.feature_vector_controller
 components:
   schemas:
+    Standings:
+      type: object
+      properties:
+        west:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamStandings'
+        east:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamStandings'
+      example:
+        east:
+          - null
+          - null
+        west:
+          - w_pct: 0.692
+            home_record: 21-4
+            conference: West
+            g: 52
+            standingsdate: 2024-02-08T00:00:00.000+00:00
+            season_id: "22023"
+            team_id: 1610612743
+            team: Cleveland Cavaliers
+            l: 16
+            team_ticker: CLE
+            w: 36
+            road_record: 15-12
+            league_id: "00"
+          - w_pct: 0.692
+            home_record: 21-4
+            conference: West
+            g: 52
+            standingsdate: 2024-02-08T00:00:00.000+00:00
+            season_id: "22023"
+            team_id: 1610612743
+            team: Cleveland Cavaliers
+            l: 16
+            team_ticker: CLE
+            w: 36
+            road_record: 15-12
+            league_id: "00"
+    TeamStandings:
+      type: object
+      properties:
+        team_id:
+          type: integer
+          example: 1610612743
+        league_id:
+          type: string
+          example: "00"
+        season_id:
+          type: string
+          example: "22023"
+        standingsdate:
+          type: string
+          format: date
+          example: 2024-02-08
+        conference:
+          type: string
+          example: West
+        team:
+          type: string
+          example: Cleveland Cavaliers
+        team_ticker:
+          type: string
+          example: CLE
+        g:
+          type: integer
+          example: 52
+        w:
+          type: integer
+          example: 36
+        l:
+          type: integer
+          example: 16
+        w_pct:
+          type: number
+          format: float
+          example: 0.692
+        home_record:
+          type: string
+          example: 21-4
+        road_record:
+          type: string
+          example: 15-12
+      example:
+        w_pct: 0.692
+        home_record: 21-4
+        conference: West
+        g: 52
+        standingsdate: 2024-02-08T00:00:00.000+00:00
+        season_id: "22023"
+        team_id: 1610612743
+        team: Cleveland Cavaliers
+        l: 16
+        team_ticker: CLE
+        w: 36
+        road_record: 15-12
+        league_id: "00"
     Team:
       type: object
       properties:
         team_ticker:
           type: string
-          example: "BOS"
+          example: BOS
         team_info:
           $ref: '#/components/schemas/TeamInfo'
         team_players:
           type: array
           items:
             $ref: '#/components/schemas/Player'
-
+      example:
+        team_info:
+          full_name: Boston Celtics
+          city: Boston
+          year_founded: 1946
+          nickname: Celtics
+          id: 1610612738
+          state: MA
+          arena: TD Garden
+          abbreviation: BOS
+        team_players:
+          - player_id: 1630552
+            num: "36"
+            weight: 220
+            position: G
+            exp: "6"
+            age: 29
+            player: Marcus Smart
+            height: 6-3
+          - player_id: 1630552
+            num: "36"
+            weight: 220
+            position: G
+            exp: "6"
+            age: 29
+            player: Marcus Smart
+            height: 6-3
+        team_ticker: BOS
     TeamInfo:
       type: object
       properties:
@@ -281,26 +482,34 @@ components:
           example: 1610612738
         full_name:
           type: string
-          example: "Boston Celtics"
+          example: Boston Celtics
         abbreviation:
           type: string
-          example: "BOS"
+          example: BOS
         nickname:
           type: string
-          example: "Celtics"
+          example: Celtics
         city:
           type: string
-          example: "Boston"
+          example: Boston
         state:
           type: string
-          example: "MA"
+          example: MA
         year_founded:
           type: integer
           example: 1946
         arena:
           type: string
-          example: "TD Garden"
-
+          example: TD Garden
+      example:
+        full_name: Boston Celtics
+        city: Boston
+        year_founded: 1946
+        nickname: Celtics
+        id: 1610612738
+        state: MA
+        arena: TD Garden
+        abbreviation: BOS
     Player:
       type: object
       properties:
@@ -309,16 +518,16 @@ components:
           example: 1630552
         player:
           type: string
-          example: "Marcus Smart"
+          example: Marcus Smart
         num:
           type: string
           example: "36"
         position:
           type: string
-          example: "G"
+          example: G
         height:
           type: string
-          example: "6-3"
+          example: 6-3
         weight:
           type: integer
           example: 220
@@ -328,7 +537,15 @@ components:
         exp:
           type: string
           example: "6"
-
+      example:
+        player_id: 1630552
+        num: "36"
+        weight: 220
+        position: G
+        exp: "6"
+        age: 29
+        player: Marcus Smart
+        height: 6-3
     TeamStats:
       type: object
       properties:
@@ -337,117 +554,172 @@ components:
           items:
             $ref: '#/components/schemas/TeamMatchStat'
         totals:
-          type: object
+          type: array
           items:
-            properties:
-              wins:
-                type: integer
-                example: 2
-              losses:
-                type: integer
-                example: 3
+            $ref: '#/components/schemas/TeamStats_totals'
         average:
           $ref: '#/components/schemas/Average'
-       
-       
+      example:
+        average:
+          - fg3a: 32
+            blk: 5.4
+            fga: 6
+            ast: 25
+            dreb: 35.8
+            fg_pct: 0.4367
+            stl: 8.4
+            fgm: 0
+            ft_pct: 0.4367
+            fg3_pct: 0.4367
+            reb: 45.9
+            pts: 16.4
+            fta: 22
+            fg3m: 12.2
+            oreb: 10.1
+            pf: 20
+            tov: 13.4
+            ftm: 18.3
+          - fg3a: 32
+            blk: 5.4
+            fga: 6
+            ast: 25
+            dreb: 35.8
+            fg_pct: 0.4367
+            stl: 8.4
+            fgm: 0
+            ft_pct: 0.4367
+            fg3_pct: 0.4367
+            reb: 45.9
+            pts: 16.4
+            fta: 22
+            fg3m: 12.2
+            oreb: 10.1
+            pf: 20
+            tov: 13.4
+            ftm: 18.3
+        all_stats:
+          - fga: 85
+            ast: 25
+            dreb: 35
+            fg_pct: 47.1
+            team_id: 1610612738
+            fgm: 40
+            fg3_pct: 37.5
+            reb: 45
+            fta: 22
+            min: 240
+            wl: W
+            tov: 13
+            ftm: 18
+            game_id: "0022001074"
+            w_pct: 0.45
+            fg3a: 32
+            blk: 5
+            match_up: BOS vs. LAL
+            team_abbreviation: BOS
+            stl: 8
+            l: 44
+            ft_pct: 81.8
+            team_name: Boston Celtics
+            pts: 110
+            fg3m: 12
+            oreb: 10
+            pf: 20
+            w: 36
+            game_date: 2024-01-23T00:00:00.000+00:00
+          - fga: 85
+            ast: 25
+            dreb: 35
+            fg_pct: 47.1
+            team_id: 1610612738
+            fgm: 40
+            fg3_pct: 37.5
+            reb: 45
+            fta: 22
+            min: 240
+            wl: W
+            tov: 13
+            ftm: 18
+            game_id: "0022001074"
+            w_pct: 0.45
+            fg3a: 32
+            blk: 5
+            match_up: BOS vs. LAL
+            team_abbreviation: BOS
+            stl: 8
+            l: 44
+            ft_pct: 81.8
+            team_name: Boston Celtics
+            pts: 110
+            fg3m: 12
+            oreb: 10
+            pf: 20
+            w: 36
+            game_date: 2024-01-23T00:00:00.000+00:00
+        totals:
+          - wins: 2
+            losses: 3
+          - wins: 2
+            losses: 3
     AveragePlayer:
       allOf:
         - $ref: '#/components/schemas/Average'
         - type: object
           properties:
             plus_minus:
-                type: number
-                example: -2.2
-            
+              type: number
+              example: -2.2
     Average:
-          type: object
-          items:
-            properties:
-              fgm:
-                type: integer
-                example: 40.4
-              fga:
-                type: integer
-                example: 85.5
-              fg_pct:
-                type: number
-                example: 0.4367
-              fg3m:
-                type: number
-                example: 12.2
-              fg3a:
-                type: number
-                example: 32.0
-              fg3_pct:
-                type: number
-                example: 0.4367
-              ftm:
-                type: number
-                example: 18.3
-              fta:
-                type: number
-                example: 22.0
-              ft_pct:
-                type: number
-                example: 0.4367
-              oreb:
-                type: number
-                example: 10.1
-              dreb:
-                type: number
-                example: 35.8
-              reb:
-                type: number
-                example: 45.9
-              ast:
-                type: number
-                example: 25
-              stl:
-                type: number
-                example: 8.4
-              blk:
-                type: number
-                example: 5.4
-              tov:
-                type: number
-                example: 13.4
-              pf:
-                type: number
-                example: 20.0
-              pts:
-                type: number
-                example: 16.4
-
+      type: array
+      items:
+        $ref: '#/components/schemas/Average_inner'
     Match:
       type: object
       properties:
         match_up:
           type: string
-          example: "CLE vs. CHA"
+          example: CLE vs. CHA
         game_id:
           type: string
           example: "0022301187"
         date:
           type: string
           format: date
-          example: "2024-04-14"
+          example: 2024-04-14
         home_team:
           $ref: '#/components/schemas/TeamInfo'
         away_team:
           $ref: '#/components/schemas/TeamInfo'
         referee:
           $ref: '#/components/schemas/Referee'
-          
+      example:
+        date: 2024-04-14T00:00:00.000+00:00
+        match_up: CLE vs. CHA
+        home_team:
+          full_name: Boston Celtics
+          city: Boston
+          year_founded: 1946
+          nickname: Celtics
+          id: 1610612738
+          state: MA
+          arena: TD Garden
+          abbreviation: BOS
+        referee:
+          name: Sean Corbin
+          id: 1151
+        game_id: "0022301187"
     Referee:
       type: object
       properties:
         name:
           type: string
-          example: "Sean Corbin"
+          example: Sean Corbin
         id:
           type: integer
           example: 1151
-
+      example:
+        name: Sean Corbin
+        id: 1151
     MatchStats:
       type: object
       properties:
@@ -459,7 +731,101 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LastMatchStats'
-
+      example:
+        actual_match_stats:
+          - global_stats:
+              home_point: 123
+              winner: GSW
+              match_up: GSW vs. UTA
+              away_point: 116
+              game_date: 2024-04-14T00:00:00.000+00:00
+              game_id: "0022301198"
+            by_home_stats:
+              fga: 85
+              ast: 25
+              dreb: 35
+              fg_pct: 47.1
+              team_id: 1610612738
+              fgm: 40
+              fg3_pct: 37.5
+              reb: 45
+              video_available: 1
+              fta: 22
+              min: 240
+              wl: W
+              tov: 13
+              ftm: 18
+              game_id: "0022001074"
+              fg3a: 32
+              blk: 5
+              match_up: BOS vs. LAL
+              team_abbreviation: BOS
+              season_id: "22023"
+              stl: 8
+              ft_pct: 81.8
+              team_name: Boston Celtics
+              pts: 110
+              plus_minus: -6
+              fg3m: 12
+              oreb: 10
+              pf: 20
+              game_date: 2024-01-23T00:00:00.000+00:00
+          - global_stats:
+              home_point: 123
+              winner: GSW
+              match_up: GSW vs. UTA
+              away_point: 116
+              game_date: 2024-04-14T00:00:00.000+00:00
+              game_id: "0022301198"
+            by_home_stats:
+              fga: 85
+              ast: 25
+              dreb: 35
+              fg_pct: 47.1
+              team_id: 1610612738
+              fgm: 40
+              fg3_pct: 37.5
+              reb: 45
+              video_available: 1
+              fta: 22
+              min: 240
+              wl: W
+              tov: 13
+              ftm: 18
+              game_id: "0022001074"
+              fg3a: 32
+              blk: 5
+              match_up: BOS vs. LAL
+              team_abbreviation: BOS
+              season_id: "22023"
+              stl: 8
+              ft_pct: 81.8
+              team_name: Boston Celtics
+              pts: 110
+              plus_minus: -6
+              fg3m: 12
+              oreb: 10
+              pf: 20
+              game_date: 2024-01-23T00:00:00.000+00:00
+        last_match_stats:
+          - global_stats:
+              - null
+              - null
+            by_away_stats:
+              - null
+              - null
+            by_home_stats:
+              - null
+              - null
+          - global_stats:
+              - null
+              - null
+            by_away_stats:
+              - null
+              - null
+            by_home_stats:
+              - null
+              - null
     GlobalStats:
       type: object
       properties:
@@ -469,20 +835,26 @@ components:
         game_date:
           type: string
           format: date
-          example: "2024-04-14"
+          example: 2024-04-14
         match_up:
           type: string
-          example: "GSW vs. UTA"
+          example: GSW vs. UTA
         winner:
           type: string
-          example: "GSW"
+          example: GSW
         home_point:
           type: integer
           example: 123
         away_point:
           type: integer
           example: 116
-
+      example:
+        home_point: 123
+        winner: GSW
+        match_up: GSW vs. UTA
+        away_point: 116
+        game_date: 2024-04-14T00:00:00.000+00:00
+        game_id: "0022301198"
     ActualMatchStats:
       type: object
       properties:
@@ -492,7 +864,44 @@ components:
           $ref: '#/components/schemas/Stat'
         by_away_stats:
           $ref: '#/components/schemas/Stat'
-
+      example:
+        global_stats:
+          home_point: 123
+          winner: GSW
+          match_up: GSW vs. UTA
+          away_point: 116
+          game_date: 2024-04-14T00:00:00.000+00:00
+          game_id: "0022301198"
+        by_home_stats:
+          fga: 85
+          ast: 25
+          dreb: 35
+          fg_pct: 47.1
+          team_id: 1610612738
+          fgm: 40
+          fg3_pct: 37.5
+          reb: 45
+          video_available: 1
+          fta: 22
+          min: 240
+          wl: W
+          tov: 13
+          ftm: 18
+          game_id: "0022001074"
+          fg3a: 32
+          blk: 5
+          match_up: BOS vs. LAL
+          team_abbreviation: BOS
+          season_id: "22023"
+          stl: 8
+          ft_pct: 81.8
+          team_name: Boston Celtics
+          pts: 110
+          plus_minus: -6
+          fg3m: 12
+          oreb: 10
+          pf: 20
+          game_date: 2024-01-23T00:00:00.000+00:00
     LastMatchStats:
       type: object
       properties:
@@ -508,7 +917,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Stat'
-         
+      example:
+        global_stats:
+          - null
+          - null
+        by_away_stats:
+          - null
+          - null
+        by_home_stats:
+          - null
+          - null
     TeamMatchStat:
       type: object
       properties:
@@ -517,23 +935,23 @@ components:
           example: 1610612738
         team_abbreviation:
           type: string
-          example: "BOS"
+          example: BOS
         team_name:
           type: string
-          example: "Boston Celtics"
+          example: Boston Celtics
         game_id:
           type: string
           example: "0022001074"
         game_date:
           type: string
           format: date
-          example: "2024-01-23"
+          example: 2024-01-23
         match_up:
           type: string
-          example: "BOS vs. LAL"
+          example: BOS vs. LAL
         wl:
           type: string
-          example: "W"
+          example: W
         w:
           type: integer
           example: 36
@@ -600,7 +1018,36 @@ components:
         pts:
           type: integer
           example: 110
-          
+      example:
+        fga: 85
+        ast: 25
+        dreb: 35
+        fg_pct: 47.1
+        team_id: 1610612738
+        fgm: 40
+        fg3_pct: 37.5
+        reb: 45
+        fta: 22
+        min: 240
+        wl: W
+        tov: 13
+        ftm: 18
+        game_id: "0022001074"
+        w_pct: 0.45
+        fg3a: 32
+        blk: 5
+        match_up: BOS vs. LAL
+        team_abbreviation: BOS
+        stl: 8
+        l: 44
+        ft_pct: 81.8
+        team_name: Boston Celtics
+        pts: 110
+        fg3m: 12
+        oreb: 10
+        pf: 20
+        w: 36
+        game_date: 2024-01-23T00:00:00.000+00:00
     Stat:
       type: object
       properties:
@@ -612,23 +1059,23 @@ components:
           example: 1610612738
         team_abbreviation:
           type: string
-          example: "BOS"
+          example: BOS
         team_name:
           type: string
-          example: "Boston Celtics"
+          example: Boston Celtics
         game_id:
           type: string
           example: "0022001074"
         game_date:
           type: string
           format: date
-          example: "2024-01-23"
+          example: 2024-01-23
         match_up:
           type: string
-          example: "BOS vs. LAL"
+          example: BOS vs. LAL
         wl:
           type: string
-          example: "W"
+          example: W
         min:
           type: integer
           example: 240
@@ -692,7 +1139,36 @@ components:
         video_available:
           type: number
           example: 1
-
+      example:
+        fga: 85
+        ast: 25
+        dreb: 35
+        fg_pct: 47.1
+        team_id: 1610612738
+        fgm: 40
+        fg3_pct: 37.5
+        reb: 45
+        video_available: 1
+        fta: 22
+        min: 240
+        wl: W
+        tov: 13
+        ftm: 18
+        game_id: "0022001074"
+        fg3a: 32
+        blk: 5
+        match_up: BOS vs. LAL
+        team_abbreviation: BOS
+        season_id: "22023"
+        stl: 8
+        ft_pct: 81.8
+        team_name: Boston Celtics
+        pts: 110
+        plus_minus: -6
+        fg3m: 12
+        oreb: 10
+        pf: 20
+        game_date: 2024-01-23T00:00:00.000+00:00
     PlayerStats:
       type: object
       properties:
@@ -701,28 +1177,82 @@ components:
           items:
             $ref: '#/components/schemas/PlayerMatchStats'
         totals:
-          type: object
+          type: array
           items:
-            properties:
-              wins:
-                type: integer
-                example: 2
-              losses:
-                type: integer
-                example: 3
+            $ref: '#/components/schemas/TeamStats_totals'
         average:
           $ref: '#/components/schemas/AveragePlayer'
         player_efficiency:
-          type: object
+          type: array
           items:
-            properties:
-              all:
-                type: number
-                example: 19.5192
-              filtered_matches:
-                type: number
-                example: 14.6
-
+            $ref: '#/components/schemas/PlayerStats_player_efficiency'
+      example:
+        average: ""
+        all_stats:
+          - fga: 15
+            ast: 7
+            dreb: 4
+            fg_pct: 53.3
+            fgm: 8
+            fg3_pct: 44.4
+            reb: 5
+            video_available: 1
+            fta: 2
+            player_id: 203507
+            min: 36
+            wl: W
+            tov: 3
+            ftm: 2
+            game_id: "0022001074"
+            fg3a: 9
+            blk: 1
+            match_up: BOS vs. LAL
+            season_id: "22023"
+            stl: 2
+            ft_pct: 100
+            pts: 22
+            plus_minus: -6
+            fg3m: 4
+            oreb: 1
+            pf: 4
+            game_date: 2000-01-23
+          - fga: 15
+            ast: 7
+            dreb: 4
+            fg_pct: 53.3
+            fgm: 8
+            fg3_pct: 44.4
+            reb: 5
+            video_available: 1
+            fta: 2
+            player_id: 203507
+            min: 36
+            wl: W
+            tov: 3
+            ftm: 2
+            game_id: "0022001074"
+            fg3a: 9
+            blk: 1
+            match_up: BOS vs. LAL
+            season_id: "22023"
+            stl: 2
+            ft_pct: 100
+            pts: 22
+            plus_minus: -6
+            fg3m: 4
+            oreb: 1
+            pf: 4
+            game_date: 2000-01-23
+        totals:
+          - wins: 2
+            losses: 3
+          - wins: 2
+            losses: 3
+        player_efficiency:
+          - all: 19.5192
+            filtered_matches: 14.6
+          - all: 19.5192
+            filtered_matches: 14.6
     PlayerMatchStats:
       type: object
       properties:
@@ -738,13 +1268,12 @@ components:
         game_date:
           type: string
           format: date
-          example: "APR 10, 2024"
         match_up:
           type: string
-          example: "BOS vs. LAL"
+          example: BOS vs. LAL
         wl:
           type: string
-          example: "W"
+          example: W
         min:
           type: number
           example: 36
@@ -808,21 +1337,144 @@ components:
         video_available:
           type: number
           example: 1
+      example:
+        fga: 15
+        ast: 7
+        dreb: 4
+        fg_pct: 53.3
+        fgm: 8
+        fg3_pct: 44.4
+        reb: 5
+        video_available: 1
+        fta: 2
+        player_id: 203507
+        min: 36
+        wl: W
+        tov: 3
+        ftm: 2
+        game_id: "0022001074"
+        fg3a: 9
+        blk: 1
+        match_up: BOS vs. LAL
+        season_id: "22023"
+        stl: 2
+        ft_pct: 100
+        pts: 22
+        plus_minus: -6
+        fg3m: 4
+        oreb: 1
+        pf: 4
+        game_date: 2000-01-23
+    TeamStats_totals:
+      properties:
+        wins:
+          type: integer
+          example: 2
+        losses:
+          type: integer
+          example: 3
+      example:
+        wins: 2
+        losses: 3
+    Average_inner:
+      properties:
+        fgm:
+          type: integer
+        fga:
+          type: integer
+        fg_pct:
+          type: number
+          example: 0.4367
+        fg3m:
+          type: number
+          example: 12.2
+        fg3a:
+          type: number
+          example: 32
+        fg3_pct:
+          type: number
+          example: 0.4367
+        ftm:
+          type: number
+          example: 18.3
+        fta:
+          type: number
+          example: 22
+        ft_pct:
+          type: number
+          example: 0.4367
+        oreb:
+          type: number
+          example: 10.1
+        dreb:
+          type: number
+          example: 35.8
+        reb:
+          type: number
+          example: 45.9
+        ast:
+          type: number
+          example: 25
+        stl:
+          type: number
+          example: 8.4
+        blk:
+          type: number
+          example: 5.4
+        tov:
+          type: number
+          example: 13.4
+        pf:
+          type: number
+          example: 20
+        pts:
+          type: number
+          example: 16.4
+      example:
+        fg3a: 32
+        blk: 5.4
+        fga: 6
+        ast: 25
+        dreb: 35.8
+        fg_pct: 0.4367
+        stl: 8.4
+        fgm: 0
+        ft_pct: 0.4367
+        fg3_pct: 0.4367
+        reb: 45.9
+        pts: 16.4
+        fta: 22
+        fg3m: 12.2
+        oreb: 10.1
+        pf: 20
+        tov: 13.4
+        ftm: 18.3
+    PlayerStats_player_efficiency:
+      properties:
+        all:
+          type: number
+          example: 19.5192
+        filtered_matches:
+          type: number
+          example: 14.6
+      example:
+        all: 19.5192
+        filtered_matches: 14.6
     FeatureVector:
       type: object
       properties:
         fg_pct_H:
           type: number
-          format: float
           description: Field goal percentage for the home team
+          format: float
         fg3_pct_H:
           type: number
-          format: float
           description: Three-point field goal percentage for the home team
+          format: float
         ft_pct_H:
           type: number
-          format: float
           description: Free throw percentage for the home team
+          format: float
         reb_H:
           type: integer
           description: Total rebounds for the home team
@@ -840,28 +1492,28 @@ components:
           description: Total blocks for the home team
         ts_pct_H:
           type: number
-          format: float
           description: True shooting percentage for the home team
+          format: float
         w_pct_H:
           type: number
-          format: float
           description: Winning percentage for the home team
+          format: float
         w_pct_last_5_games_H:
           type: number
-          format: float
           description: Winning percentage in the last 5 games for the home team
+          format: float
         fg_pct_A:
           type: number
-          format: float
           description: Field goal percentage for the away team
+          format: float
         fg3_pct_A:
           type: number
-          format: float
           description: Three-point field goal percentage for the away team
+          format: float
         ft_pct_A:
           type: number
-          format: float
           description: Free throw percentage for the away team
+          format: float
         reb_A:
           type: integer
           description: Total rebounds for the away team
@@ -879,40 +1531,40 @@ components:
           description: Total blocks for the away team
         ts_pct_A:
           type: number
-          format: float
           description: True shooting percentage for the away team
+          format: float
         w_pct_A:
           type: number
-          format: float
           description: Winning percentage for the away team
+          format: float
         w_pct_last_5_games_A:
           type: number
-          format: float
           description: Winning percentage in the last 5 games for the away team
+          format: float
         off_rating_H:
           type: number
-          format: float
           description: Offensive rating for the home team
+          format: float
         def_rating_H:
           type: number
-          format: float
           description: Defensive rating for the home team
+          format: float
         off_rating_A:
           type: number
-          format: float
           description: Offensive rating for the away team
+          format: float
         def_rating_A:
           type: number
-          format: float
           description: Defensive rating for the away team
+          format: float
         lineup_efficiency_H:
           type: number
-          format: float
           description: Lineup efficiency for the home team
+          format: float
         lineup_efficiency_A:
           type: number
-          format: float
           description: Lineup efficiency for the away team
+          format: float
         home_team:
           type: string
           description: Home team code
@@ -936,8 +1588,8 @@ components:
           description: Season year
         date:
           type: string
-          format: date
           description: Date of the game
+          format: date
         playoff:
           type: boolean
           description: Indicates if the game was a playoff game
@@ -976,14 +1628,15 @@ components:
         def_rating_A: 115.03496503496504
         lineup_efficiency_H: 11.921331417624522
         lineup_efficiency_A: 13.659979368814922
-        home_team: "ORL"
-        away_team: "MIL"
+        home_team: ORL
+        away_team: MIL
         game_id: "0022301191"
-        winner: "home"
+        winner: home
         pts_H: 113
         pts_A: 88
-        season: "2023-24"
-        date: "2024-04-14"
+        season: 2023-24
+        date: 2024-04-14
         playoff: false
-        referee_name: "Brent Barnaky"
-        referee_id: 201638       
+        referee_name: Brent Barnaky
+        referee_id: 201638
+
