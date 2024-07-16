@@ -5,6 +5,8 @@ on:
     branches: [ "master" ]
     paths:
       - 'nba_api/**'
+    paths-ignore:
+      - '*.yaml'
 
 jobs:
   buildImage:
