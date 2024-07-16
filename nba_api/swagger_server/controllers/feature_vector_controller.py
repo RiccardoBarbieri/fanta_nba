@@ -3,6 +3,16 @@ import traceback
 
 from featurevec.feature_vector_calculator import get_feature_vector, get_game_id_and_season_type, is_team_home
 
+from utils.constants import FV_COLS
+
+
+def get_empty_feature_vector():
+    empty_fv = {}
+    for i in FV_COLS:
+        empty_fv.update({i: None})
+
+    return empty_fv
+
 
 def feature_vector_get(season: str, team_ticker: str, opp_team_ticker: str, date: str) -> dict[str, any]:
     """
@@ -14,8 +24,11 @@ def feature_vector_get(season: str, team_ticker: str, opp_team_ticker: str, date
     :param date: Date
     :return: Feature vector
     """
+    max_retries = 5
+
     success = False
-    while not success:
+    retries = 0
+    while not success and retries < max_retries:
         try:
             info = get_game_id_and_season_type(team_ticker, season, date)
             success = True
@@ -25,12 +38,14 @@ def feature_vector_get(season: str, team_ticker: str, opp_team_ticker: str, date
             traceback.print_exc()
             success = False
             time.sleep(1)
+            retries += 1
 
     game_id = info["game_id"]
     playoff = info["playoff"]
 
     success = False
-    while not success:
+    retries = 0
+    while not success and retries < max_retries:
         try:
             is_main_team_home = is_team_home(team_ticker, game_id, season)
             success = True
@@ -40,9 +55,12 @@ def feature_vector_get(season: str, team_ticker: str, opp_team_ticker: str, date
             traceback.print_exc()
             success = False
             time.sleep(1)
+            retries += 1
 
+    feature_vector = get_empty_feature_vector()
     success = False
-    while not success:
+    retries = 0
+    while not success and retries < max_retries:
         try:
             feature_vector = get_feature_vector(
                 season,
@@ -59,5 +77,6 @@ def feature_vector_get(season: str, team_ticker: str, opp_team_ticker: str, date
             traceback.print_exc()
             success = False
             time.sleep(1)
+            retries += 1
 
     return feature_vector

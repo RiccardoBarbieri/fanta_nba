@@ -158,11 +158,9 @@ def get_dash_lineups(team_ticker: str, opp_team_ticker: str, game_id: str, seaso
                                          date_to_nullable=date,
                                          season_type_all_star=season_type,
                                          # headers={'User-Agent': next(user_agents_cycle)}
-                                         )
+                                         ).get_normalized_dict()['Lineups']
     logger.debug(f'get_dash_lineups took {time.time() - start_time} seconds')
     time.sleep(0.3)
-
-    dash_lineups = dash_lineups.get_normalized_dict()['Lineups']
 
     return all_keys_to_lower(dash_lineups)
 
