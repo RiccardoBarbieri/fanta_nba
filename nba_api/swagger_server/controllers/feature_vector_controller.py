@@ -1,5 +1,7 @@
+import os
 import time
 import traceback
+import requests
 
 from featurevec.feature_vector_calculator import get_feature_vector, get_game_id_and_season_type, is_team_home
 
@@ -80,3 +82,27 @@ def feature_vector_get(season: str, team_ticker: str, opp_team_ticker: str, date
             retries += 1
 
     return feature_vector
+
+
+def score_get(feature_vector: dict[str, any]):
+    """
+    Get score for a given feature vector
+
+    :param feature_vector: Feature vector
+    :return: Score
+    """
+    url = 'https://fanta-nba-mlw-uuyto.westeurope.inference.ml.azure.com/score'
+    apiKey = os.getenv('ML_API_KEY')
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {apiKey}'
+    }
+    obj = {'data': feature_vector}
+
+    response = requests.post(url, headers=headers, json=obj)
+
+    if response.status_code != 200:
+        print(f"Error: {response.status_code}, {response.text}")
+        return None
+
+    return float(response.json()[0])

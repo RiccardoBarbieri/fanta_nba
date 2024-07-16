@@ -43,3 +43,4 @@ def run(raw_data):
     print(result)
     logging.info("Request processed")
     return result.tolist()
+

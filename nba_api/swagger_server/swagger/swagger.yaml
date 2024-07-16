@@ -332,6 +332,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/FeatureVector'
       x-openapi-router-controller: swagger_server.controllers.feature_vector_controller
+  /score:
+    post:
+      summary: Score on feature vector
+      operationId: score_get
+      requestBody:
+        x-body-name: feature_vector
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureVector'
+      responses:
+        "200":
+          description: Plus minus score
+          content:
+            application/json:
+              schema:
+                type: number
+      x-openapi-router-controller: swagger_server.controllers.feature_vector_controller
+
 components:
   schemas:
     Standings:
