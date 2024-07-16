@@ -26,44 +26,20 @@ def feature_vector_get(season: str, team_ticker: str, opp_team_ticker: str, date
     :param date: Date
     :return: Feature vector
     """
-    max_retries = 5
-
-    success = False
-    retries = 0
-    while not success and retries < max_retries:
-        try:
-            info = get_game_id_and_season_type(team_ticker, season, date)
-            success = True
-        except Exception as e:
-            print("Error occured")
-            print(e)
-            traceback.print_exc()
-            success = False
-            time.sleep(1)
-            retries += 1
-
-    game_id = info["game_id"]
-    playoff = info["playoff"]
-
-    success = False
-    retries = 0
-    while not success and retries < max_retries:
-        try:
-            is_main_team_home = is_team_home(team_ticker, game_id, season)
-            success = True
-        except Exception as e:
-            print("Error occured")
-            print(e)
-            traceback.print_exc()
-            success = False
-            time.sleep(1)
-            retries += 1
+    max_retries = 10
 
     feature_vector = get_empty_feature_vector()
+
     success = False
     retries = 0
-    while not success and retries < max_retries:
+    while not success and retries <= max_retries:
         try:
+            info = get_game_id_and_season_type(team_ticker, season, date)
+            game_id = info["game_id"]
+            playoff = info["playoff"]
+
+            is_main_team_home = is_team_home(team_ticker, game_id, season)
+
             feature_vector = get_feature_vector(
                 season,
                 team_ticker,
