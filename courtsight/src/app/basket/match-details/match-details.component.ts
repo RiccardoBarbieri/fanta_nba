@@ -5,10 +5,12 @@ import {Match} from "../match";
 import {DividerModule} from "primeng/divider";
 import {ActualAndLastMatchStats, MatchStats} from "../stats";
 import {FieldsetModule} from "primeng/fieldset";
-import {DatePipe} from "@angular/common";
+import {CommonModule, DatePipe} from "@angular/common";
 import {SplitterModule} from "primeng/splitter";
 import {StatsTableComponent} from "./stats-table/stats-table.component";
 import {MeterGroupModule, MeterItem} from "primeng/metergroup";
+import {PanelModule} from "primeng/panel";
+import {CardModule} from "primeng/card";
 
 @Component({
   selector: 'app-match-details',
@@ -20,7 +22,10 @@ import {MeterGroupModule, MeterItem} from "primeng/metergroup";
     DatePipe,
     SplitterModule,
     StatsTableComponent,
-    MeterGroupModule
+    MeterGroupModule,
+    CommonModule,
+    PanelModule,
+    CardModule
   ],
   templateUrl: './match-details.component.html',
   styleUrl: './match-details.component.css'
@@ -30,28 +35,34 @@ export class MatchDetailsComponent {
   matchesService = inject(MatchesService);
 
   matchStats: MatchStats | undefined;
-  meterValue: MeterItem[] | undefined;
+  meterValue: MeterItem[] = [];
 
   constructor() {
     const match_id = this.route.snapshot.params["id"];
     const match_date = this.route.snapshot.params["date"];
 
-    this.matchesService.getMatchStatsById(match_id, match_date).then((matches: ActualAndLastMatchStats[]) => {
-      if (matches.length > 0) {
-        this.matchStats = matches[0].actual_match_stats
+    this.matchesService.getMatchStatsById(match_id, match_date).then((matches: ActualAndLastMatchStats) => {
+      this.matchStats = matches.actual_match_stats
 
-        let homePts = this.matchStats.by_home_stats.pts;
-        let awayPts = this.matchStats.by_away_stats.pts;
-        let total = homePts + awayPts;
+      let homePts = this.matchStats.by_home_stats.pts;
+      let awayPts = this.matchStats.by_away_stats.pts;
+      let total = homePts + awayPts;
 
-        this.meterValue = [
-          {label: '', value: homePts / total * 100, color: '#52c35b'},
-          {label: '', value: awayPts / total * 100, color: '#e67229'},
-        ]
-      }
+      this.meterValue = [
+        {label: '', value: homePts / total * 100, color: homePts >= awayPts ? colors.winningLeft : colors.losingLeft},
+        {label: '', value: awayPts / total * 100, color: homePts < awayPts ? colors.winningRight : colors.losingRight},
+      ]
+
     });
     // this.matchStats = mochMatchStats.actual_match_stats;
   }
+}
+
+export const colors = {
+  winningLeft: "#3bc21d",
+  losingLeft: "rgba(73,225,11,0.25)",
+  winningRight: "#eb9c08",
+  losingRight: "rgba(235,156,8,0.25)",
 }
 
 const mockMatch: Match =

@@ -52,7 +52,7 @@ export class MatchesService {
     return await data.json() ?? [];
   }
 
-  async getMatchStatsById(match_id: number, match_date: string): Promise<ActualAndLastMatchStats[]> {
+  async getMatchStatsById(match_id: number, match_date: string): Promise<ActualAndLastMatchStats> {
     const data = await fetch(this.nba_api_url + 'match/' + match_id + '/stats?' + new URLSearchParams({
       match_date: match_date,
     }), {

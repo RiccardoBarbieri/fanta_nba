@@ -5,6 +5,8 @@ import {Button} from "primeng/button";
 import {Row} from "../standings.component";
 import {RouterLink} from "@angular/router";
 import {NgClass} from "@angular/common";
+import {PanelModule} from "primeng/panel";
+import {FieldsetModule} from "primeng/fieldset";
 
 @Component({
   selector: 'app-standings-list',
@@ -14,7 +16,9 @@ import {NgClass} from "@angular/common";
     TableModule,
     Button,
     RouterLink,
-    NgClass
+    NgClass,
+    PanelModule,
+    FieldsetModule
   ],
   templateUrl: './standings-list.component.html',
   styleUrl: './standings-list.component.css'
