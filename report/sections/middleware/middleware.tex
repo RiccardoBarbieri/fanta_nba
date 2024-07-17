@@ -110,9 +110,17 @@ Tuttavia, per poter utilizzare le librerie Python di \texttt{swar/nba\_api}, abb
 
 Oltre alla facilitazione già fornita da Swagger, tramite Python è stato possibile mappare gli endpoint ai metodi direttamente dalla specifica YAML, aggiungendo qualche campo in più. Questo ha aumentato di gran lunga la manutenibilità e l'estensibilità del middleware. L'aggiunta di nuovi endpoint nel corso dello sviluppo ha comportato solo l'inserimento dei percorsi nel codice Swagger e l'implementazione delle funzioni con la logica applicativa necessaria.
 
+\subsubsection{Problema nba api}
+
+La libreria Python che abbiamo usato per ottenere le statistiche effettua le richieste al \texttt{nba.com} tramite l'endpoint \texttt{stats.nba.com}, l'API esposta è soggetta a un rate limiting rigoroso, per questo può succedere che alcune chiamate falliscano per timeout.
+
+Un'altro problema riscontrato consiste nel fatto che l'API blocca tutte le richieste provenienti da cloud pubblici per ragioni di sicurezza, per questa proof of concept abbiamo deciso di implementare uno switch che indirizza le richieste tramite un proxy \textit{solo quando in esecuzione in ambiente di produzione}, ovvero su Azure Cloud; il proxy in questione è in esecuzione on-premise.
+
+In futuro per migliorare l'affidabilità del middleware si potrà implementare l'API NBA ufficiale.
+
 \subsubsection{Dati di allenamento del modello}
 Lo scopo di questo middleware non è solo quello di fornire degli endpoint per l'applicazione web. Infatti, grazie all'implementazione di metodi comuni e all'utilizzo delle librerie di \texttt{swar/nba\_api}, sono state aggiunte parti di codice volte a popolare il database di allenamento del modello di machine learning per la previsione dell'esito delle partite.
 
-Oltre alla grande comunanza di codice, questa scelta è stata fatta anche per un miglioramento delle prestazioni, particolarmente a lungo termine, tramite l'uso della \textbf{cache} per i metodi della libreria.
+Oltre al fatto che le due task condividono gran parte delle funzioni di utilità, questa scelta è stata fatta anche per un miglioramento delle prestazioni, particolarmente a lungo termine, tramite l'uso della \textbf{cache} per i metodi della libreria.
 
 Come sviluppo futuro, non realizzato per mancanza di tempo, si potrebbe pensare di dividere questo middleware in tre microservizi: un REST API Server che utilizza le librerie di \texttt{swar/nba\_api} e che fornisce endpoint per gli altri due microservizi, il primo che funge da middleware per l'applicazione e il secondo che si occupa di ottenere i dati e popolare il database di allenamento del modello di machine learning.
