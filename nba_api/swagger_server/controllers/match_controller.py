@@ -66,6 +66,9 @@ def matches_get(date_from: str, date_to: str | None = None) -> list[dict[str, st
     matches = helper.get_league_game_log_by_date(date_from, date_to)
 
     res = []
+    if matches is None:
+        return res
+
     for match in matches:
         if "@" in match["matchup"]:
             continue
