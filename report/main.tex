@@ -9,9 +9,27 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{float}
 \usepackage{hyperref}
+\usepackage[cache=false]{minted}
 \usepackage[utf8]{inputenc}
 \usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{subcaption}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pgfplots}
+\usepackage{eurosym}
+\usepackage{interval}
 \newcommand\hr{\par\vspace{-.5\ht\strutbox}\noindent\hrulefill\par}
+
+\newenvironment{multicolfigure}    
+  {\par\medskip\noindent\minipage{\linewidth}}    
+  {\endminipage\par\medskip}    
+
+\definecolor{lightgray}{gray}{0.95}
 
 \numberwithin{equation}{section}
 \onehalfspacing
