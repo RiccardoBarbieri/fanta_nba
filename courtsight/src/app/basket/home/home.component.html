@@ -1,0 +1,32 @@
+<div class="grid">
+
+  <div class="col-12">
+    <p-card header="This Week's Matches"
+            subheader="From {{date | date: 'EEEE - MMMM d, y'}} to {{next_week() | date: 'EEEE - MMMM d, y'}}">
+      <app-match-list *ngIf="!loading" [matches]="matches"></app-match-list>
+      <p-dataView [value]="[{}]" layout="grid" *ngIf="loading">
+        <ng-template pTemplate="grid">
+          <div class="grid">
+            <div class="col-12 sm:col-12 md:col-6 lg:col-4" *ngFor="let i of counterArray(6)">
+              <div class="p-4 border-1 surface-border surface-card border-round">
+                <div class="flex flex-wrap align-items-center justify-content-between gap-2">
+                  <div style="flex: 1">
+                    <p-skeleton width="100%" styleClass="mb-2"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </p-card>
+  </div>
+
+  <div class="col-12">
+    <app-standings [date]="date"></app-standings>
+  </div>
+</div>
+
+<div class="col-12">
+    <app-time-travel (onDateUpdate)="refreshMatches()"></app-time-travel>
+</div>

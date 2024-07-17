@@ -1,0 +1,34 @@
+<p-card header="Standings" [styleClass]="'surface-ground'">
+
+  <div class="grid">
+    <div class="col-12 lg:col-6 mb-2">
+      <app-standings-list [title]="'East Coast'" [teams]="standings?.east!"/>
+    </div>
+    <div class="col-12 lg:col-6 mb-2">
+      <app-standings-list [title]="'West Coast'" [teams]="standings?.west!"/>
+    </div>
+  </div>
+
+  <div class="flex flex-column mt-2">
+    <div class="flex flex-row align-items-center">
+      <p-avatar
+        styleClass="mr-2 playoff"
+        size="normal"/>
+      <div>Playoff</div>
+      <p-avatar
+        styleClass="ml-4 mr-2 playin"
+        size="normal"/>
+      <div>Playin</div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-row align-items-center justify-content-between flex-wrap">
+      <div class="flex">
+        <div class="mr-2">Last update:</div>
+        <div>{{ date | date: 'M/d/yy, H:mm' }}</div>
+      </div>
+      <p-button icon="pi pi-refresh" [rounded]="true" [text]="true" (click)="refreshStandings()"/>
+    </div>
+  </ng-template>
+</p-card>
