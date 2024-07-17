@@ -16,6 +16,17 @@ In sintesi, il progetto si articola in due fasi principali:
 
 I risultati ottenuti dalle varie sperimentazioni con i diversi modelli saranno discussi nelle sezioni successive, evidenziando i vantaggi e le limitazioni di ciascun approccio.
 
+\subsection{Il Dataset}
+
+I dati utilizzati per addestrare e testare i modelli sono stati raccolti da una vasta gamma di statistiche presenti nel Database di NBA.com. Per la scelta e la selezione di queste statistiche sono state prese in considerazione numerose risorse online tra cui ad esempio il paper "Which NBA Statistics Actually Translate to Wins" di Chinmay Vayda. Queste varie ricerche ci hanno così permesso di trovare quelle che a nostro avviso solo le statistiche più rilevanti per la predizione delle partite NBA.\newline
+\texttt{['home\_team','away\_team','game\_id','season','date','pts\_H','pts\_A','winner','playoff', \newline
+'fg\_pct\_A','fg3\_pct\_A','ft\_pct\_A','reb\_A','tot\_ast\_A','tot\_tov\_A','tot\_stl\_A','tot\_blk\_A','ts\_pct\_A','w\_pct\_A', \newline
+'w\_pct\_last\_5\_games\_A','fg\_pct\_H','fg3\_pct\_H','ft\_pct\_H','reb\_H','tot\_ast\_H','tot\_tov\_H','tot\_stl\_H','tot\_blk\_H', \newline
+'ts\_pct\_H','w\_pct\_H','w\_pct\_last\_5\_games\_H','off\_rating\_A','def\_rating\_A','off\_rating\_H','def\_rating\_H', \newline
+'lineup\_efficiency\_A','lineup\_efficiency\_H','referee\_name','referee\_id']}
+
+Questo è il Dataset da noi creato ed ottenuto tramite la NBA API. Risulta essere un dataset molto ampio e completo che è stato poi ridotto e preprocessato in fase di preprocessing e fine-tuning dei vari modelli.
+
 \subsection{Il Modello di Classificazione}
 
 \subsubsection{MLP}
