@@ -10,7 +10,7 @@
           <div class="flex flex-column align-items-end justify-content-end align-self-center">
             <span class="font-medium text-secondary text-lg">{{ matchStats.by_home_stats.team_abbreviation }}</span>
             <a class="text-4xl font-medium text-900 text-green-500 text-right mt-1 no-underline"
-               routerLink="/basket/team/{{ matchStats.by_home_stats.team_abbreviation }}">
+               routerLink="/basketball/team/{{ matchStats.by_home_stats.team_abbreviation }}">
               {{ matchStats.by_home_stats.team_name }}
             </a>
             <div class="text-7xl">{{ matchStats.by_home_stats.pts }}</div>
@@ -25,7 +25,7 @@
           <div class="flex flex-column align-items-start justify-content-start align-self-center">
             <span class="font-medium text-secondary text-lg">{{ matchStats.by_away_stats.team_abbreviation }}</span>
             <a class="text-4xl font-medium text-900 text-orange-500 text-left mt-1 no-underline"
-               routerLink="/basket/team/{{ matchStats.by_away_stats.team_abbreviation }}">
+               routerLink="/basketball/team/{{ matchStats.by_away_stats.team_abbreviation }}">
               {{ matchStats.by_away_stats.team_name }}
             </a>
             <div class="text-7xl">{{ matchStats.by_away_stats.pts }}</div>
@@ -63,7 +63,7 @@
             {{ prediction_message }}
           </div>
           <div *ngIf="prediction_result" class="text-lg mr-2">
-            Predicted point difference: <span class="font-bold">{{ prediction_result | number: '1' }}</span>
+            Predicted point difference: <span class="font-bold">{{ prediction_result | number: '1.0-0' }}</span>
           </div>
         </div>
       </div>
@@ -71,32 +71,8 @@
 
     <div class="flex flex-row flex-wrap gap-2">
       <p-card *ngIf="odds" header="Bookmakers" class="flex flex-1 flex-column">
-        <p-table [value]="bookmakers_list" styleClass="p-datatable-sm" sortMode="multiple">
-          <ng-template pTemplate="header">
-            <tr>
-              <th></th>
-              <th pSortableColumn="home_team_quota.value" style="width:20%">
-                {{ matchStats.by_home_stats.team_abbreviation }}
-                <p-sortIcon field="home_team_quota.value"/>
-              </th>
-              <th pSortableColumn="away_team_quota.value" style="width:20%">
-                {{ matchStats.by_away_stats.team_abbreviation }}
-                <p-sortIcon field="away_team_quota.value"/>
-              </th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-bookmaker>
-            <tr>
-              <td><a href="{{bookmaker.url}}">{{ bookmaker.name }}</a></td>
-              <td><span
-                class="{{bookmaker.home_team_quota.color}} font-bold">{{ bookmaker.home_team_quota.value | number: '1.2' }}</span>
-              </td>
-              <td><span
-                class="{{bookmaker.away_team_quota.color}} font-bold">{{ bookmaker.away_team_quota.value | number: '1.2' }}</span>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+        <app-bookmakers-list [odds]="odds" [home_team]="matchStats.by_home_stats.team_abbreviation"
+                             [away_team]="matchStats.by_away_stats.team_abbreviation"></app-bookmakers-list>
       </p-card>
 
       <p-card class="flex flex-1 flex-column" header="Game stats">

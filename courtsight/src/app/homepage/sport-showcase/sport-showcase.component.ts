@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { SportDetailsComponent } from "../sport-details/sport-details.component";
-import { Sport } from '../../shared/sport';
+import { AvailableSport } from '../../shared/sport';
 import { CommonModule } from '@angular/common';
 import { SportsService } from '../../shared/sports.service';
 
@@ -13,9 +13,11 @@ import { SportsService } from '../../shared/sports.service';
 })
 export class SportShowcaseComponent {
   sportService: SportsService = inject(SportsService);
-  sportsList: Sport[] = []
+  sportsList: AvailableSport[] = []
 
   constructor() {
-    this.sportsList = this.sportService.getAllSports();
+    this.sportService.getAvailableSports().then(sports=>{
+      this.sportsList = sports;
+    });
   }
 }

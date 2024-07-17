@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { Sport } from '../../shared/sport';
+import { AvailableSport } from '../../shared/sport';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
   styleUrl: './sport-details.component.css'
 })
 export class SportDetailsComponent {
-  @Input() sport!: Sport;
+  @Input() sport!: AvailableSport;
 
   getIcon(value: boolean):string {
     if (value) {

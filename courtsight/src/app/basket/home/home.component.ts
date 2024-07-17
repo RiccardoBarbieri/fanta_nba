@@ -15,6 +15,8 @@ import {CalendarModule} from "primeng/calendar";
 import {FormsModule} from "@angular/forms";
 import {InputGroupModule} from "primeng/inputgroup";
 import {SkeletonModule} from "primeng/skeleton";
+import {TimeTravelComponent} from "../../shared/time-travel/time-travel.component";
+import {TimeTravelService} from "../../shared/time-travel.service";
 
 
 @Component({
@@ -35,30 +37,31 @@ import {SkeletonModule} from "primeng/skeleton";
     FormsModule,
     InputGroupModule,
     SkeletonModule,
+    TimeTravelComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
+  timetravelService = inject(TimeTravelService);
   matchesService = inject(MatchesService);
-  date: Date = new Date("2023-11-05");
-  current_date: Date;
+  date: Date;
   next_week = () => {
-    return new Date(this.current_date.getFullYear(), this.current_date.getMonth(), this.current_date.getDate() + 7)
+    return new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 7)
   };
   matches: Match[] = [];
   loading = false;
 
   constructor() {
-    this.current_date = this.date;
+    this.date = this.timetravelService.date;
     this.refreshMatches();
   }
 
   refreshMatches() {
-    this.current_date = this.date;
+    this.date = this.timetravelService.date;
     this.matches = [];
     this.loading = true;
-    this.matchesService.getMatchesByDate(getFormattedDate(this.current_date),
+    this.matchesService.getMatchesByDate(getFormattedDate(this.date),
       getFormattedDate(this.next_week())).then((matches: Match[]) => {
       this.matches = matches;
       this.loading =false;

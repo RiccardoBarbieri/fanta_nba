@@ -3,24 +3,41 @@ import {HomeComponent} from "./homepage/home/home.component";
 import {HomeComponent as BasketHome} from "./basket/home/home.component";
 import {TeamDetailsComponent} from "./basket/team-details/team-details.component";
 import {MatchDetailsComponent} from "./basket/match-details/match-details.component";
+import {BasketComponent} from "./basket/basket.component";
 
 export const routes: Routes = [
   {
-    path: "",
-    component: HomeComponent,
-    title: "Home Page"
-  },
-  {
-    path: "basket",
-    component: BasketHome,
-    title: "Basketball",
-  },
-  {
-    path: 'basket/match/:id/:date',
-    component: MatchDetailsComponent,
-  },
-  {
-    path: 'basket/team/:ticker',
-    component: TeamDetailsComponent,
+    path: '',
+    children: [
+      {
+        path: '',
+        component: HomeComponent,
+        title: "Home Page",
+        data: {breadcrumb: 'Home'}
+      },
+      {
+        path: "basketball",
+        component: BasketComponent,
+        title: "Basketball",
+        data: {breadcrumb: 'Basketball'},
+        children: [
+          {
+            path: '',
+            component: BasketHome,
+            data: {breadcrumb: ''}
+          },
+          {
+            path: 'match/:id/:date',
+            component: MatchDetailsComponent,
+            data: {breadcrumb: 'Match'}
+          },
+          {
+            path: 'team/:ticker',
+            component: TeamDetailsComponent,
+            data: {breadcrumb: 'Team'}
+          },
+        ]
+      },
+    ]
   },
 ];

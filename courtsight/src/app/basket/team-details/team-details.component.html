@@ -29,62 +29,16 @@
 
 <div class="grid ml-6 mr-6">
   <div class="col">
-    <p-card header="Next Matches" subheader="From {{current_date | date: 'MM/d/y'}} to {{next_week() | date: 'MM/d/y'}}">
+    <p-card header="Next Matches" subheader="From {{date | date: 'MM/d/y'}} to {{next_week() | date: 'MM/d/y'}}">
       <app-match-list [matches]="matches"></app-match-list>
     </p-card>
   </div>
 </div>
 
 <div class="m-6">
-  <p-carousel
-    [value]="team?.team_players!"
-    [numVisible]="7"
-    [numScroll]="7"
-    [circular]="false"
-    [responsiveOptions]="responsiveOptions"
-    autoplayInterval="6000">
-    <ng-template let-player pTemplate="">
-      <div class="border-1 surface-border border-round m-2 p-3">
-        <div class="flex flex-column gap-4">
-          <div class="flex flex-row flex-wrap justify-content-between align-items-center">
-            <div>
-              <div class="text-lg font-medium text-900 mt-1">
-                {{ player.player }}
-              </div>
-            </div>
-            <div class="surface-100 p-1" style="border-radius: 30px">
-              <div class="surface-0 flex align-items-center gap-2 justify-content-center py-1 px-2"
-                   style="border-radius: 30px">
-                <i class="pi pi-user font-bold"></i>
-                <span class="text-900 font-bold text-purple-500">{{ player.num }} / {{ player.position }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-row justify-content-between align-items-center gap-2">
-            <div class="mt-0 font-semibold">
-              {{ player.age }} <span class="text-color-secondary"> y/o </span>
-            </div>
-            <div class="mt-0 font-semibold">
-              {{ player.weight }} <span class="text-color-secondary">lb</span>
-            </div>
-            <div class="mt-0 font-semibold">
-              {{ player.height }} <span class="text-color-secondary">ft</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ng-template>
-  </p-carousel>
+  <app-player-showcase [players]="team?.team_players!"></app-player-showcase>
 </div>
+
 <div class="col-12">
-  <p-divider align="center">
-    <div class="flex flex-row justify-content-between align-items-baseline gap-1">
-      <span class="text-lg font-bold mr-2">Time Travel</span>
-      <p-calendar [(ngModel)]="date"
-                  [iconDisplay]="'input'"
-                  [showIcon]="true"
-      />
-      <button type="button" pButton icon="pi pi-refresh" (click)="refreshMatches()" [text]="true"></button>
-    </div>
-  </p-divider>
+  <app-time-travel (onDateUpdate)="refreshMatches()"></app-time-travel>
 </div>

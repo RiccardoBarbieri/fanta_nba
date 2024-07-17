@@ -14,6 +14,9 @@ import {ScrollPanelModule} from "primeng/scrollpanel";
 import {DividerModule} from "primeng/divider";
 import {CalendarModule} from "primeng/calendar";
 import {FormsModule} from "@angular/forms";
+import {PlayerShowcaseComponent} from "./player-showcase/player-showcase.component";
+import {TimeTravelComponent} from "../../shared/time-travel/time-travel.component";
+import {TimeTravelService} from "../../shared/time-travel.service";
 
 @Component({
   selector: 'app-team-details',
@@ -26,71 +29,46 @@ import {FormsModule} from "@angular/forms";
     ScrollPanelModule,
     DividerModule,
     CalendarModule,
-    FormsModule
+    FormsModule,
+    PlayerShowcaseComponent,
+    TimeTravelComponent
   ],
   templateUrl: './team-details.component.html',
   styleUrl: './team-details.component.css'
 })
-export class TeamDetailsComponent implements OnInit {
+export class TeamDetailsComponent {
+  timetravelService = inject(TimeTravelService);
   route: ActivatedRoute = inject(ActivatedRoute);
   teamsService = inject(TeamsService);
   matchesService = inject(MatchesService);
   team: Team | undefined;
   matches: Match[] = [] ;
 
-  date: Date = new Date("2023-11-05");
-  current_date: Date;
+  date: Date;
   next_week = () => {
-    return new Date(this.current_date.getFullYear(), this.current_date.getMonth(), this.current_date.getDate() + 7)
+    return new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 7)
   };
 
-  // today: Date = new Date("2023-11-05");
-  // next_week: Date = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()+7);
-
-  responsiveOptions: any[] | undefined;
-
   constructor(private titleService: Title) {
-    this.current_date = this.date;
+    this.date = this.timetravelService.date;
     this.titleService.setTitle('Team Details');
     const ticker = this.route.snapshot.params["ticker"];
-    // this.team = mockTeam; // TODO debug
-    // this.matches = mockMatches;
     this.teamsService.getTeamFromTicker(ticker, "2023-24").then((team: Team) => {
       this.team = team;
-      this.matchesService.getMatchesByDate(getFormattedDate(this.current_date),getFormattedDate(this.next_week())).then((matches: Match[]) => {
+      this.matchesService.getMatchesByDate(getFormattedDate(this.date),getFormattedDate(this.next_week())).then((matches: Match[]) => {
         this.matches = matches.filter((match: Match) => {return match.home_team.id === team.team_info.id || match.away_team.id === team.team_info.id});
       })
     });
   }
 
   refreshMatches() {
-    this.current_date = this.date;
+    this.date = this.timetravelService.date;
     this.matches = [];
     // this.loading = true;
-    this.matchesService.getMatchesByDate(getFormattedDate(this.current_date),
+    this.matchesService.getMatchesByDate(getFormattedDate(this.date),
       getFormattedDate(this.next_week())).then((matches: Match[]) => {
       this.matches = matches;
-      // this.loading =false;
+      // this.loading = false;
     })
-  }
-
-  ngOnInit(): void {
-    this.responsiveOptions = [
-      {
-        breakpoint: '1500px',
-        numVisible: 4,
-        numScroll: 4
-      },
-      {
-        breakpoint: '1000px',
-        numVisible: 3,
-        numScroll: 3
-      },
-      {
-        breakpoint: '500px',
-        numVisible: 1,
-        numScroll: 1
-      }
-    ];
   }
 }

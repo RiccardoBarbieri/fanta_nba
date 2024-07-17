@@ -1,5 +1,5 @@
 import {Component, inject, Input, input, OnInit} from '@angular/core';
-import {Sport} from '../shared/sport';
+import {AvailableSport} from '../shared/sport';
 import {SportsService} from '../shared/sports.service';
 import {AvatarModule} from 'primeng/avatar';
 import {InputTextModule} from 'primeng/inputtext';
@@ -7,7 +7,7 @@ import {MenubarModule} from 'primeng/menubar';
 import {MenuItem} from 'primeng/api';
 import {DropdownModule} from "primeng/dropdown";
 import {FormsModule} from "@angular/forms";
-import {Theme, ThemeService} from "../theme.service";
+import {Theme, ThemeService} from "../shared/theme.service";
 
 
 @Component({
@@ -27,7 +27,6 @@ export class MenubarComponent implements OnInit {
   @Input() title!: string;
 
   sportService: SportsService = inject(SportsService);
-  sportsList: Sport[] = []
 
   items: MenuItem[] | undefined;
 
@@ -36,34 +35,37 @@ export class MenubarComponent implements OnInit {
   selectedTheme: Theme | undefined;
 
   constructor() {
-    this.sportsList = this.sportService.getAllSports();
+
     this.themes = this.themeService.getAvailableThemes()
     this.selectedTheme = this.themes[0];
   }
 
   ngOnInit() {
-    let sportItems: MenuItem[] = [];
+    this.sportService.getAvailableSports().then(sports => {
 
-    for (const sport of this.sportsList) {
-      sportItems.push({
-        label: sport.name,
-        route: sport.url,
-        disabled: sport.url === undefined
-      });
-    }
+      let sportItems: MenuItem[] = [];
 
-    this.items = [
-      {
-        label: 'Home',
-        icon: 'pi pi-home',
-        route: '/'
-      },
-      {
-        label: 'Sports',
-        icon: 'pi pi-trophy',
-        items: sportItems,
-      },
-    ]
+      for (const sport of sports) {
+        sportItems.push({
+          label: sport.name,
+          route: sport.url,
+          disabled: sport.url === undefined
+        });
+      }
+
+      this.items = [
+        {
+          label: 'Home',
+          icon: 'pi pi-home',
+          route: '/'
+        },
+        {
+          label: 'Sports',
+          icon: 'pi pi-trophy',
+          items: sportItems,
+        },
+      ]
+    });
   }
 
   changeTheme() {

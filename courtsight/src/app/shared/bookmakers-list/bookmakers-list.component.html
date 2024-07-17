@@ -1,0 +1,26 @@
+<p-table [value]="bookmakers_list" styleClass="p-datatable-sm" sortMode="multiple">
+  <ng-template pTemplate="header">
+    <tr>
+      <th></th>
+      <th pSortableColumn="home_team_quota.value" style="width:20%">
+        {{ home_team }}
+        <p-sortIcon field="home_team_quota.value"/>
+      </th>
+      <th pSortableColumn="away_team_quota.value" style="width:20%">
+        {{ away_team }}
+        <p-sortIcon field="away_team_quota.value"/>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-bookmaker>
+    <tr>
+      <td><a href="{{bookmaker.url}}">{{ bookmaker.name }}</a></td>
+      <td><span
+        class="{{bookmaker.home_team_quota.color}} font-bold">{{ bookmaker.home_team_quota.value | number: '1.2' }}</span>
+      </td>
+      <td><span
+        class="{{bookmaker.away_team_quota.color}} font-bold">{{ bookmaker.away_team_quota.value | number: '1.2' }}</span>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -18,6 +18,7 @@ import {Button} from "primeng/button";
 import {SkeletonModule} from "primeng/skeleton";
 import {Odds} from "../odds";
 import {TableModule} from "primeng/table";
+import {BookmakersListComponent} from "../../shared/bookmakers-list/bookmakers-list.component";
 
 @Component({
   selector: 'app-match-details',
@@ -35,7 +36,8 @@ import {TableModule} from "primeng/table";
     CardModule,
     Button,
     SkeletonModule,
-    TableModule
+    TableModule,
+    BookmakersListComponent
   ],
   templateUrl: './match-details.component.html',
   styleUrl: './match-details.component.css'
@@ -57,7 +59,6 @@ export class MatchDetailsComponent {
   prediction_message = "";
   prediction_result = "";
 
-  bookmakers_list: any[] = [];
 
   constructor() {
     const match_id = this.route.snapshot.params["id"];
@@ -82,50 +83,6 @@ export class MatchDetailsComponent {
       const event_id: string = `${this.matchStats?.by_home_stats.team_abbreviation}FAKE${this.matchStats?.by_away_stats.team_abbreviation}`;
       this.oddsService.getOddsForMatch(event_id).then((odds: Odds[]) => {
         this.odds = odds[0];
-
-        let max = 0;
-        let min = 100000
-        for (let bookmaker of this.odds.bookmakers) {
-          const home_quota = bookmaker.markets[0].outcomes.find((o) => o.name === this.matchStats!.by_home_stats.team_abbreviation)?.price!;
-          const away_quota = bookmaker.markets[0].outcomes.find((o) => o.name === this.matchStats!.by_away_stats.team_abbreviation)?.price!;
-          if (home_quota < min) {
-            min = home_quota;
-          }
-          if (away_quota < min) {
-            min = away_quota;
-          }
-          if (home_quota > max) {
-            max = home_quota;
-          }
-          if (away_quota > max) {
-            max = away_quota;
-          }
-          this.bookmakers_list.push({
-            name: bookmaker.title,
-            url: bookmaker.url,
-            home_team_quota: {
-              value: home_quota, color: "text-900"
-            },
-            away_team_quota: {
-              value: away_quota, color: "text-900"
-            },
-          })
-        }
-
-        for (let item of this.bookmakers_list) {
-          if (item.home_team_quota.value === max) {
-            item.home_team_quota.color = "text-green-600"
-          }
-          if (item.home_team_quota.value === min) {
-            item.home_team_quota.color = "text-red-500"
-          }
-          if (item.away_team_quota.value === max) {
-            item.away_team_quota.color = "text-green-600"
-          }
-          if (item.away_team_quota.value === min) {
-            item.away_team_quota.color = "text-red-500"
-          }
-        }
       })
     });
   }
