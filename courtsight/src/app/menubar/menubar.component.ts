@@ -1,5 +1,4 @@
-import {Component, inject, Input, input, OnInit} from '@angular/core';
-import {AvailableSport} from '../shared/sport';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {SportsService} from '../shared/sports.service';
 import {AvatarModule} from 'primeng/avatar';
 import {InputTextModule} from 'primeng/inputtext';

@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {CommonModule} from "@angular/common";
 import {BreadcrumbModule} from "primeng/breadcrumb";
