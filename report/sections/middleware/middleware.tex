@@ -107,12 +107,12 @@ Di seguito vengono presentati gli endpoint disponibili:
 Anche questo middleware è stato realizzato tramite la generazione assistita di Swagger Editor.\\
 Tuttavia, per poter utilizzare le librerie Python di \texttt{swar/nba\_api}, abbiamo dovuto utilizzare un ambiente Python con \texttt{Flask}. 
 
-Oltre alla facilitazione già fornita da Swagger, tramite Python è stato possibile mappare gli endpoint ai metodi direttamente dalla specifica YAML, aggiungendo qualche campo in più. Questo ha aumentato di gran lunga la manutenibilità ed estensibilità del middleware. L'aggiunta di nuovi endpoint nel corso dello sviluppo ha implicato solo l'aggiunta dei percorsi nel codice Swagger e l'implementazione della funziona con la logica applicativa necessaria.
 
+Oltre alla facilitazione già fornita da Swagger, tramite Python è stato possibile mappare gli endpoint ai metodi direttamente dalla specifica YAML, aggiungendo qualche campo in più. Questo ha aumentato di gran lunga la manutenibilità e l'estensibilità del middleware. L'aggiunta di nuovi endpoint nel corso dello sviluppo ha comportato solo l'inserimento dei percorsi nel codice Swagger e l'implementazione delle funzioni con la logica applicativa necessaria.
 
 \subsubsection{Dati di allenamento del modello}
-Lo scopo di qeusto middleware non è solo qello di fornire degli enpoint per l'applicazione web. Infatti, a causa dell'implementazione di metodi comuni e dell'utilizzo delle librerire di \texttt{swar/nba\_api}, sono state aggiunte parti di codice volte a popolare il database di alllenamento del modello di machine learning per la previsione dell'esito delle partite. \\
+Lo scopo di questo middleware non è solo quello di fornire degli endpoint per l'applicazione web. Infatti, grazie all'implementazione di metodi comuni e all'utilizzo delle librerie di \texttt{swar/nba\_api}, sono state aggiunte parti di codice volte a popolare il database di allenamento del modello di machine learning per la previsione dell'esito delle partite.
 
-Oltre alla grande comunanza di codice, questa scelta è stata fatta anche per un miglioramento delle prestazioni, particolarmente a lungo termine, tramite uso di \textbf{cache} per i metodi della libreria.
+Oltre alla grande comunanza di codice, questa scelta è stata fatta anche per un miglioramento delle prestazioni, particolarmente a lungo termine, tramite l'uso della \textbf{cache} per i metodi della libreria.
 
-Come sviluppo futuro, non realizzato per mancanza di tempo, si potrebbe pensare di dividere questo middleware in 3 microservizi: un REST API Server che utlizza le librerie di \texttt{swar/nba\_api} e che fornisce endpoint per gli altri due miscroservizi, il primo che funge da middleware per l'applicazione ed il seccondo che si occupa di ottenere i dati e popolare il database di allenamento del modello di ML.
+Come sviluppo futuro, non realizzato per mancanza di tempo, si potrebbe pensare di dividere questo middleware in tre microservizi: un REST API Server che utilizza le librerie di \texttt{swar/nba\_api} e che fornisce endpoint per gli altri due microservizi, il primo che funge da middleware per l'applicazione e il secondo che si occupa di ottenere i dati e popolare il database di allenamento del modello di machine learning.
