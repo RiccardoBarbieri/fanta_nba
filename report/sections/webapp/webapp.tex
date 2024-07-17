@@ -1,1 +1,91 @@
 \section{Webapp}
+\subsection{Introduzione}
+Rendere disponibili agli utenti finali i dati ottenuti dai servizi presentati è responsabilità di una apposita applicazione web. 
+
+Questa dovrà interfacciarsi con i vari middleware attraverso le api disponibili, per ottenere i dati da presentare all'utente in maniera il più possibile pratica e ordinata.
+
+La web app sarà accessibile da browser e dovrà supportare anche dispositivi mobili, quindi reagire in maniera \textit{responsive} a schermi di dimensioni molto diverse. 
+
+
+\subsection{Tecnologie utilizzate}
+Essendo già a conoscenza dell'ambiente finale di deployment, la scelta delle tecnologie è stata presa top-down, per assicurare completa compatibilità e supporto.
+
+La piattaforma Azure mette a disposizione diverse opzioni per l'hosting di una app web, che può essere ad esempio ospitata su una tradizionale macchina virtuale o come container app.
+
+Le esigenze del nostro servizio dal punto di vista dell'interfaccia utente sono modeste, in quanto si tratta di una semplice vetrina per i dati disponibili, senza bisogno di autenticazione o salvataggio di dati in un database dedicato.
+
+Delinandosi come applicazione prettamente front-end, la scelta è ricaduta su una Static Web App. Questo servizio Azure è pensato per ospitare web app full-stack che non hanno un tradizionale backend, e offre un supporto integrato ad API sotto forma di Azure Functions o Container App.
+
+Le SWA sono costruite usando framework web come Angular, React o Vue, tecnologie per cui non è richiesto rendering lato server: le applicazioni sono costituite interamente da asset statici e file html/css/javascript. Questi sono serviti non da un web server tradizionale, bensì gestiti da Azure e distribuiti globalmente.
+
+Il deployment delle nuove versioni avviene in maniera automatica a partire da cambiamenti in una repository di codice, come GitHub mediante \textit{Actions} o Azure stesso grazie alla \textit{DevOps Pipeline}. 
+Il workflow è auto-generato da Azure stesso e necessita pochi parametri di configurazione oltre alla repository (ed eventualmente branch) di riferimento. Questo modus operandi è, per design, molto vicino al flusso di lavoro tipico dello sviluppatore e permette uno sviluppo organico seguendo la pratica del \textit{Continuous Integration / Continuous Delivery}.
+
+La scelta del framework javascript è ricaduta su Angular, sviluppato da Google e arrivato a luglio 2024 alla versione 18. È un framework open source maturo e facile da usare, adatto ad applicazioni web multipiattaforma.
+È direttamente supportato da Azure Static Web Apps e rispetta la caratteristica richiesta di rendering lato browser.
+
+
+\subsection{Angular}
+Le app Angular sono scritte in typescript e devono seguire una precia struttura. Sono \textit{single-page-applications} organizzate per componenti con singola responsabilità, componibili all'interno di file .html estesi per supportare tag aggiuntivi.
+
+I componenti sono definibili direttamente in un unico file typescript ed esportati come classi. Sono identificati da un selettore, reso poi disponibile sotto forma di tag, e devono presentare un template HTML per istruire il rendering, che può anche essere inserito sotto forma di link a un file a sé.
+
+È costume velocizzare lo sviluppo delle applicazioni web affidandosi a librerie di terze parti aggiuntive che mettano a disposizione componenti pronti all'uso. Nel caso di Courtsight è stato scelta \textbf{PrimeNG}.
+Questa libreria molto completa è sviluppata da PrimeTek, che l'ha declinata per tutti i maggiori framework. Alla base di queste diverse librerie c'è il loro sistema \textit{PrimeFlex}, che permette una facile gestione della distribuzione dei componenti a schermo semplificando le direttive CSS "flex".
+
+\subsection{Organizzazione webapp}
+Coursight presenta le seguenti schermate:
+\begin{itemize}
+    \item \textbf{Homepage}: La pagina principale del sito presenta all'utente i vari sport supportati. L'integrazione con la \texttt{bet\_api} ci permette di mostrare le quote anche per sport diversi dal basket, che però rappresenta il principale focus.
+    \item \textbf{Home - Basket}: La schermata home della sezione basket offre l'elenco delle partite della settimana che viene e la classifica aggiornata divisa tra le due conference NBA: East e West Coast. 
+    \item \textbf{Basket - Squadra}: Selezionando il nome di una squadra è possibile vedere i dettagli sulla sua data di fondazione e arena di casa, oltre all'elenco dei giocatori e le prossime partite che disputerà.
+    \item \textbf{Basket - Partita}: La schermata dedicata ai match è il vero luogo di incontro di tutti i microservizi sviluppati. Oltre a presentare il punteggio e le statistiche del match, è disponibile l'elenco di tutti i bookmaker e le quote della partita. Inoltre, premendo un bottone è possibile interrogare il modello di ML per predire il risultato del match.
+\end{itemize}
+Mediante il sistema di routing di Angular, le pagine sono definite ognuna da un diverso componente, inserito dinamicamente nel root della applicazione a seconda dell'url richiesto. 
+
+\subsection{Struttura dell'applicazione}
+In questa sezione verrà delineato l'intero elenco di componenti sviluppati, prima di soffermarsi nei dettagli di quelli più importanti. Nelle applicazioni Angular quando il numero di componenti inizia a crescere è bene suddividerli in cartelle organizzati per feature. L'elenco che segue presenta quindi la medesima strategia.
+
+\subsubsection{app}
+Alla base dell'applicazione web c'è un file \texttt{index.html} il cui body verrà dinamicamente aggiornato a runtime inserendo i vari componenti quando richiesto, e sarà quindi sempre presentato all'utente. 
+\texttt{app-root} è l'unico componente indicato ed è il vero scheletro esterno dell'applicazione, in quanto verrà sempre disegnato. Ha al suo interno la barra del menu superiore, che ovviamente deve essere disponibile in ogni momento, e un contenitore fornito da Angular (\texttt{router-outlet}) per ospitare i componenti serviti dal sistema di routing. 
+Il componente \texttt{menubar} oltre al titolo ospita anche i link ai vari sport e sulla sinistra un selettore del tema grafico da adottare, modificabile in tempo reale. 
+
+\subsubsection{homepage}
+L'homepage presenta semplicemente all'utente l'elenco degli sport disponibili. Questi sono ottenuti dinamicamente e mostrati a schermo in base alle feature disponibili. L'elenco degli sport e il singolo item sono quindi due componenti diversi, \texttt{sport-showcase} e \texttt{sport-details}, mostrati all'interno del macro componente \texttt{home}.
+
+\subsubsection{basket/home}
+La pagina principale dedicata all'NBA quando caricata effettua il \textit{fetch} delle partite della settimana che viene. Queste sono presentate come \texttt{match} all'interno di un elenco \texttt{match-list}, paginato a gruppi di sei. 
+
+Subito sotto, la classifica aggiornata alla giornata corrente è resa disponibile dal componente \texttt{standings}. Questo, data la caratteristica del campionato di avere in realtà due classifiche in base alla costa (East Conference e West Conference), presenta due diverse tabelle \texttt{standings-list}. Oltre alla semplice posizione di ogni squadra sono anche forniti tutti i dati più rilevanti, come ad esempio partite vinte o record fuori casa.
+Inoltre, le prime 8 righe di ogni tabella hanno una colorazione azzurra per segnalare che quelle squadre parteciperanno ai Playoff, mentre le successive 4 colorate di verde sono quelle che dovranno prima qualificarsi giocando i Play-in. 
+
+\subsubsection{basket/team}
+Ogni team ha una pagina dedicata, accessibile premendo sul suo nome ovunque compaia all'interno dell'app. Il componente \texttt{team-details} ospita, assieme a dettagli sulla squadra come anno di fondazione e arena di casa, l'elenco delle prossime partite da disputare (riutilizzando il componente \texttt{match-list}) e la lista di tutti i giocatori. Quest'ultimo componente (\texttt{players-showcase}) è un "carosello" che mostra di ogni giocatore ruolo, età, numero di maglia, peso e altezza.
+
+\subsubsection{basket/match}
+La schermata dedicata ai match ha in primo piano il risultato (corrente o passato) e dati quali data, palazzetto e arbitro. Due componenti sono poi disposti subito sotto. Il primo è \texttt{bookmakers-list}, che dati gli \textit{odds} di una partita mostra le quote per tutti i siti disponibili. Il secondo è invece \texttt{stats-table}, una lista di \texttt{stats-row} per elencare tutte le statistiche della partita (assist, rebound, falli, etc.).
+Al centro della pagina un bottone permette, se premuto, di dare il via alle operazioni necessarie per predire il risultato della partita, ovvero recuperare il feature vector e inviarlo all'endpoint per ottenere infine lo score. Se questo risultato è disponibile, viene allora mostrato il nome del vincitore previsto del match e lo scarto di punti previsto. 
+
+\subsubsection{\textit{Time travel}}
+Per permettere di visualizzare partite vere anche a campionato terminato, un semplice selettore di data è reso disponibile in fondo alle pagine dove sarebbe invece richiesta la data odierna. 
+
+\subsection{Servizi}
+Le applicazioni Angular sfruttano la Dependancy Injection per rendere disponibili feature e dati ai vari componenti solo se esplicitamente richiesti. Una serie di \textit{services} sono definiti per interfacciarsi alle API e nascondere i dettagli in merito a chiamate e ottenimento dei dati.
+I servizi sono divisi in file in base all'ambito di utilizzo anche se condividono in molti casi l'API a cui fanno riferimento. In particolare sono:
+\begin{itemize}
+    \item SportsService
+    \item OddsService
+    \item StandingsService
+    \item MatchesService
+    \item TeamsService
+    \item PlayersService
+    \item PredictionsService
+\end{itemize}
+Tre ulteriori servizi sono definiti per mettere a disposizione dell'intera app impostazioni e feature condivise, ovvero:
+\begin{itemize}
+    \item ThemeService, per il cambiamento dinamico del tema grafico.
+    \item BreadcrumbService, per la navigazione mediante breadcrumb.
+    \item TimeTravelService, per permettere di cambiare la data "odierna" di riferimento in tutta l'applicazione.
+\end{itemize}
+

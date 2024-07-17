@@ -1,1 +1,102 @@
 \section{Deployment}
+In questa sezione verranno trattate le scelte in materia di deployment dell'architettura, discuteremo le scelte effettuate per i servizi Azure utilizzati, la configurazione di tali servizi e l'automazione del processo di deployment, così come le soluzioni e strategie adottate per garantire scalabilità e affidabilità dell'applicazione.
+
+\subsection{Componenti}
+Per riferimento si riportano di seguito i componenti principali che costituiscono l'applicazione.
+\begin{itemize}
+    \item Middleware NBA Api
+    \item Middleware Bet Api
+    \item Frontend Applicazione Web
+    \item Modello Machine Learning
+\end{itemize}
+
+Abbiamo preso la decisione di creare dei middleware per l'interazione con le api delle quote e delle statistiche NBA per creare una interfaccia che permette alla applicazione di non essere a conoscenza del funzionamento delle API sottostanti che forniscono i dati, questo approccio permetterà inoltre in futuro di modificare le API sottostanti per migliorare le prestazioni dell'applicazione.
+
+L'applicazione deve essere in grado di adattarsi ad aumenti inaspettati del carico di richieste, per questo è stato necessario utilizzare servizi che supportassero funzionalità di scalabilità automatiche sia all'aumento del carico, sia alla sua diminuzione per mantenere il più possibile contenuti i costi del servizio.
+
+Per la distribuzione dei due middleware abbiamo deciso di utilizzare container OCI in quanto sono lo strumento più adatto a effettuare il deployment di una architettura a microservizi.
+
+\subsection{Servizi Azure}
+
+Microsoft Azure offre una vasta gamma di servizi per qualsiasi tipo di deployment, la scelta del giusto servizio per un certo componente è cruciale per bilanciare costi di operazione del componente e massimizzare l'efficienza e automazione del processo di deployment minimizzando le interruzioni del servizio.
+
+\subsubsection{Container}
+Microsoft Azure offre varie opzioni per il deployment di componenti basati su container OCI, da cluster Kubernetes parzialmente gestiti a ambiente completamente gestiti:
+\begin{itemize}
+    \item Azure Container Instances (ACI)
+    \item Azure Container Apps (ACA)
+    \item Azure Kubernetes Services (AKS)
+    \item Azure App Service (AAS)
+\end{itemize}
+
+Questi servizi hanno diversi livelli di complessità delle opzioni di configurazione, in particolare AKS è il servizio che offre la maggiore granularità nelle opzioni di gestione dei cluster di container: si tratta di una istanza di Kubernetes gestita da Azure che fornisce una piattaforma di orchestrazione completa adatta a deployment molto complessi.
+
+Durante la valutazione delle opzioni abbiamo escluso il servizio AAS in quanto si tratta di un servizio non nativamente improntato a deployment di applicazioni sotto forma di container, non offre infatti le opzioni di gestione della scalabilità offerte da altri servizi concepito per container.
+
+Mentre ACI offre una esperienza di deployment molto semplificata non da la possibilità di creare regole di scaling e replicazione personalizzate, ogni aspetto del deployment è gestito da Azure; ACA si pone a metà strada tra la semplicità di ACI e la complessità di AKS in quanto nasconde dettagli di gestione del cluster Kubernetes ma permette comunque di specificare regole e limiti di scaling con abbastanza granularità.
+
+Abbiamo infine deciso di utilizzare Azure Container Apps per il deployment dei due microservizi.
+
+Abbiamo distribuito i componenti middleware in un unico Azure Container App Environment, il componente che orchestra le ACA mantenendo aggiornamenti OS, procedure di recupero post-failure e bilanciamento delle risorse tra componenti, questo servizio gestisce inoltre la creazione e configurazione del virtual network che si pone a protezione delle ACA istanziate.
+
+\subsubsection{Web Application}
+Per effettuare il deployment dell'applicazione web abbiamo ristretto l'offerta di Azure a due servizi:
+\begin{itemize}
+    \item Azure Static Web App (SWA)
+    \item Azure App Service (AAS)
+\end{itemize}
+
+Come in precedenza il servizio AAS risulta non adatto agli scopi dell'applicazione in quanto l'applicazione necessita solo di un frontend che comunica con i due microservizi, abbiamo quindi deciso di utilizzare il servizio SWA, un servizio che offre la possibilità di distribuire una webapp statica con gestione automatica di un CDN globale per garantire una distribuzione del contenuto veloce e affidabile.
+
+Questo servizio offre anche la possibilità di associare un backend sotto forma di ACA o Azure Functions: in futuro sarà possibile aggiungere un nuovo microservizio che gestisca il backend dell'applicazione, implementando funzionalità come la creazione account utente.
+
+\subsubsection{Modello Machine Learning}
+Per rendere il modello accessibile al componente che ne deve mostrare i risultati abbiamo valutato diverse opzioni per creare appositi endpoint per richiedere una inferenza al modello.
+
+La prima opzione che abbiamo considerato è stata creare un container apposito e utilizzare una ACA per rendere gli endpoint accessibili al frontend dell'applicazione, per quanto questa possa essere una soluzione appropriata in quanto avrebbe reso più uniforme l'architettura che fa già largamente uso di ACA, Azure offre una soluzione migliore apposita per modelli di machine learning.
+
+Azure Machine Learning Workspace mette a disposizione un ambiente completamente fornito per ogni step della creazione e gestione di un modello di machine learning.
+
+Le funzionalità principali che sono risultate utili sono le seguenti:
+\begin{itemize}
+    \item ambienti di sviluppo gestiti e configurabili
+    \item categorizzazione e versioning dei modelli creati
+    \item authoring di modelli tramite jupyter notebooks e strumenti di alto livello a componenti
+    \item riusabilità dei componenti
+    \item gestione automatica della cache di inferenze passate
+    \item valutazione delle performance del modello tramite strumenti di analisi
+\end{itemize}
+
+Questo workspace permette inoltre di effettuare deployment dei modelli creati e di generare appositi endpoint HTTP per richiedere l'inferenza su una istanza del feature vector in modo sicuro, autenticando le richieste tramite chiavi api.
+
+Durante il deployment del modello abbiamo riscontrato problematiche con la gestione delle politiche CORS: il sistema di deployment integrato non supporta la modifica delle politiche CORS per abilitare l'accesso da parte di una applicaizione web. Per risolvere questo problema abbiamo integrato questo endpoint in un endpoint presente nel Middleware NBA Api.
+
+\subsubsection{Servizi di supporto}
+I servizi appena descritti includono i componenti principali dell'applicazione, abbiamo però utilizzato diversi altri servizi Azure di supporto.
+
+\paragraph{Gestione segreti} 
+Una necessità immediatamente evidente durante lo sviluppo è stata quella di avere a disposizione un sistema centralizzato dove archiviare in modo sicuro vari segreti come chiavi api e certificati. Si presta a questo scopo il servizio Azure Key Vault che offre la possibilità di immagazzinare segreti gestendone il versionamento di questi ultimi.
+
+Un'altra funzionalità che Key Vault offre è la possibilità di impostare la rotazione automatica di certificati crittografici, sfruttata dal sistema per rinnovare automaticamente i certificati legati al dominio personalizzato usato per raggiungere l'applicazione.
+
+\paragraph{Gestione Immagini OCI}
+Il sistema sfrutta diverse immagini OCI e deve essere in grado di gestirne il versionamento mantenendole private.
+
+A questo scopo abbiamo sfruttato due istanze di Azure Container Registry, un servizio che offre la possibilità di immagazzinare definizioni di immagini con gestione delle versioni tramite tag, è inoltre meglio integrato con gli altri servizi di Azure di altri container registry.
+
+Le credenziali per l'accesso all'istanza ACR principale, ovvero quella che contiene le immagini dei middleware, sono gestite tramite Azure Key Vault; la seconda istanza, dedicata alle immagini degli ambienti di sviluppo del Machine Learning Workspace, è completamente gestita dal Workspace stesso.
+
+\paragraph{Gestione DNS}
+Allo scopo di associare domini personalizzati ai servizi, in particolare alla applicazione web, abbiamo creato una Azure DNS Zone, risorsa che assume il compito di gestire la propagazione dei record DNS del dominio utilizzato.
+
+Abbiamo fatto la scelta di trasferire il controllo dei DNS ad Azure per automatizzare il processo di provisioning dei certificati: questo processo necessita della creazione di record DNS temporanei per autenticare la creazione del certificato, dato che Azure è in controllo dei record può generare e verificare i certificati senza intervento.
+
+\paragraph{Gestione Log}
+Per la gestione dei log generati dai vari componenti dell'infrastruttura abbiamo fatto uso del servizio Azure Log Analitycs Workspace che offre una raccolta dei log centralizzata e mette a disposizione un linguaggio di query e altri strumenti per effettuare analisi sulle informazioni raccolte dai servizi.
+
+
+
+
+
+
+
