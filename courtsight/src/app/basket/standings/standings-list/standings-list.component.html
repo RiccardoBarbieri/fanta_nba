@@ -1,7 +1,7 @@
 <p-fieldset legend="{{title}}">
-  <p-table
-    [value]="teams"
-    styleClass="p-datatable-sm p-datatable-striped">
+  <p-table [value]="teams" [scrollable]="true"
+    styleClass="p-datatable-sm p-datatable-striped"
+  >
     <ng-template pTemplate="header">
       <tr>
         <th class="text-center" pFrozenColumn style="width:3rem">#</th>
@@ -17,7 +17,7 @@
     <ng-template pTemplate="body" let-team let-i="rowIndex">
       <tr>
         <td class="text-center font-bold" pFrozenColumn [class]="{'playoff': i <= 6, 'playin': i >= 7 && i <= 10}">{{i+1}}</td>
-        <td class="text-left" pFrozenColumn ><a class="font-medium no-underline text-900" routerLink="/basketball/team/{{team.team_ticker}}">{{ team.team }}</a></td>
+        <td class="text-left" pFrozenColumn><a class="font-medium no-underline text-900" routerLink="/basketball/team/{{team.team_ticker}}">{{ team.team }}</a></td>
         <td class="text-center">{{ team.g }}</td>
         <td class="text-center">{{ team.w }}</td>
         <td class="text-center">{{ team.l }}</td>

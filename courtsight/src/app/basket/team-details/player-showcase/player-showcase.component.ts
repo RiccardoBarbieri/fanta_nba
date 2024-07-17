@@ -29,7 +29,12 @@ export class PlayerShowcaseComponent implements OnInit {
         numScroll: 3
       },
       {
-        breakpoint: '500px',
+        breakpoint: '800px',
+        numVisible: 2,
+        numScroll: 2
+      },
+      {
+        breakpoint: '600px',
         numVisible: 1,
         numScroll: 1
       }

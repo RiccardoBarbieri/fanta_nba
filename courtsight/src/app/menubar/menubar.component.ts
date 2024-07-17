@@ -7,6 +7,7 @@ import {MenuItem} from 'primeng/api';
 import {DropdownModule} from "primeng/dropdown";
 import {FormsModule} from "@angular/forms";
 import {Theme, ThemeService} from "../shared/theme.service";
+import {CommonModule} from "@angular/common";
 
 
 @Component({
@@ -17,7 +18,8 @@ import {Theme, ThemeService} from "../shared/theme.service";
     AvatarModule,
     InputTextModule,
     DropdownModule,
-    FormsModule
+    FormsModule,
+    CommonModule
   ],
   templateUrl: './menubar.component.html',
   styleUrl: './menubar.component.css'

@@ -11,14 +11,28 @@
       <span class="ml-2">{{ item.label }}</span>
     </a>
   </ng-template>
-    <ng-template pTemplate="end">
-      <p-dropdown
-        [options]="themes"
-        [(ngModel)]="selectedTheme"
-        (onChange)="changeTheme()"
-        optionLabel="name"
-        placeholder="Select a Theme" />
-<!--        <input type="text" pInputText placeholder="Search" class="w-8rem sm:w-auto" />-->
-<!--        <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />-->
-    </ng-template>
+  <ng-template pTemplate="end">
+    <p-dropdown
+      [options]="themes"
+      [(ngModel)]="selectedTheme"
+      (onChange)="changeTheme()"
+      optionLabel="name"
+      placeholder="Select a Theme">
+      <ng-template pTemplate="selectedItem">
+        <div class="flex align-items-center gap-2" *ngIf="selectedTheme">
+          <i class="{{selectedTheme.icon}}"></i>
+          <div>{{ selectedTheme.name }}</div>
+        </div>
+      </ng-template>
+      <ng-template let-theme pTemplate="item">
+        <div class="flex align-items-center gap-2">
+          <i class="{{theme.icon}}"></i>
+          <div>{{ theme.name }}</div>
+        </div>
+      </ng-template>
+
+    </p-dropdown>
+    <!--        <input type="text" pInputText placeholder="Search" class="w-8rem sm:w-auto" />-->
+    <!--        <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />-->
+  </ng-template>
 </p-menubar>

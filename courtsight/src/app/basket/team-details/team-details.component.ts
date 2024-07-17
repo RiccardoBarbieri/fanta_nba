@@ -9,7 +9,7 @@ import {DataViewModule} from "primeng/dataview";
 import {MatchListComponent} from "../match-list/match-list.component";
 import {Match} from "../match";
 import {MatchesService} from "../matches.service";
-import {getFormattedDate} from "../../shared/utils";
+import {counterArray, getFormattedDate} from "../../shared/utils";
 import {ScrollPanelModule} from "primeng/scrollpanel";
 import {DividerModule} from "primeng/divider";
 import {CalendarModule} from "primeng/calendar";
@@ -17,6 +17,7 @@ import {FormsModule} from "@angular/forms";
 import {PlayerShowcaseComponent} from "./player-showcase/player-showcase.component";
 import {TimeTravelComponent} from "../../shared/time-travel/time-travel.component";
 import {TimeTravelService} from "../../shared/time-travel.service";
+import {SkeletonModule} from "primeng/skeleton";
 
 @Component({
   selector: 'app-team-details',
@@ -31,7 +32,8 @@ import {TimeTravelService} from "../../shared/time-travel.service";
     CalendarModule,
     FormsModule,
     PlayerShowcaseComponent,
-    TimeTravelComponent
+    TimeTravelComponent,
+    SkeletonModule
   ],
   templateUrl: './team-details.component.html',
   styleUrl: './team-details.component.css'
@@ -43,7 +45,7 @@ export class TeamDetailsComponent {
   matchesService = inject(MatchesService);
   team: Team | undefined;
   matches: Match[] = [] ;
-
+  loading = false;
   date: Date;
   next_week = () => {
     return new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 7)
@@ -64,11 +66,13 @@ export class TeamDetailsComponent {
   refreshMatches() {
     this.date = this.timetravelService.date;
     this.matches = [];
-    // this.loading = true;
+    this.loading = true;
     this.matchesService.getMatchesByDate(getFormattedDate(this.date),
       getFormattedDate(this.next_week())).then((matches: Match[]) => {
       this.matches = matches;
-      // this.loading = false;
+      this.loading = false;
     })
   }
+
+  protected readonly counterArray = counterArray;
 }
