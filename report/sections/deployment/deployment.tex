@@ -419,11 +419,33 @@ I risultati di Bet Api differiscono significativamente da quelli di NBA Api, Bet
 
 \subsection{Stima costi}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{ | l | r @{ --} | }
+\hline
+\multicolumn{2}{|c|}{\textbf{\rule{0pt}{1.5ex} Services (Euro/Month) \rule{0pt}{1.5ex}}} \\
+\hline
+Azure cosmos DB & $\sim$ 6 \\
+Load Test & $\sim$ 10 (50h test) \\
+Azure ML workspace & $\sim$ 90 \\
+Container apps x2 & $\sim$ 600 (3x load test) \\
+Registry x2 & $\sim$ 10 \\
+DNS Zone & $\sim$ 0.80 (1 mld richieste) \\
+Azure key vault & $\sim$ 5 \\
+Log analytics x2 & $\sim$ 28 \\
+Various Alerts & 0.00 \\
+Static web app & $\sim$ 80 (3x load test) \\
+\cline{1-2}
+\textbf{Total} & \textbf{830} \\
+\hline
+\end{tabular}
+\end{table}
 
+La sezione di cost analysis è stata inaccessibile di recente quindi le valutazioni sui costi sono stimate basandosi sui prezzi riportati da Azure al momento della scrittura e sono stati aggiustati tenendo conto di un carico simile a circa 3 volte i load test effettuati.
 
+Il servizio Static Web App risulta essere la soluzione meno costosa tra quelle presenti per hostare applicazioni web, questo è dovuto al fatto che si tratta di una applicazione senza backend, il costo si alzerebbe considerevolmente aggiungendo un Container App per il backend ($\sim$ \euro 100).
 
-
-
+Il servizio più costoso sono le Container App in quanto sono le risorse che usano più vCPU in assoluto, in futuro si potrà sostituire il cluster ACA con un Azure Kubernetes Service che consentirebbe di abbassare il costo diretto del cluster aggiungendo però overhead di gestione dello stesso, le Azure Container Apps si sono rese utili per distribuire il più velocemente possibile una versione iniziale dell'applicazione.
 
 
 
