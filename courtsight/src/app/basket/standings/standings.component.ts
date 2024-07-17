@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {CardModule} from "primeng/card";
 import {Button, ButtonDirective} from "primeng/button";
@@ -28,19 +28,21 @@ import {Standings} from "../standings";
   templateUrl: './standings.component.html',
   styleUrl: './standings.component.css'
 })
-export class StandingsComponent {
+export class StandingsComponent implements OnInit {
+  @Input() date!: Date;
   standingsService = inject(StandingsService);
-  last_update!: Date;
 
   standings : Standings | undefined;
 
   constructor() {
+  }
+
+  ngOnInit() {
     this.refreshStandings()
   }
 
   refreshStandings() {
-    this.last_update = new Date();
-    this.standingsService.getStandingsForDate(getFormattedDate(this.last_update)).then((standings: Standings) => {
+    this.standingsService.getStandingsForDate(getFormattedDate(this.date)).then((standings: Standings) => {
       this.standings = standings;
     })
   }

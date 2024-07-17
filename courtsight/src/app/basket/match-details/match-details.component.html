@@ -1,19 +1,19 @@
 <div class="p-5" *ngIf="matchStats">
   <div class="flex flex-column mx-6 gap-4">
 
-    <p-card header="{{matchStats?.global_stats?.game_date | date: 'fullDate' }}"
+    <p-card header="{{matchStats.global_stats.game_date | date: 'fullDate' }}"
             subheader="{{match?.home_team?.arena}} ({{match?.home_team?.city}}, {{match?.home_team?.state}})">
 
       <div class="grid">
 
         <div class="col">
           <div class="flex flex-column align-items-end justify-content-end align-self-center">
-            <span class="font-medium text-secondary text-lg">{{ matchStats?.by_home_stats?.team_abbreviation }}</span>
+            <span class="font-medium text-secondary text-lg">{{ matchStats.by_home_stats.team_abbreviation }}</span>
             <a class="text-4xl font-medium text-900 text-green-500 text-right mt-1 no-underline"
-               routerLink="/basket/team/{{ matchStats?.by_home_stats?.team_abbreviation }}">
-              {{ matchStats?.by_home_stats?.team_name }}
+               routerLink="/basket/team/{{ matchStats.by_home_stats.team_abbreviation }}">
+              {{ matchStats.by_home_stats.team_name }}
             </a>
-            <div class="text-7xl">{{ matchStats?.by_home_stats?.pts }}</div>
+            <div class="text-7xl">{{ matchStats.by_home_stats.pts }}</div>
           </div>
         </div>
 
@@ -23,12 +23,12 @@
 
         <div class="col">
           <div class="flex flex-column align-items-start justify-content-start align-self-center">
-            <span class="font-medium text-secondary text-lg">{{ matchStats?.by_away_stats?.team_abbreviation }}</span>
+            <span class="font-medium text-secondary text-lg">{{ matchStats.by_away_stats.team_abbreviation }}</span>
             <a class="text-4xl font-medium text-900 text-orange-500 text-left mt-1 no-underline"
-               routerLink="/basket/team/{{ matchStats?.by_away_stats?.team_abbreviation }}">
-              {{ matchStats?.by_away_stats?.team_name }}
+               routerLink="/basket/team/{{ matchStats.by_away_stats.team_abbreviation }}">
+              {{ matchStats.by_away_stats.team_name }}
             </a>
-            <div class="text-7xl">{{ matchStats?.by_away_stats?.pts }}</div>
+            <div class="text-7xl">{{ matchStats.by_away_stats.pts }}</div>
           </div>
         </div>
 
@@ -63,7 +63,7 @@
             {{ prediction_message }}
           </div>
           <div *ngIf="prediction_result" class="text-lg mr-2">
-            Predicted point difference: <span class="font-bold">{{ prediction_result | number: '1.0-2' }}</span>
+            Predicted point difference: <span class="font-bold">{{ prediction_result | number: '1' }}</span>
           </div>
         </div>
       </div>

@@ -11,8 +11,14 @@
       <span class="ml-2">{{ item.label }}</span>
     </a>
   </ng-template>
-  <!--  <ng-template pTemplate="end">-->
-  <!--      <input type="text" pInputText placeholder="Search" class="w-8rem sm:w-auto" />-->
-  <!--      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />-->
-  <!--  </ng-template>-->
+    <ng-template pTemplate="end">
+      <p-dropdown
+        [options]="themes"
+        [(ngModel)]="selectedTheme"
+        (onChange)="changeTheme()"
+        optionLabel="name"
+        placeholder="Select a Theme" />
+<!--        <input type="text" pInputText placeholder="Search" class="w-8rem sm:w-auto" />-->
+<!--        <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />-->
+    </ng-template>
 </p-menubar>

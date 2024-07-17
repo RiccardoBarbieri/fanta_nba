@@ -16,9 +16,9 @@
         size="normal"/>
       <div>Playoff</div>
       <p-avatar
-        styleClass="ml-4 mr-2 playon"
+        styleClass="ml-4 mr-2 playin"
         size="normal"/>
-      <div>Playon</div>
+      <div>Playin</div>
     </div>
   </div>
 
@@ -26,7 +26,7 @@
     <div class="flex flex-row align-items-center justify-content-between flex-wrap">
       <div class="flex">
         <div class="mr-2">Last update:</div>
-        <div>{{ last_update | date: 'M/d/yy, H:mm' }}</div>
+        <div>{{ date | date: 'M/d/yy, H:mm' }}</div>
       </div>
       <p-button icon="pi pi-refresh" [rounded]="true" [text]="true" (click)="refreshStandings()"/>
     </div>

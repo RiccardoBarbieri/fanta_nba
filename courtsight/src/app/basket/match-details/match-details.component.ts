@@ -59,18 +59,9 @@ export class MatchDetailsComponent {
 
   bookmakers_list: any[] = [];
 
-  load() {
-    this.loading = true;
-
-    setTimeout(() => {
-      this.loading = false
-    }, 4000);
-  }
-
   constructor() {
     const match_id = this.route.snapshot.params["id"];
     const match_date = this.route.snapshot.params["date"];
-
 
     this.matchesService.getMatchStatsById(match_id, match_date).then((matches: ActualAndLastMatchStats) => {
       this.matchStats = matches.actual_match_stats
@@ -78,7 +69,6 @@ export class MatchDetailsComponent {
       let homePts = this.matchStats.by_home_stats.pts;
       let awayPts = this.matchStats.by_away_stats.pts;
       let total = homePts + awayPts;
-      console.log(homePts, awayPts)
 
       this.meterValue = [
         {label: '', value: homePts / total * 100, color: homePts >= awayPts ? colors.winningLeft : colors.losingLeft},

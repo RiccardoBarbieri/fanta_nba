@@ -27,7 +27,27 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              {
+                "input": "src/themes/lara-light-blue.css",
+                "bundleName": "lara-light-blue",
+                "inject": false
+              },
+              {
+                "input": "src/themes/lara-dark-blue.css",
+                "bundleName": "lara-dark-blue",
+                "inject": false
+              },
+              {
+                "input": "src/themes/bootstrap-light-purple.css",
+                "bundleName": "bootstrap-light-purple",
+                "inject": false
+              },
+              {
+                "input": "src/themes/bootstrap-dark-purple.css",
+                "bundleName": "bootstrap-dark-purple",
+                "inject": false
+              },
             ],
             "scripts": []
           },

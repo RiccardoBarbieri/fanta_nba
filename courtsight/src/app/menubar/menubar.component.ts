@@ -1,10 +1,13 @@
-import { Component, inject, Input, input } from '@angular/core';
-import { Sport } from '../shared/sport';
-import { SportsService } from '../shared/sports.service';
-import { AvatarModule } from 'primeng/avatar';
-import { InputTextModule } from 'primeng/inputtext';
-import { MenubarModule } from 'primeng/menubar';
-import { MenuItem } from 'primeng/api';
+import {Component, inject, Input, input, OnInit} from '@angular/core';
+import {Sport} from '../shared/sport';
+import {SportsService} from '../shared/sports.service';
+import {AvatarModule} from 'primeng/avatar';
+import {InputTextModule} from 'primeng/inputtext';
+import {MenubarModule} from 'primeng/menubar';
+import {MenuItem} from 'primeng/api';
+import {DropdownModule} from "primeng/dropdown";
+import {FormsModule} from "@angular/forms";
+import {Theme, ThemeService} from "../theme.service";
 
 
 @Component({
@@ -13,12 +16,14 @@ import { MenuItem } from 'primeng/api';
   imports: [
     MenubarModule,
     AvatarModule,
-    InputTextModule
+    InputTextModule,
+    DropdownModule,
+    FormsModule
   ],
   templateUrl: './menubar.component.html',
   styleUrl: './menubar.component.css'
 })
-export class MenubarComponent {
+export class MenubarComponent implements OnInit {
   @Input() title!: string;
 
   sportService: SportsService = inject(SportsService);
@@ -26,10 +31,15 @@ export class MenubarComponent {
 
   items: MenuItem[] | undefined;
 
+  themeService: ThemeService = inject(ThemeService);
+  themes: Theme[] | undefined;
+  selectedTheme: Theme | undefined;
+
   constructor() {
     this.sportsList = this.sportService.getAllSports();
+    this.themes = this.themeService.getAvailableThemes()
+    this.selectedTheme = this.themes[0];
   }
-
 
   ngOnInit() {
     let sportItems: MenuItem[] = [];
@@ -55,4 +65,11 @@ export class MenubarComponent {
       },
     ]
   }
+
+  changeTheme() {
+    if (this.selectedTheme) {
+      this.themeService.switchTheme(this.selectedTheme.bundle);
+    }
+  }
+
 }
