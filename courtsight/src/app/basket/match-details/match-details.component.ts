@@ -124,8 +124,8 @@ export class MatchDetailsComponent {
 }
 
 export const colors = {
-  winningLeft: "#3bc21d",
-  losingLeft: "rgba(73,225,11,0.25)",
-  winningRight: "#eb9c08",
-  losingRight: "rgba(235,156,8,0.25)",
+  winningLeft: "var(--green-500)",
+  losingLeft: "var(--green-200)",
+  winningRight: "var(--orange-400)",
+  losingRight: "var(--orange-200)",
 }
