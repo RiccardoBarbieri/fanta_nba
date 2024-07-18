@@ -2,7 +2,7 @@ name: Create and push nba_api docker image
 
 on:
   push:
-    branches: [ "webapp" ]
+    branches: [ "master" ]
     paths:
       - 'nba_api/**'
 
