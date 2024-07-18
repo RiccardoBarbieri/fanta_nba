@@ -26,7 +26,7 @@ La scelta del framework javascript è ricaduta su Angular, sviluppato da Google 
 
 
 \subsection{Angular}
-Le app Angular sono scritte in typescript e devono seguire una precia struttura. Sono \textit{single-page-applications} organizzate per componenti con singola responsabilità, componibili all'interno di file .html estesi per supportare tag aggiuntivi.
+Le app Angular sono scritte in typescript e devono seguire una precisa struttura. Sono \textit{single-page-applications} organizzate per componenti con singola responsabilità, componibili all'interno di file .html estesi per supportare tag aggiuntivi.
 
 I componenti sono definibili direttamente in un unico file typescript ed esportati come classi. Sono identificati da un selettore, reso poi disponibile sotto forma di tag, e devono presentare un template HTML per istruire il rendering, che può anche essere inserito sotto forma di link a un file a sé.
 
@@ -82,7 +82,7 @@ Questa libreria molto completa è sviluppata da PrimeTek, che l'ha declinata per
 Mediante il sistema di routing di Angular, le pagine sono definite ognuna da un diverso componente, inserito dinamicamente nel root della applicazione a seconda dell'url richiesto. 
 
 \subsection{Struttura dell'applicazione}
-In questa sezione verrà delineato l'intero elenco di componenti sviluppati. Nelle applicazioni Angular quando il numero di componenti inizia a crescere è bene suddividerli in cartelle organizzati per feature - l'elenco che segue presenta quindi la medesima strategia.
+In questa sezione verrà delineato l'intero elenco di componenti sviluppati. Nelle applicazioni Angular quando il numero di componenti inizia a crescere è bene suddividerli in cartelle organizzati per feature e l'elenco che segue presenta quindi la medesima strategia.
 
 \subsubsection{app}
 Alla base dell'applicazione web c'è un file \texttt{index.html} il cui body verrà dinamicamente aggiornato a runtime inserendo i vari componenti quando richiesto, e sarà quindi sempre presentato all'utente. 
@@ -116,7 +116,7 @@ Per permettere di visualizzare partite vere anche a campionato terminato, un sem
 
 
 \subsection{Servizi}
-Le applicazioni Angular sfruttano la Dependancy Injection per rendere disponibili feature e dati ai vari componenti solo se esplicitamente richiesti. Una serie di \textit{services} sono definiti per interfacciarsi alle API e nascondere i dettagli in merito a chiamate e ottenimento dei dati.
+Le applicazioni Angular sfruttano la Dependency Injection per rendere disponibili feature e dati ai vari componenti solo se esplicitamente richiesti. Una serie di \textit{services} sono definiti per interfacciarsi alle API e nascondere i dettagli in merito a chiamate e ottenimento dei dati.
 I servizi sono divisi in file in base all'ambito di utilizzo anche se condividono in molti casi l'API a cui fanno riferimento. In particolare sono:
 \begin{itemize}
     \item SportsService: ottiene dalla \texttt{bet\_api} l'elenco degli sport supportati.
