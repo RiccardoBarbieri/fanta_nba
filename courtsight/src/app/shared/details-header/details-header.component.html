@@ -4,7 +4,8 @@
         <div class="flex align-items-start flex-column lg:justify-content-between">
           <div class="flex flex-row gap-1 align-items-baseline flex-wrap">
             <div class="text-6xl font-bold text-primary mr-3">{{ title }}</div>
-            <div class="text-4xl text-color-secondary">{{ subtitle }}</div>
+            <div *ngIf="!subtitleLink" class="text-4xl text-color-secondary">{{ subtitle }}</div>
+            <a *ngIf="subtitleLink" routerLink="{{subtitleLink}}" class="text-4xl text-color-secondary no-underline">{{ subtitle }}</a>
           </div>
           <div class="flex flex-row align-items-center text-700 flex-wrap">
             <div *ngFor="let item of items" class="mr-5 flex align-items-center mt-3">

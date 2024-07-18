@@ -1,11 +1,11 @@
-<div class="grid mt-3 lg:mx-6 m-2">
+<div class="grid mt-3 lg:mx-6 m-2 mb-8">
   <app-details-header
     [title]="team?.team_info?.full_name!"
     [subtitle]="team?.team_info?.abbreviation!"
     [items]="header_items"></app-details-header>
 </div>
-
-<div class="lg:mx-6">
+<br>
+<div class="lg:mx-6 my-3">
   <app-player-showcase [players]="team?.team_players!"></app-player-showcase>
 </div>
 

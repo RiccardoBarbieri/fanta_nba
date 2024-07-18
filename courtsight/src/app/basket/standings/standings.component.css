@@ -1,8 +1,11 @@
 
 ::ng-deep .playoff {
-  background-color: rgba(0, 128, 0, 0.1);
+  background-color: var(--green-500) /*rgb(86, 194, 86);*/;
+  color: var(--primary-color-text	);
 }
 
 ::ng-deep .playin {
-  background-color: rgba(0, 0, 255, 0.1);
+  background-color:var(--blue-500)  /*rgb(107, 107, 228);*/;
+  color: var(--primary-color-text	);
 }
+

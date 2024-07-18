@@ -21,7 +21,17 @@ export class PlayerShowcaseComponent implements OnInit {
   ngOnInit(): void {
     this.responsiveOptions = [
       {
-        breakpoint: '1500px',
+        breakpoint: '1600px',
+        numVisible: 6,
+        numScroll: 6
+      },
+      {
+        breakpoint: '1400px',
+        numVisible: 5,
+        numScroll: 5
+      },
+      {
+        breakpoint: '1200px',
         numVisible: 4,
         numScroll: 4
       },

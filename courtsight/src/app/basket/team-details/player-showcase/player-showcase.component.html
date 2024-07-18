@@ -4,13 +4,13 @@
   [numScroll]="7"
   [circular]="false"
   [responsiveOptions]="responsiveOptions"
-  autoplayInterval="6000">
+  autoplayInterval="9000">
   <ng-template let-player pTemplate="">
     <div class="border-1 surface-border border-round m-2 p-3">
       <div class="flex flex-column gap-4">
-        <div class="flex flex-row flex-wrap justify-content-between align-items-center">
+        <div class="flex flex-row flex-wrap justify-content-between align-items-baseline">
           <div>
-            <div class="text-lg font-medium text-900 mt-1">
+            <div class="text-lg font-medium text-900 mt-1 mb-3 mr-2">
               <a routerLink="./player/{{player.player_id}}" class="no-underline text-900">{{ player.player }}</a>
             </div>
           </div>

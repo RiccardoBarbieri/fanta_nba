@@ -16,7 +16,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-team let-i="rowIndex">
       <tr>
-        <td class="text-center font-bold" pFrozenColumn [class]="{'playoff': i <= 6, 'playin': i >= 7 && i <= 10}">{{i+1}}</td>
+        <td class="text-center font-bold" pFrozenColumn [class]="{'playoff': i <= 7, 'playin': i > 7 && i <= 11}">{{i+1}}</td>
         <td class="text-left" pFrozenColumn><a class="font-medium no-underline text-900" routerLink="/basketball/team/{{team.team_ticker}}">{{ team.team }}</a></td>
         <td class="text-center">{{ team.g }}</td>
         <td class="text-center">{{ team.w }}</td>
