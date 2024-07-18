@@ -73,7 +73,7 @@ export class PlayerDetailsComponent {
           this.playerStats = playerStats;
           this.average_stats = [
             {
-              value: this.player?.exp,
+              value: `${this.player?.exp} years`,
               name: "Experience",
             },
             {
