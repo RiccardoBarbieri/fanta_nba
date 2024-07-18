@@ -348,7 +348,7 @@ Per l'applicazione web il workflow è stato configurato direttamente da Azure, c
 \subsection{Scalabilità}
 Per garantire un certo livello di performance dell'applicazione anche sotto carichi elevati abbiamo stabilito regole di scalabilità precise. Per quanto riguarda il deployment del modello di machine learning queste impostazioni non sono configurabili, Azure gestisce autonomamente la creazione di container Docker ridondanti all'aumentare delle richieste.
 
-Le Container App permettono gestiscono la scalabilità replicando il container in esecuzione quando necessario, abbiamo configurato:
+Le Container App permettono di gestire la scalabilità replicando il container in esecuzione quando necessario, abbiamo configurato:
 \begin{itemize}
     \item numero minimo di repliche: 1
     \item numero massimo di repliche 15
@@ -373,17 +373,17 @@ Per monitorare la qualità del servizio abbiamo impostato, tramite il servizio A
 \begin{itemize}
     \item Bet Api
     \begin{itemize}
-        \item Memory AVG > 210 MB
-        \item Network In AVG > 150 MB
-        \item vCore Usage TOTAL > 1.3c
-        \item Replica Count > 7
+        \item Memory AVG $>$ 210 MB
+        \item Network In AVG $>$ 150 MB
+        \item vCore Usage TOTAL $>$ 1.3c
+        \item Replica Count $>$ 7
     \end{itemize}
     \item NBA Api
     \begin{itemize}
-        \item Memory AVG > 350 MB
-        \item Network In AVG > 220 MB
-        \item vCore Usage TOTAL > 1.5c
-        \item Replica Count > 7
+        \item Memory AVG $>$ 350 MB
+        \item Network In AVG $>$ 220 MB
+        \item vCore Usage TOTAL $>$ 1.5c
+        \item Replica Count $>$ 7
     \end{itemize}
 \end{itemize}
 
@@ -394,28 +394,28 @@ Abbiamo effettuato un load test su entrambe le api con diversi parametri, per ge
 
 I test sono stati configurati compilando gli endpoint da testare e fornendo liste di parametri sui quali iterare per effettuare le richieste, questo permette di verificare che i sistemi di cache siano efficaci in quanto viene riutilizzate molte volte la stessa richiesta.
 
-Il test per NBA Api è stato generate con due engine che generano ognuno fino a 50 utenti concorrenti per una durata di 1 ora, quello per Bet Api è stato generato con 5 engine e fino a 100 utenti concorrenti per una durata di 2 ore e 30 minuti.
+Il test per NBA Api è stato generato con 2 engine che generano ognuno fino a 50 utenti concorrenti per una durata di 1 ora, quello per Bet Api è stato generato con 5 engine e fino a 100 utenti concorrenti per una durata di 2 ore e 30 minuti.
 
 La discrepanza tra il numero di utenti tra i due test è dovuta al fatto che, a causa delle limitazioni di \texttt{swar/nba\_api}, non si ottengono risultati accurati sovraccaricando eccessivamente l'api, si denota che le limitazioni non sono dovute alla implementazione ma al rate limiting dell'api.
 
 Di seguito si riportano alcuni grafici che mostrano l'andamento di utilizzo delle risorse durante il test di NBA Api.
 
-Come si può notare dai grafici, NBA Api subisce una considerevole riduzione (circa 30\%) della media di memoria di sistema utilizzata da una replica, l'utilizzo di CPU medio incrementa fino a 0.2 vCPU in media per ogni replica; questi grafici evidenziano il problema definito in precedenza con il rate limiting di \texttt{swar/nba\_api}: quando l'api risponde con timeout la replica in questione viene terminata dopo qualche minuto perché il sistema non la ritiene più necessaria.
 
 \begin{tabular}{ c c }
     \includegraphics[width=0.5\textwidth]{img/load_test/nba-api-mem-avg.png} & \includegraphics[width=0.5\textwidth]{img/load_test/nba-api-cpu-avg.png} \\
     \includegraphics[width=0.5\textwidth]{img/load_test/nba-api-rep-count.png} & \includegraphics[width=0.5\textwidth]{img/load_test/nba-api-rx-sum.png} \\
 \end{tabular}
 
-Di seguito si riportano alcuni grafici che mostrano l'andamento di utilizzo delle risorse durante il test di Bet Api.
+Come si può notare dai grafici, NBA Api subisce una considerevole riduzione (circa 30\%) della media di memoria di sistema utilizzata da una replica, l'utilizzo di CPU medio incrementa fino a 0.2 vCPU in media per ogni replica; questi grafici evidenziano il problema definito in precedenza con il rate limiting di \texttt{swar/nba\_api}: quando l'api risponde con timeout la replica in questione viene terminata dopo qualche minuto perché il sistema non la ritiene più necessaria.
 
-I risultati di Bet Api differiscono significativamente da quelli di NBA Api, Bet Api si rivela molto più efficiente in quanto non necessita di un numero di repliche alto (massimo raggiunto pari a 4) per gestire un traffico maggiore di quello imposto a NBA Api.
+Di seguito si riportano alcuni grafici che mostrano l'andamento di utilizzo delle risorse durante il test di Bet Api.
 
 \begin{tabular}{ c c }
     \includegraphics[width=0.5\textwidth]{img/load_test/bet-api-mem-avg.png} & \includegraphics[width=0.5\textwidth]{img/load_test/bet-api-cpu-avg.png} \\
     \includegraphics[width=0.5\textwidth]{img/load_test/bet-api-rep-count.png} & \includegraphics[width=0.5\textwidth]{img/load_test/bet-api-rx-sum.png} \\
 \end{tabular}
 
+I risultati di Bet Api differiscono significativamente da quelli di NBA Api, Bet Api si rivela molto più efficiente in quanto non necessita di un numero di repliche alto (massimo raggiunto pari a 4) per gestire un traffico maggiore di quello imposto a NBA Api.
 
 \subsection{Stima costi}
 
