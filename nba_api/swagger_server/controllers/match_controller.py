@@ -1,5 +1,8 @@
 import datetime
+from pprint import pprint
+
 import featurevec.feature_vector_helper as feature_vector_helper
+from utils.helper_functions import get_home_away_team
 import featurevec.rest_api_functions_helper as helper
 
 
@@ -28,6 +31,16 @@ def match_match_id_stats_get(match_id: str, match_date: str) -> dict[str, any]:
         actual_matches.__getitem__(0)["team_id"],
         date_from, date_to)
 
+    home_away = get_home_away_team(actual_matches.__getitem__(0)['matchup'])
+
+    if home_away['home_team'] == actual_matches.__getitem__(0)['team_abbreviation']:
+        home_team_actual_match = actual_matches.__getitem__(0)
+        away_team_actual_match = actual_matches.__getitem__(1)
+    else:
+        home_team_actual_match = actual_matches.__getitem__(1)
+        away_team_actual_match = actual_matches.__getitem__(0)
+
+
     if "vs" in actual_matches.__getitem__(0)["matchup"]:
         actual_stats = helper.calculate_stats(actual_matches.__getitem__(0), actual_matches.__getitem__(1)["pts"])
     else:
@@ -46,15 +59,15 @@ def match_match_id_stats_get(match_id: str, match_date: str) -> dict[str, any]:
             final_stats.append(helper.calculate_stats(stats_1, stats_0["pts"]))
 
     return {"actual_match_stats": {"global_stats": actual_stats,
-                                   "by_home_stats": actual_matches.__getitem__(1),
-                                   "by_away_stats": actual_matches.__getitem__(0)},
+                                   "by_home_stats": home_team_actual_match,
+                                   "by_away_stats": away_team_actual_match},
             "last_match_stats": {"global_stats": final_stats,
                                  "by_home_stats": list(filter(lambda direct_matchups:
-                                                              actual_matches.__getitem__(1)["team_abbreviation"] ==
+                                                              home_team_actual_match["team_abbreviation"] ==
                                                               direct_matchups["team_abbreviation"] and direct_matchups[
                                                                   "game_id"] != match_id, direct_matchups)),
                                  "by_away_stats": list(filter(lambda direct_matchups:
-                                                              actual_matches.__getitem__(0)["team_abbreviation"] ==
+                                                              away_team_actual_match["team_abbreviation"] ==
                                                               direct_matchups["team_abbreviation"] and direct_matchups[
                                                                   "game_id"] != match_id, direct_matchups))}}
 
