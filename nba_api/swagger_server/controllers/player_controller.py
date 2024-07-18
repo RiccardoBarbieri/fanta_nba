@@ -25,8 +25,8 @@ def players_player_id_stats_get(player_id: str, season: str, date_to: str, last_
 
     filtered = list(filter(lambda player: player.get("id") == int(player_id), players))
     if len(filtered) == 1:
-        player_info = filtered[0].pop("id")
-        result.update({'player_info': player_info})
+        filtered[0].pop("id")
+        result.update({'player_info': filtered[0]})
     else:
         result.update({'player_info': None})
 
