@@ -1,3 +1,5 @@
+import {Player} from "./player";
+
 export interface GlobalStats {
   game_id: string,
   game_date: string,
@@ -44,7 +46,7 @@ export interface PlayerMatchStats {
   player_id: number,
   game_id: string,
   game_date: string,
-  match_up: string,
+  matchup: string,
   wl: string,
   min: number,
   fgm: number,
@@ -69,6 +71,45 @@ export interface PlayerMatchStats {
   video_available: number,
 }
 
+export interface AveragePlayerStats {
+  ast: number,
+  blk: number,
+  dreb: number,
+  fg3_pct: number,
+  fg3a: number,
+  fg3m: number,
+  fg_pct: number,
+  fga: number,
+  fgm: number,
+  ft_pct: number,
+  fta: number,
+  ftm: number,
+  oreb: number,
+  pf: number,
+  plus_minus: number,
+  pts: number,
+  reb: number,
+  stl: number,
+  tov: number,
+}
+
+export interface PlayerEfficiency {
+  all: number,
+  filtered_matches: number,
+}
+
+export interface TotalPlayerStats {
+  losses: number,
+  wins: number,
+}
+
+export interface PlayerInfo {
+  first_name: string,
+  full_name: string,
+  is_active: boolean,
+  last_name: string,
+}
+
 export interface MatchStats {
   global_stats: GlobalStats,
   by_home_stats: TeamMatchStats,
@@ -88,6 +129,8 @@ export interface TeamStats {
 
 export interface PlayerStats {
   all_stats: PlayerMatchStats[],
-  totals: {},
-  average: {}
+  average: AveragePlayerStats,
+  player_efficiency: PlayerEfficiency,
+  player_info: PlayerInfo,
+  totals: TotalPlayerStats,
 }

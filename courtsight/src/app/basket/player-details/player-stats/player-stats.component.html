@@ -1,0 +1,68 @@
+<p-table
+    [value]="rows"
+    [scrollable]="true"
+    styleClass="p-datatable-striped"
+>
+  <ng-template pTemplate="caption">
+    <div class="flex align-items-center justify-content-between">
+      {{ title }}
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th class="text-center" pFrozenColumn>Date</th>
+      <th class="text-center" pFrozenColumn>Matchup</th>
+      <th class="text-center">W/L</th>
+      <th class="text-center">min</th>
+      <th class="text-center">pts</th>
+      <th class="text-center">fgm</th>
+      <th class="text-center">fga</th>
+      <th class="text-center">fg %</th>
+      <th class="text-center">fg3m</th>
+      <th class="text-center">fg3a</th>
+      <th class="text-center">fg3 %</th>
+      <th class="text-center">ftm</th>
+      <th class="text-center">fta</th>
+      <th class="text-center">ft %</th>
+      <th class="text-center">oreb</th>
+      <th class="text-center">dreb</th>
+      <th class="text-center">reb</th>
+      <th class="text-center">ast</th>
+      <th class="text-center">stl</th>
+      <th class="text-center">blk</th>
+      <th class="text-center">tov</th>
+      <th class="text-center">pf</th>
+      <th class="text-center">+/-</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-stats>
+    <tr>
+      <td class="text-center" pFrozenColumn><a routerLink="/basketball/match/{{stats.game_id}}/{{stats.game_date | date: 'yyyy-MM-dd' }}" class="text-primary">{{ stats.game_date }}</a></td>
+      <td class="text-center" pFrozenColumn>{{ stats.matchup }}</td>
+      <td class="text-center">{{ stats.wl }}</td>
+      <td class="text-center">{{ stats.min }}</td>
+      <td class="text-center">{{ stats.pts }}</td>
+      <td class="text-center">{{ stats.fgm }}</td>
+      <td class="text-center">{{ stats.fga }}</td>
+      <td class="text-center">{{ stats.fg_pct }}</td>
+      <td class="text-center">{{ stats.fg3m }}</td>
+      <td class="text-center">{{ stats.fg3a }}</td>
+      <td class="text-center">{{ stats.fg3_pct }}</td>
+      <td class="text-center">{{ stats.ftm }}</td>
+      <td class="text-center">{{ stats.fta }}</td>
+      <td class="text-center">{{ stats.ft_pct }}</td>
+      <td class="text-center">{{ stats.oreb }}</td>
+      <td class="text-center">{{ stats.dreb }}</td>
+      <td class="text-center">{{ stats.reb }}</td>
+      <td class="text-center">{{ stats.ast }}</td>
+      <td class="text-center">{{ stats.stl }}</td>
+      <td class="text-center">{{ stats.blk }}</td>
+      <td class="text-center">{{ stats.tov }}</td>
+      <td class="text-center">{{ stats.pf }}</td>
+      <td class="text-center">{{ stats.plus_minus }}</td>
+    </tr>
+  </ng-template>
+
+
+</p-table>
+

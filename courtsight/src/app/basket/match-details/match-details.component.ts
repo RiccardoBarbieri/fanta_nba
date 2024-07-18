@@ -61,29 +61,35 @@ export class MatchDetailsComponent {
 
 
   constructor() {
-    const match_id = this.route.snapshot.params["id"];
-    const match_date = this.route.snapshot.params["date"];
+    this.route.params.subscribe(routeParams => {
+      const match_id = routeParams["id"];
+      const match_date = routeParams["date"];
 
-    this.matchesService.getMatchStatsById(match_id, match_date).then((matches: ActualAndLastMatchStats) => {
-      this.matchStats = matches.actual_match_stats
+      this.matchesService.getMatchStatsById(match_id, match_date).then((matches: ActualAndLastMatchStats) => {
+        this.matchStats = matches.actual_match_stats
 
-      let homePts = this.matchStats.by_home_stats.pts;
-      let awayPts = this.matchStats.by_away_stats.pts;
-      let total = homePts + awayPts;
+        let homePts = this.matchStats.by_home_stats.pts;
+        let awayPts = this.matchStats.by_away_stats.pts;
+        let total = homePts + awayPts;
 
-      this.meterValue = [
-        {label: '', value: homePts / total * 100, color: homePts >= awayPts ? colors.winningLeft : colors.losingLeft},
-        {label: '', value: awayPts / total * 100, color: homePts >= awayPts ? colors.losingRight : colors.winningRight},
-      ]
+        this.meterValue = [
+          {label: '', value: homePts / total * 100, color: homePts >= awayPts ? colors.winningLeft : colors.losingLeft},
+          {
+            label: '',
+            value: awayPts / total * 100,
+            color: homePts >= awayPts ? colors.losingRight : colors.winningRight
+          },
+        ]
 
-      this.matchesService.getMatchesByDate(this.matchStats.global_stats.game_date, this.matchStats.global_stats.game_date).then(matches => {
-        this.match = matches.find(m => m.game_id === match_id);
-      })
+        this.matchesService.getMatchesByDate(this.matchStats.global_stats.game_date, this.matchStats.global_stats.game_date).then(matches => {
+          this.match = matches.find(m => m.game_id === match_id);
+        })
 
-      const event_id: string = `${this.matchStats?.by_home_stats.team_abbreviation}FAKE${this.matchStats?.by_away_stats.team_abbreviation}`;
-      this.oddsService.getOddsForMatch(event_id).then((odds: Odds[]) => {
-        this.odds = odds[0];
-      })
+        const event_id: string = `${this.matchStats?.by_home_stats.team_abbreviation}FAKE${this.matchStats?.by_away_stats.team_abbreviation}`;
+        this.oddsService.getOddsForMatch(event_id).then((odds: Odds[]) => {
+          this.odds = odds[0];
+        })
+      });
     });
   }
 

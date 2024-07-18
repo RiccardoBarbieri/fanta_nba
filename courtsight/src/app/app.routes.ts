@@ -3,7 +3,8 @@ import {HomeComponent} from "./homepage/home/home.component";
 import {HomeComponent as BasketHome} from "./basket/home/home.component";
 import {TeamDetailsComponent} from "./basket/team-details/team-details.component";
 import {MatchDetailsComponent} from "./basket/match-details/match-details.component";
-import {BasketComponent} from "./basket/basket.component";
+import {PlayerDetailsComponent} from "./basket/player-details/player-details.component";
+import {SimpleRouterComponent} from "./shared/simple-router/simple-router.component";
 
 export const routes: Routes = [
   {
@@ -17,7 +18,7 @@ export const routes: Routes = [
       },
       {
         path: "basketball",
-        component: BasketComponent,
+        component: SimpleRouterComponent,
         title: "Basketball",
         data: {breadcrumb: 'Basketball'},
         children: [
@@ -29,12 +30,26 @@ export const routes: Routes = [
           {
             path: 'match/:id/:date',
             component: MatchDetailsComponent,
+            title: "Match",
             data: {breadcrumb: 'Match'}
           },
           {
             path: 'team/:ticker',
-            component: TeamDetailsComponent,
-            data: {breadcrumb: 'Team'}
+            component: SimpleRouterComponent,
+            title: "Team",
+            data: {breadcrumb: 'Team'},
+            children: [
+              {
+                path: '',
+                component: TeamDetailsComponent,
+                data: {breadcrumb: ''}
+              },
+              {
+                path: 'player/:id',
+                component: PlayerDetailsComponent,
+                data: {breadcrumb: 'Player'}
+              },
+            ]
           },
         ]
       },

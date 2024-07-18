@@ -18,6 +18,7 @@ import {PlayerShowcaseComponent} from "./player-showcase/player-showcase.compone
 import {TimeTravelComponent} from "../../shared/time-travel/time-travel.component";
 import {TimeTravelService} from "../../shared/time-travel.service";
 import {SkeletonModule} from "primeng/skeleton";
+import {DetailsHeaderComponent, Item} from "../../shared/details-header/details-header.component";
 
 @Component({
   selector: 'app-team-details',
@@ -33,7 +34,8 @@ import {SkeletonModule} from "primeng/skeleton";
     FormsModule,
     PlayerShowcaseComponent,
     TimeTravelComponent,
-    SkeletonModule
+    SkeletonModule,
+    DetailsHeaderComponent
   ],
   templateUrl: './team-details.component.html',
   styleUrl: './team-details.component.css'
@@ -43,8 +45,11 @@ export class TeamDetailsComponent {
   route: ActivatedRoute = inject(ActivatedRoute);
   teamsService = inject(TeamsService);
   matchesService = inject(MatchesService);
+
+  header_items: Item[] = [];
+
   team: Team | undefined;
-  matches: Match[] = [] ;
+  matches: Match[] = [];
   loading = false;
   date: Date;
   next_week = () => {
@@ -54,12 +59,34 @@ export class TeamDetailsComponent {
   constructor(private titleService: Title) {
     this.date = this.timetravelService.date;
     this.titleService.setTitle('Team Details');
-    const ticker = this.route.snapshot.params["ticker"];
-    this.teamsService.getTeamFromTicker(ticker, "2023-24").then((team: Team) => {
-      this.team = team;
-      this.matchesService.getMatchesByDate(getFormattedDate(this.date),getFormattedDate(this.next_week())).then((matches: Match[]) => {
-        this.matches = matches.filter((match: Match) => {return match.home_team.id === team.team_info.id || match.away_team.id === team.team_info.id});
-      })
+    this.route.params.subscribe(routeParams => {
+      this.date = this.timetravelService.date;
+      const ticker = this.route.snapshot.params["ticker"];
+
+
+      this.teamsService.getTeamFromTicker(ticker, "2023-24").then((team: Team) => {
+        this.team = team;
+        this.header_items = [
+          {
+            icon: 'pi pi-calendar',
+            value: `Founded: ${team?.team_info?.year_founded}`,
+          },
+          {
+            icon: 'pi pi-map-marker',
+            value: `${team?.team_info?.city}, ${team?.team_info?.state}`,
+          },
+          {
+            icon: 'pi pi-home',
+            value: `${team?.team_info?.arena}`,
+          },
+        ];
+
+        this.matchesService.getMatchesByDate(getFormattedDate(this.date), getFormattedDate(this.next_week())).then((matches: Match[]) => {
+          this.matches = matches.filter((match: Match) => {
+            return match.home_team.id === team.team_info.id || match.away_team.id === team.team_info.id
+          });
+        })
+      });
     });
   }
 

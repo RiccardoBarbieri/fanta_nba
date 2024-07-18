@@ -9,7 +9,7 @@ export class PlayersService {
 
   constructor() { }
 
-  async getPlayerStatsById(player_id: number, season: string, date_to: string | undefined, last_x: string | undefined, home_away_filter: string | undefined): Promise<PlayerStats> {
+  async getPlayerStatsById(player_id: number, season: string, date_to: string, last_x: string = "5", home_away_filter: string = ""): Promise<PlayerStats> {
     const params = new URLSearchParams(
       {
         season: season,
@@ -20,11 +20,11 @@ export class PlayersService {
     if (last_x) {
       params.append('last_x', last_x);
     }
-    if (home_away_filter) {
+    if (home_away_filter !== "") {
       params.append('home_away_filter', home_away_filter);
     }
 
-    const data = await fetch(`${this.nba_api_url}/${player_id}/stats` + params.toString(), {
+    const data = await fetch(`${this.nba_api_url}/${player_id}/stats?` + params.toString(), {
       headers: {
         "Accept": "application/json",
       }

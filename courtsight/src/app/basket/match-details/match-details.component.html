@@ -1,5 +1,5 @@
-<div class="p-5" *ngIf="matchStats">
-  <div class="flex flex-column mx-6 gap-4">
+<div class="lg:px-5" *ngIf="matchStats">
+  <div class="flex flex-column lg:mx-6 gap-4">
 
     <p-card header="{{matchStats.global_stats.game_date | date: 'fullDate' }}"
             subheader="{{match?.home_team?.arena}} ({{match?.home_team?.city}}, {{match?.home_team?.state}})">

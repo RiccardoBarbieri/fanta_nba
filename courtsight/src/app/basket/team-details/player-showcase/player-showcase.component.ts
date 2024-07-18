@@ -1,12 +1,14 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {CarouselModule} from "primeng/carousel";
 import {Player} from "../../player";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-player-showcase',
   standalone: true,
   imports: [
-    CarouselModule
+    CarouselModule,
+    RouterLink
   ],
   templateUrl: './player-showcase.component.html',
   styleUrl: './player-showcase.component.css'

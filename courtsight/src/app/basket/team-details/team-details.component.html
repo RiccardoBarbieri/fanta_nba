@@ -1,37 +1,15 @@
-<div class="grid mt-3 ml-6 mr-6">
-  <div class="col">
-    <div class="flex flex-column gap-2">
-      <div class="flex flex-row justify-content-start align-content-start mb-8">
-        <div class="flex align-items-start flex-column lg:justify-content-between">
-          <div class="flex flex-row gap-1 align-items-baseline">
-            <div class="text-6xl font-bold mr-3">{{ team?.team_info?.full_name }}</div>
-            <div class="text-4xl text-color-secondary">{{ team?.team_info?.abbreviation }}</div>
-          </div>
-          <div class="flex flex-row align-items-center text-700 flex-wrap">
-            <div class="mr-5 flex align-items-center mt-3">
-              <i class="pi pi-calendar mr-2"></i>
-              <span>Founded: {{ team?.team_info?.year_founded }}</span>
-            </div>
-            <div class="mr-5 flex align-items-center mt-3">
-              <i class="pi pi-map-marker mr-2"></i>
-              <span>{{ team?.team_info?.city }}, {{ team?.team_info?.state }}</span>
-            </div>
-            <div class="flex align-items-center mt-3">
-              <i class="pi pi-home mr-2"></i>
-              <span>{{ team?.team_info?.arena }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="grid mt-3 lg:mx-6 m-2">
+  <app-details-header
+    [title]="team?.team_info?.full_name!"
+    [subtitle]="team?.team_info?.abbreviation!"
+    [items]="header_items"></app-details-header>
 </div>
 
-<div class="mx-6">
+<div class="lg:mx-6">
   <app-player-showcase [players]="team?.team_players!"></app-player-showcase>
 </div>
 
-<div class="grid ml-6 mr-6">
+<div class="grid lg:mx-6">
   <div class="col">
     <p-card header="Next Matches" subheader="From {{date | date: 'MM/d/y'}} to {{next_week() | date: 'MM/d/y'}}">
       <app-match-list *ngIf="!loading" [matches]="matches"></app-match-list>

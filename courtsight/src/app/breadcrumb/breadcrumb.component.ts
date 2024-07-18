@@ -17,7 +17,7 @@ import {filter} from "rxjs/operators";
   standalone: true
 })
 export class BreadcrumbComponent implements OnInit {
-  home:MenuItem={icon: 'pi pi-home', routerLink: '/'};
+  home: MenuItem = {icon: 'pi pi-home', routerLink: '/'};
   breadcrumbs: MenuItem[] = [];
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute) {
@@ -25,6 +25,9 @@ export class BreadcrumbComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.breadcrumbs = this.createBreadcrumbs(this.activatedRoute.root);
+      if (this.breadcrumbs && this.breadcrumbs.length > 1) {
+        this.breadcrumbs.at(-1)!.url = undefined;
+      }
     });
   }
 
