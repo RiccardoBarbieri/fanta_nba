@@ -1,8 +1,8 @@
 \section{Webapp}
 \subsection{Introduzione}
-Rendere disponibili agli utenti finali i dati ottenuti dai servizi presentati è responsabilità di una apposita applicazione web. 
+Rendere disponibili agli utenti finali i dati ottenuti dai servizi sopra presentati è responsabilità di una apposita applicazione web. 
 
-Questa dovrà interfacciarsi con i vari middleware attraverso le api disponibili, per ottenere i dati da presentare all'utente in maniera il più possibile pratica e ordinata.
+Questa dovrà interfacciarsi con i vari middleware attraverso le API disponibili, per ottenere i dati da presentare all'utente in maniera il più possibile pratica e ordinata.
 
 La web app sarà accessibile da browser e dovrà supportare anche dispositivi mobili, quindi reagire in maniera \textit{responsive} a schermi di dimensioni molto diverse. 
 
@@ -10,9 +10,9 @@ La web app sarà accessibile da browser e dovrà supportare anche dispositivi mo
 \subsection{Tecnologie utilizzate}
 Essendo già a conoscenza dell'ambiente finale di deployment, la scelta delle tecnologie è stata presa top-down, per assicurare completa compatibilità e supporto.
 
-La piattaforma Azure mette a disposizione diverse opzioni per l'hosting di una app web, che può essere ad esempio ospitata su una tradizionale macchina virtuale o come container app.
+La piattaforma Azure mette a disposizione diverse opzioni per l'hosting di una web app, che può essere ad esempio ospitata su una tradizionale macchina virtuale o come container app.
 
-Le esigenze del nostro servizio dal punto di vista dell'interfaccia utente sono modeste, in quanto si tratta di una semplice vetrina per i dati disponibili, senza bisogno di autenticazione o salvataggio di dati in un database dedicato.
+Le esigenze del nostro servizio dal punto di vista dell'interfaccia utente sono modeste, in quanto si tratta di una semplice vetrina per le informazioni disponibili, senza bisogno di autenticazione o salvataggio di dati in uno storage dedicato.
 
 Delinandosi come applicazione prettamente front-end, la scelta è ricaduta su una Static Web App. Questo servizio Azure è pensato per ospitare web app full-stack che non hanno un tradizionale backend, e offre un supporto integrato ad API sotto forma di Azure Functions o Container App.
 
@@ -26,7 +26,7 @@ La scelta del framework javascript è ricaduta su Angular, sviluppato da Google 
 
 
 \subsection{Angular}
-Le app Angular sono scritte in typescript e devono seguire una precisa struttura. Sono \textit{single-page-applications} organizzate per componenti con singola responsabilità, componibili all'interno di file .html estesi per supportare tag aggiuntivi.
+Le app Angular sono scritte in typescript e devono seguire una precisa struttura. Sono \textit{single-page-applications} organizzate per componenti con singola responsabilità, componibili all'interno di file \texttt{.html} estesi per supportare tag aggiuntivi.
 
 I componenti sono definibili direttamente in un unico file typescript ed esportati come classi. Sono identificati da un selettore, reso poi disponibile sotto forma di tag, e devono presentare un template HTML per istruire il rendering, che può anche essere inserito sotto forma di link a un file a sé.
 
@@ -34,7 +34,7 @@ I componenti sono definibili direttamente in un unico file typescript ed esporta
 Questa libreria molto completa è sviluppata da PrimeTek, che l'ha declinata per tutti i maggiori framework. Alla base di queste diverse librerie c'è il loro sistema \textit{PrimeFlex}, che permette una facile gestione della distribuzione dei componenti a schermo semplificando le direttive CSS "flex".
 
 \subsection{Contenuto webapp}
-    \paragraph{Homepage} La pagina principale del sito presenta all'utente i vari sport supportati. L'integrazione con la \texttt{bet\_api} ci può permettere in un futuro di mostrare le quote anche per sport diversi dal basket, che per ora rappresenta il principale focus.
+    \paragraph{Homepage} La pagina principale del sito presenta all'utente i vari sport supportati. L'integrazione con la \texttt{bet\_api} ci può permettere in un futuro di mostrare le quote anche per sport diversi dal basket americano, che per ora rappresenta il principale focus.
     
     \begin{figure}[H]
         \centering
@@ -43,7 +43,7 @@ Questa libreria molto completa è sviluppata da PrimeTek, che l'ha declinata per
         \label{fig:enter-label}
     \end{figure}
     
-    \paragraph{Home - Basket} La schermata home della sezione basket offre l'elenco delle partite della settimana che viene e la classifica aggiornata divisa tra le due conference NBA: East e West Coast. 
+    \paragraph{Home - Basket} La schermata home della sezione basket offre l'elenco delle partite della settimana attuale e la classifica aggiornata al periodo esposto, divisa tra le due conference NBA: East e West Coast. 
     \begin{figure}[H]
         \centering
         \fbox{\includegraphics[width=0.75\linewidth]{img/webapp/basket_matches_list.png}}
@@ -82,7 +82,7 @@ Questa libreria molto completa è sviluppata da PrimeTek, che l'ha declinata per
 Mediante il sistema di routing di Angular, le pagine sono definite ognuna da un diverso componente, inserito dinamicamente nel root della applicazione a seconda dell'url richiesto. 
 
 \subsection{Struttura dell'applicazione}
-In questa sezione verrà delineato l'intero elenco di componenti sviluppati. Nelle applicazioni Angular quando il numero di componenti inizia a crescere è bene suddividerli in cartelle organizzati per feature e l'elenco che segue presenta quindi la medesima strategia.
+In questa sezione verrà delineato l'intero elenco di componenti sviluppati. Nelle applicazioni Angular, quando il numero di componenti inizia a crescere, è bene suddividerli in cartelle organizzate per feature e l'elenco che segue presenta quindi la medesima strategia.
 
 \subsubsection{app}
 Alla base dell'applicazione web c'è un file \texttt{index.html} il cui body verrà dinamicamente aggiornato a runtime inserendo i vari componenti quando richiesto, e sarà quindi sempre presentato all'utente. 
