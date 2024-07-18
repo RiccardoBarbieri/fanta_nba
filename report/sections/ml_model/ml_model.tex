@@ -1,8 +1,9 @@
 \section{Modello di predizione}
 \subsection{Introduzione}
-L'obiettivo principale di questo progetto è sviluppare un modello di machine learning capace di predire l'esito delle partite NBA. Questo rappresenta una sfida ambiziosa che richiede un'analisi approfondita delle statistiche delle squadre e l'applicazione di avanzate tecniche di machine learning. Il dataset utilizzato comprende un array di statistiche per ciascuna squadra, sia per la squadra di casa che per quella in trasferta.
+Uno degli obiettivi principali di questo progetto è stato quello di sviluppare un modello di machine learning capace di predire l'esito delle partite NBA. Questo rappresenta una sfida ambiziosa che richiede un'analisi approfondita delle statistiche delle squadre e l'applicazione di avanzate tecniche di ML. Il dataset utilizzato comprende un array di statistiche per ciascuna squadra, sia per la squadra di casa che per quella in trasferta.
 
 Sono stati testati sette differenti modelli sul set di training: Multi-Layer Perceptron (MLP), Random Forest, Support Vector Machine (SVM), XGBoost, Regressione Lineare, Modello Bayesiano e K-Nearest Neighbors (KNN).
+
 
 Per sviluppare un modello competitivo rispetto alle soluzioni attualmente disponibili sul mercato, è stato inizialmente affrontato il problema come una questione di classificazione, utilizzando un MLP. Dato che i risultati ottenuti erano promettenti, sono state poi esplorate ulteriori possibilità per migliorare le prestazioni del modello. Di conseguenza, è stato convertito il problema di classificazione in un problema di regressione, con l'obiettivo di prevedere non solo l'esito (vittoria o sconfitta) ma anche il margine di punti con cui una squadra vince o perde.
 
@@ -19,15 +20,16 @@ I risultati ottenuti dalle varie sperimentazioni con i diversi modelli saranno d
 \subsection{Il Dataset}
 
 I dati utilizzati per addestrare e testare i modelli sono stati raccolti da una vasta gamma di statistiche presenti nel Database di NBA.com. Per la scelta e la selezione di queste statistiche sono state prese in considerazione numerose risorse online tra cui ad esempio il paper "Which NBA Statistics Actually Translate to Wins" di Chinmay Vayda. Queste varie ricerche ci hanno così permesso di trovare quelle che a nostro avviso solo le statistiche più rilevanti per la predizione delle partite NBA.\newline
+\newline
 \texttt{['home\_team','away\_team','game\_id','season','date','pts\_H','pts\_A','winner','playoff', \newline
 'fg\_pct\_A','fg3\_pct\_A','ft\_pct\_A','reb\_A','tot\_ast\_A','tot\_tov\_A','tot\_stl\_A',\newline
 'tot\_blk\_A','ts\_pct\_A','w\_pct\_A','w\_pct\_last\_5\_games\_A','fg\_pct\_H','fg3\_pct\_H',\newline
 'ft\_pct\_H','reb\_H','tot\_ast\_H','tot\_tov\_H','tot\_stl\_H','tot\_blk\_H', \newline
 'ts\_pct\_H','w\_pct\_H','w\_pct\_last\_5\_games\_H','off\_rating\_A','def\_rating\_A',\newline
 'off\_rating\_H','def\_rating\_H','lineup\_efficiency\_A','lineup\_efficiency\_H',\newline
-'referee\_name','referee\_id']}
-
-Questo è il Dataset da noi creato ed ottenuto tramite la NBA API. Risulta essere un dataset molto ampio e completo che è stato poi ridotto e preprocessato in fase di preprocessing e fine-tuning dei vari modelli.
+'referee\_name','referee\_id']}\\
+\\
+Questo è il Dataset da noi creato ed ottenuto tramite la \texttt{nba\_api}. Risulta essere un dataset molto ampio e completo, che è stato poi ridotto e lavorato in fase di preprocessing e fine-tuning dei vari modelli.
 
 \subsection{Il Modello di Classificazione}
 
@@ -43,14 +45,14 @@ Il Multi-Layer Perceptron (MLP) è una classe di reti neurali artificiali ampiam
 \end{figure}
 
 \paragraph{Sviluppo del Modello}
-Il primo approccio analizzato è stato quello di creare un MLP per risolvere il problema di classificazione. Il primo passo è stato quello di effettuare il preprocessing dei dati, eliminando tutte le informazioni non necessarie per l'allenamento della rete o eliminando informazione che rendevano il modello meno accurato e dunque meno performante. In particolare, sono stati rimossi i seguenti campi: \newline
+L'idea iniziale è stata quella di creare un MLP per risolvere il problema di classificazione. Il primo passo è stato quello di effettuare il preprocessing dei dati, eliminando tutte le informazioni non necessarie per l'allenamento della rete o eliminando informazioni che rendevano il modello meno accurato( e dunque meno performante). In particolare, sono stati rimossi i seguenti campi: \newline
 \texttt{['pts\_H', 'pts\_A', 'referee\_id', 'winner', 'home\_team', 'away\_team', 'referee\_name', \newline
 'season', 'date']}
 
-Inoltre prima di poter utilizzare il vettore finale, composto dunque dalle statistiche delle due squadre, per allenare il nostro modello, è stato necessario preprocessarlo. È stato quindi usato il \texttt{MinMaxScaler}, ovvero un algoritmo che garantisce che i valori fossero compresi tra -1 e 1, questo ha portato notevoli miglioramenti sia in termini di accuracy del modello sia in termini di performance della rete.
+Inoltre, prima di poter utilizzare il vettore finale, composto dunque dalle statistiche delle due squadre, per allenare il nostro modello, è stato necessario preprocessarlo. È stato quindi usato il \texttt{MinMaxScaler}, ovvero un algoritmo che garantisce che i valori fossero compresi tra -1 e 1, il che ha portato notevoli miglioramenti sia in termini di accuracy del modello sia in termini di performance della rete.
 
 \paragraph{Struttura del Modello}
-Il modello di machine learning è stato quindi costruito utilizzando tre strati \texttt{Dense}, ovvero strati fortemente connessi in grado di apprendere dai dati in input per ottenre un preciso output. La rete neurale ottenuta è stata quindi addestrata, come consuetudine, utilizzando l'80\% del Dataset suddiviso il Train Set e Validation Set.
+Il modello di machine learning è stato quindi costruito utilizzando tre strati \texttt{Dense}, ovvero strati fortemente connessi in grado di apprendere dai dati in input per ottenere un preciso output. La rete neurale ottenuta è stata quindi addestrata, come consuetudine, utilizzando l'80\% del Dataset suddiviso il Train Set e Validation Set.
 Per migliorare ulteriormente il modello è stato eseguito un processo di fine-tuning manuale per massimizzare l'accuratezza.
 
 \begin{figure}[H]
@@ -73,7 +75,7 @@ Per migliorare ulteriormente il modello è stato eseguito un processo di fine-tu
 Inizialmente, è stato utilizzato un \textit{batch size} di 16 e sono state impostate 800 epoche per monitorare la funzione di \textit{loss} e identificare il punto di \textit{overfitting} del modello. Attraverso questo processo, è stato determinato che i parametri ideali per l'allenamento erano 300 epoche e un \textit{batch size} di 32.
 
 \paragraph{Risultati}
-Prima di poter analizzare questo risultato occorre precisare che l'accuracy fornita dai modelli citati online risulta essere tra il 62\% ed il 66\%. In particolare è presente un interessante articolo, redatto dalla Bryant University, nel quale presentano il loro modello che possiede una accuracy del 65\%.
+Prima di poter analizzare questo risultato occorre precisare che l'accuracy fornita dai modelli citati online risulta essere tra il 62\% ed il 66\%. In relazione a ciò è presente un interessante articolo, redatto dalla Bryant University, nel quale presentano il loro modello che possiede una accuracy del 65\%.
 
 In quest'ottica è possibile dire che il nostro modello finale ha ottenuto un'accuratezza estremamente competitiva, ottenendo una accuracy del 69,92\%, dimostrando così la validità dell'approccio MLP nel contesto della classificazione delle partite NBA. Questi risultati indicano che il nostro modello è in grado di fornire predizioni accurate (7 volte su 10) sulla vittoria o sconfitta delle squadre, basandosi sulle statistiche pre-partita.
 
@@ -86,8 +88,9 @@ Results MLP:
 
 
 \subsection{I Modelli di Regressione}
-Il problema di classificazione è stato poi convertito in un problema di regressione, in modo da testare nuovi approcci e verificare se il modello ottenuto potesse essere ulteriormente migliorato.
-Tutti i modelli analizzati in questa sezione sono stati prima ottimizzati utilizzando una GridSearch per ottenere la combinazione ideale di iperparametri per ciascun modello. Verranno quindi analizzati i vari modelli e i risultati ottenuti, in ordine crescente di accuracy fornita.
+Come anticipato, il problema di classificazione è stato convertito in un problema di regressione, in modo da testare nuovi approcci e verificare se il modello ottenuto potesse essere ulteriormente migliorato.
+Tutti i modelli analizzati in questa sezione sono stati prima ottimizzati utilizzando una \texttt{GridSearch} per ottenere la combinazione ideale di iperparametri per ciascun modello.\\
+Di seguito, verranno quindi analizzati i vari modelli e i risultati ottenuti, in ordine crescente di accuracy fornita.
 
 \subsubsection{Analisi delle metriche}
 Nel valutare le prestazioni del modello di regressione per la predizione dei risultati delle partite NBA, sono stati utilizzati diversi indicatori chiave di errore e precisione.
@@ -148,11 +151,11 @@ Il modello ha raggiunto un'accuratezza del 68.06\%. Inoltre, sono stati estratti
     \label{fig:enter-label}
 \end{figure}
 
-Questi risultati dimostrano che il modello SVM ha mostrato una buona capacità predittiva per l'esito delle partite NBA, con una precisione significativa e una buona gestione della variazione nei dati di test.
+Questi risultati dimostrano che il modello SVM ha una buona capacità predittiva per l'esito delle partite NBA, con un'ottima precisione e una buona gestione della variazione nei dati di test.
 
 \subsubsection{Random Forest}
 
-Il Random Forest è un metodo di apprendimento ensemble utilizzato per la classificazione e la regressione. Esso costruisce diversi alberi decisionali e li combina per ottenere previsioni più accurate. In un random forest, solo un sottoinsieme delle caratteristiche è considerato dall'algoritmo per dividere un nodo. Il modello classificherà anche l'importanza di ciascuna caratteristica nel prendere la decisione finale. Nella figura sottostante c'è un esempio di random forest con due alberi.
+Il Random Forest è un metodo di apprendimento \textit{ensemble} utilizzato per la classificazione e la regressione. Esso costruisce diversi alberi decisionali e li combina per ottenere previsioni più accurate. In un random forest, solo un sottoinsieme delle caratteristiche è considerato dall'algoritmo per dividere un nodo. Il modello classificherà anche l'importanza di ciascuna caratteristica nel prendere la decisione finale. Nella figura sottostante c'è un esempio di random forest con due alberi.
 
 Questo modello ha ottenuto risultati soddisfacenti nei test, come mostrato di seguito:
 
@@ -172,7 +175,7 @@ Il modello ha raggiunto un'accuratezza del 69.58\%. Inoltre, sono stati estratti
     \label{fig:enter-label}
 \end{figure}
 
-Questi risultati indicano che il modello Random Forest ha dimostrato di essere efficace nel predire l'esito delle partite NBA, con un'accuratezza significativa e una buona capacità di generalizzazione su nuovi dati di test.
+Questi risultati indicano che anche il modello Random Forest si è dimostrato essere efficace nel predire l'esito delle partite NBA, con un'elevata accuratezza e una buona capacità di generalizzazione su nuovi dati di test.
 
 \subsubsection{XGBoost}
 
@@ -196,7 +199,7 @@ Il modello ha raggiunto un'accuratezza del 70.47\%. Inoltre, sono stati estratti
     \label{fig:enter-label}
 \end{figure}
 
-Questi risultati indicano che il modello XGBoost ha dimostrato di essere altamente efficace nel predire l'esito delle partite NBA, con un'accuratezza significativa e una buona capacità di generalizzazione su nuovi dati di test. L'utilizzo di boosting ha permesso al modello di migliorare costantemente la precisione delle predizioni, rendendolo una scelta potente per problemi complessi come quello delle previsioni sportive.
+Questi risultati indicano che il modello XGBoost risulta essere altamente efficace nel predire l'esito delle partite NBA. L'utilizzo di boosting ha permesso al modello di migliorare costantemente la precisione delle predizioni, rendendolo infatti una scelta potente per problemi complessi, come quello delle previsioni sportive.
 
 
 \subsubsection{Bayesian}
@@ -221,7 +224,7 @@ Il modello ha raggiunto un'accuratezza del 70.72\%. Inoltre, sono stati estratti
     \label{fig:enter-label}
 \end{figure}
 
-Questi risultati indicano che il modello Bayesian ha mostrato una buona capacità predittiva per l'esito delle partite NBA, con un'accuratezza significativa e una robusta gestione dell'incertezza nei dati di test. L'approccio basato sull'inferenza Bayesiana ha permesso al modello di integrare informazioni a priori con i dati osservati, migliorando così le performance complessive delle previsioni.
+Questi risultati validano la qualità del modello Bayesian, che ha mostrato una robusta gestione dell'incertezza nei dati di test. L'approccio basato sull'inferenza Bayesiana ha permesso al modello di integrare informazioni a priori con i dati osservati, migliorando così le performance complessive delle previsioni.
 
 
 \subsubsection{Linear Regression}
@@ -246,11 +249,11 @@ Il modello ha raggiunto un'accuratezza del 71.36\%. Inoltre, sono stati estratti
     \label{fig:enter-label}
 \end{figure}
 
-Questi risultati indicano che il modello di Regressione Lineare ha mostrato una buona capacità predittiva per l'esito delle partite NBA, con un'accuratezza significativa e un'efficace modellazione della relazione lineare tra le variabili di input e il target. La semplicità e la trasparenza della regressione lineare lo rendono un buon punto di partenza per esplorare i modelli di previsione numerica nelle analisi sportive.
+Questi risultati indicano che il modello di Regressione Lineare ha fornito la migliore capacità predittiva, con un'efficace modellazione della relazione lineare tra le variabili di input e il target. La semplicità e la trasparenza della regressione lineare lo rendono un buon punto di partenza per esplorare i modelli di previsione numerica nelle analisi sportive.
 
 
 \subsection{I Risultati}
-È dunque possibile ora analizzare i dati in maniera unitaria e completa. Per effettuare ciò occorre suddifidere l'analisi dei risultati in due distente sezioni, una per analizzare i risultati inerenti al problema di classificazione: Vittoria o Sconfitta, ed un'altra per analizzare i risultati del problema di regressione.
+È dunque possibile ora analizzare i dati in maniera unitaria e completa. Per effettuare ciò occorre suddifidere l'analisi dei risultati in due distinte sezioni, una per analizzare i risultati inerenti al problema di classificazione: Vittoria o Sconfitta, ed un'altra per analizzare i risultati del problema di regressione.
 
 Inerentemente al problema di classificazione, per gli algoritmi di regressione è stata creata una nuova metrica fittizia denominata sign accuracy che ci ha permesso di convertire il problema di regressione in classificazione.
 Comparando così le varie sign accuracy ottenute con i vari algoritmi, otteniamo il seguente risultato.
@@ -261,14 +264,14 @@ Comparando così le varie sign accuracy ottenute con i vari algoritmi, otteniamo
     \label{fig:enter-label}
 \end{figure}
 
-È possibile notare che l'algoritmo che ci fornisce una sign accuracy migliore è il Linear Regression che totalizza una accuracy del 71,36\%. Questo è poi seguito dal Bayesian Regressor con 70,72\% e dal XGBoost Regressor con 70,46\%.
-Questi risultati algoritmi sono quindi riusciti ad ottenere, a parità di input, un risultato migliore anche del modello MLP creato.
-In ultima posizione vediamo come il K-Nearest Neighbor abbia le prestazioni peggiori. 
+È possibile notare che l'algoritmo che ci fornisce una sign accuracy migliore è il Linear Regression che totalizza una precisione del 71,36\%. Questo è poi seguito dal Bayesian Regressor con 70,72\% e dal XGBoost Regressor con 70,46\%.
+Questi algoritmi sono quindi riusciti ad ottenere, a parità di input, un risultato migliore anche del modello MLP definito inizialmente.
+In ultima posizione, vediamo come il K-Nearest Neighbor abbia le prestazioni peggiori. 
 \newline
 
 Concentrandoci ora sull'analisi del problema di regressione e dunque sull'analisi della differenza tra i punti predetti ed i punti reali otteniamo risultati leggermente diversi.
-A tal proposito è stato confrontata la metrica: Mean Absolute Error, ovvero la metrica in grado di dare informazioni riguardanti l'errore medio dei vari modelli creati.
-Confrontando così questa metrica sono stati ottenuti questi risultati.
+A tal proposito è stata messa a confronto la metrica \texttt{Mean Absolute Error}, che fornisce informazioni riguardanti l'errore medio dei vari modelli creati.
+Confrontando quindi questa metrica sono stati ottenuti i seguenti risultati.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{img/mae_a_confronto.png}
@@ -276,11 +279,11 @@ Confrontando così questa metrica sono stati ottenuti questi risultati.
     \label{fig:enter-label}
 \end{figure}
 
-L'algoritmo in termini di regressione più performante risulta essere XGBoost con 9,61 punti di scarto medio, seguito poi dalla Linear Regression con 9,67 punti e dal Bayesian con 9,68.
-Il K-Nearest Neighbor al contrario continua a confermarsi il meno performante con 11,62 punti di scarto medio.
+L'algoritmo più performante in termini di regressione risulta essere XGBoost con 9,61 punti di scarto medio, seguito poi dalla Linear Regression con 9,67 punti e dal Bayesian con 9,68.
+Il K-Nearest Neighbor, al contrario, continua a confermarsi il meno performante con 11,62 punti di scarto medio.
 
 \subsection{Importanza Metriche}
-I modelli di regressione sono stati poi confrontati per comprendere quali fossero le features che ciascun modello usava ed analizzava maggiormente per prevedere la differenza di punteggio delle partite. Nela figura sottostante sono messi a confronto i 3 modelli migliori (ovvero bayesian, xgboost e linear regression) ed il modello peggiore ovvero KNN.
+I modelli di regressione sono stati poi confrontati per comprendere quali fossero le features che ciascuno di essi ha usato ed analizzato maggiormente per prevedere la differenza di punteggio delle partite. Nela figura sottostante sono stati messi a confronto i 3 modelli migliori (ovvero bayesian, xgboost e linear regression) ed il modello peggiore, ovvero KNN.
 
 \begin{figure}[H]
     \centering
@@ -316,7 +319,7 @@ I modelli di regressione sono stati poi confrontati per comprendere quali fosser
     \end{minipage}
 \end{figure}
 
-Si può vedere come i 3 modelli migliori (ovvero bayesian, xgboost e linear regression) valutano maggiormente e dunque prediligono le seguenti metriche:
+Si può vedere come i 3 modelli migliori (ovvero bayesian, xgboost e linear regression) valutino maggiormente, e dunque prediligano, le seguenti metriche:
 \begin{itemize}
     \item lineup\_efficiency\_A
     \item lineup\_efficiency\_H
@@ -325,7 +328,7 @@ Si può vedere come i 3 modelli migliori (ovvero bayesian, xgboost e linear regr
     \item def\_rating\_H
     \item def\_rating\_A
 \end{itemize} 
-Al contrario del modello di regressione K-Nearest Neighbors che mantiene solo le lineup\_efficiency ed altre feature a scapito di:
+Al contrario, il modello di regressione K-Nearest Neighbors mantiene solo le lineup\_efficiency ed altre features, a scapito di:
 off\_rating\_A
 off\_rating\_H
 def\_rating\_A
